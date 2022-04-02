@@ -1,0 +1,179 @@
+openapi: 3.0.3
+info:
+  title: League Challenges
+  description: League Challenges
+  version: 1.0.0
+servers:
+  - url: 'https'
+paths:
+  /{player}/dashboard:
+    get:
+      description: Get statistics for the players dashboard
+      tags:
+        - player
+      parameters:
+        - name: player
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Sucessfully returned statistics
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  winrate:
+                    type: number
+                  rank:
+                    type: string  # TODO what type is this
+                  most_played:
+                    type: array # TODO: what type is this
+        '404':
+          description: Player not found or no games played
+  /{player}/competitors:
+    get:
+      description: A list of all competitors, the player has saved
+      tags:
+        - player
+      parameters:
+        - name: player
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    player:
+                      $ref: '#/components/schemas/PlayerName'
+                    fav:
+                      type: boolean
+                    # TODO: I only added the necessary attributes for now
+        '404':
+          description: Player not found or no games played
+  /{player}/recent-games:
+    get:
+      description: Return a list of the recent games o the given player
+      tags:
+        - player
+      parameters:
+        - name: player
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: A list is returned
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/RecentGame'
+        '404':
+          description: Player not found or no games played
+  /{player}/achievements:
+    get:
+      description: Get the achievements of this player
+      tags:
+        - player
+      parameters:
+        - name: player
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: champion
+          in: query
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Achievement'
+  /{player}/achievments/compare:
+    get:
+      tags:
+        - player
+      description: Compare the players achievments with others
+      responses:
+        200:
+          description: Sucess
+    # TODO
+components:
+  schemas:
+    RecentGame:
+      type: object
+      properties:
+        victory:
+          type: boolean
+          description: True if the player won this game
+        champion_id:
+          $ref: '#/components/schemas/ChampionID'
+        ally_team:
+          $ref: '#/components/schemas/Team'
+        enemy_team:
+          $ref: '#/components/schemas/Team'
+        kda:
+          type: object
+          properties:
+            kills:
+              type: number
+            deaths:
+              type: number
+            assists:
+              type: number
+            cs:
+              type: number
+        duration:
+          type: number
+          description: Duration in seconds  # TODO: unit
+        timestamp:
+          type: string
+          format: date-time
+          description: Timestamp when the game was played
+    ChampionID:
+      type: string
+      description: Same ID as in the Riot API # TODO
+    Team:
+      type: array
+      items:
+        type: object
+        properties:
+          champion_id:
+            $ref: '#/components/schemas/ChampionID'
+          player:
+            $ref: '#/components/schemas/PlayerName'
+    PlayerName:
+      type: string
+    Achievement:
+      type: object
+      properties:
+        name:
+          type: string
+        type:
+          type: string
+          description: type to allow ordering in tabs
+          example: kills
+        max:
+          type: number
+        average_per_minute:
+          type: number
+        # TODO: what is the third value?
