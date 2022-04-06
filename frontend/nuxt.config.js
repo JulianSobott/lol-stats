@@ -1,9 +1,12 @@
 export default {
   // Global page headers: https://go.nuxtjs.dev/config-head
   head: {
-    title: 'frontend',
+    title: 'League of Legends',
     htmlAttrs: {
       lang: 'en',
+    },
+    bodyAttrs: {
+      class: 'theme-dark',
     },
     meta: [
       { charset: 'utf-8' },
@@ -12,10 +15,15 @@ export default {
       { name: 'format-detection', content: 'telephone=no' },
     ],
     link: [{ rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' }],
+    script: [
+      { src: 'js/tabler.min.js' },
+    ],
   },
 
   // Global CSS: https://go.nuxtjs.dev/config-css
-  css: [],
+  css: [
+    '~/assets/css/tabler.min'
+  ],
 
   // Plugins to run before rendering page: https://go.nuxtjs.dev/config-plugins
   plugins: [],
