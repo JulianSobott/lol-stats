@@ -1,0 +1,8 @@
+version:'3.9'
+
+services:
+  user-backend:
+    build: user-backend/api/
+    ports:
+      - "5000:5000"
+    container_name: user-backend
