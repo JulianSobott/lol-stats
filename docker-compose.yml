@@ -1,7 +1,15 @@
+networks:
+  traefik:
+    external: true
 version: "3.9"
 services:
   frontend:
     build: frontend/
-    ports:
-      - "80:8080"
     container_name: frontend
+    labels:
+    - traefik.enable=true
+    - traefik.docker.network=traefik
+    - traefik.http.routers.frontend.rule=Host(`cdc.christiangreiner.net`)
+    - traefik.http.services.frontend_lb.loadbalancer.server.port=80
+  networks:
+    - servcies
