@@ -12,4 +12,4 @@ services:
     - traefik.http.routers.frontend.rule=Host(`cdc.christiangreiner.net`)
     - traefik.http.services.frontend_lb.loadbalancer.server.port=80
     networks:
-      - servcies
+      - traefik
