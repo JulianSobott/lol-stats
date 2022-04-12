@@ -1,7 +1,7 @@
 export default {
   // Global page headers: https://go.nuxtjs.dev/config-head
   head: {
-    title: 'League of Legends',
+    title: 'LoL Stats',
     htmlAttrs: {
       lang: 'en',
     },
