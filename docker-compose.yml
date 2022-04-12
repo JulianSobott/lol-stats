@@ -11,5 +11,7 @@ services:
     - traefik.docker.network=traefik
     - traefik.http.routers.frontend.rule=Host(`lol-stats.de`)
     - traefik.http.services.frontend_lb.loadbalancer.server.port=3000
+    - traefik.http.routers.frontend.entrypoints=websecure
+    - traefik.http.routers.frontend.tls.certresolver=le
     networks:
       - traefik
