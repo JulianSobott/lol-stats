@@ -1,0 +1,2 @@
+cassiopeia>=4.0.5
+psycopg2-binary
