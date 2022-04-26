@@ -23,15 +23,30 @@
                   <label class="form-label subheader mb-2">Compare with</label>
                   <div>
                     <label class="form-check mb-1">
-                      <input v-model="filters.compare" type="radio" class="form-check-input" value="global">
+                      <input
+                        v-model="filters.compare"
+                        type="radio"
+                        class="form-check-input"
+                        value="global"
+                      />
                       <span class="form-check-label">Global</span>
                     </label>
                     <label class="form-check mb-1">
-                      <input v-model="filters.compare" type="radio" class="form-check-input" value="friends">
+                      <input
+                        v-model="filters.compare"
+                        type="radio"
+                        class="form-check-input"
+                        value="friends"
+                      />
                       <span class="form-check-label">Friends</span>
                     </label>
                     <label class="form-check mb-1">
-                      <input v-model="filters.compare" type="radio" class="form-check-input" value="favorites">
+                      <input
+                        v-model="filters.compare"
+                        type="radio"
+                        class="form-check-input"
+                        value="favorites"
+                      />
                       <span class="form-check-label">Favorites</span>
                     </label>
                   </div>
@@ -77,7 +92,9 @@
                   </div>
                 </div>
                 <div class="mt-4">
-                  <button class="btn btn-primary w-100" @click="search">Confirm changes</button>
+                  <button class="btn btn-primary w-100" @click="search">
+                    Confirm changes
+                  </button>
                   <a href="#" class="btn btn-link w-100"> Reset to defaults </a>
                 </div>
               </form>
@@ -123,11 +140,11 @@
                             <th class="w-1">ID</th>
                             <th>Achievement</th>
                             <th>You</th>
-                            <th>Oppoment</th>
+                            <th>Opponent</th>
                           </tr>
                         </thead>
                         <tbody>
-                          <tr  v-for="index in 10" :key="index">
+                          <tr v-for="index in 10" :key="index">
                             <td><span class="text-muted">321</span></td>
                             <td>Lorem Ipsum</td>
                             <td>
@@ -272,15 +289,13 @@ export default {
         player: '',
         champion: 'Aatrox',
         rank: 'iron',
-      }
+      },
     }
   },
   methods: {
     search(e) {
-      console.log(this.filters.compare);
-      var request = 
-      e.preventDefault(e);
-    }
-  }
+      e.preventDefault(e)
+    },
+  },
 }
 </script>

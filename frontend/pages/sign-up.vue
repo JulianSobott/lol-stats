@@ -2,7 +2,9 @@
 <div class="page page-center">
   <form class="container-tight py-4"  @submit.prevent="login" >
     <div class="text-center mb-4">
-      <a href="." class="navbar-brand navbar-brand-autodark">LOL Stats</a>
+      <NuxtLink to="/login">
+        <img src="~/assets/images/logo.png" height="36"/>
+      </NuxtLink>
     </div>
     <div class="card card-md">
       <div class="card-body">

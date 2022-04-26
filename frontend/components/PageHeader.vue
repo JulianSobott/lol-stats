@@ -16,7 +16,9 @@
           pe-0 pe-md-3
         "
       >
-        <NuxtLink to="/">League of Legends</NuxtLink>
+        <NuxtLink to="/">
+          <img src="~/assets/images/logo.png" height="20"/>
+        </NuxtLink>
       </h1>
       <div class="navbar-nav flex-row order-md-last">
         <div class="nav-item d-none d-md-flex me-3"></div>
