@@ -210,12 +210,10 @@ components:
         avatar:
           type: string
           description: path
-        winrate:
+        win_rate:
           type: number
         rank:
           $ref: '#/components/schemas/Rank'
-        league_points:
-          type: number
         most_played:
           type: array
           items:

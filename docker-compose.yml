@@ -10,6 +10,8 @@ services:
     depends_on:
       psql-achievements:
         condition: service_healthy
+    networks:
+      - riot-api-connector
 
   psql-achievements:
     image: postgres:14.2
@@ -27,6 +29,8 @@ services:
       interval: 10s
       timeout: 3s
       retries: 3
+    networks:
+      - riot-api-connector
 
   frontend:
     build: frontend/
@@ -40,8 +44,32 @@ services:
       - traefik.http.routers.frontend.tls.certresolver=le
     networks:
       - traefik
+
+  player-api:
+    build: player-api
+    environment:
+      REDIS_HOST: "redis-player-api"
+    networks:
+      - player-api
+      - gravitee
+
+  redis-player-api:
+    image: redis:6.2.6
+    command:
+      - "--save 60 1" # save a snapshot of the DB every 60 seconds if at least 1 write operation was performed
+    volumes:
+      - redis_player_api_data:/data
+    networks:
+      - player-api
+
 volumes:
   pg_data: {}
+  redis_player_api_data: {}
+
 networks:
   traefik:
+    external: true
+  player-api: { }
+  riot-api-connector: {}
+  gravitee:
     external: true

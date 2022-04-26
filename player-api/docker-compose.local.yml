@@ -1,0 +1,19 @@
+networks:
+  player-api: {}
+
+volumes:
+  redis_player_api_data: {}
+
+version: "3.9"
+services:
+  player-api:
+    build: player-api
+
+  redis-player-api:
+    image: redis:6.2.6
+    ports:
+      - "6379:6379"
+    command:
+      - "--save 60 1" # save a snapshot of the DB every 60 seconds if at least 1 write operation was performed
+    volumes:
+      - redis_player_api_data:/data
