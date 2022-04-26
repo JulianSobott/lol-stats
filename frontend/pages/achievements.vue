@@ -17,65 +17,72 @@
       <div class="page-body">
         <div class="container-xl">
           <div class="row g-4">
-            <div class="col-3">
-              <form action="" method="get">
-                <div class="form-group mb-3">
-                  <label class="form-label">Compare with</label>
+            <div class="col-2">
+              <form ref="filters">
+                <div class="mb-3">
+                  <label class="form-label subheader mb-2">Compare with</label>
                   <div>
-                    <select class="form-select">
-                      <option>Global</option>
-                      <option>Friends</option>
-                      <option>Favorites</option>
-                    </select>
+                    <label class="form-check mb-1">
+                      <input v-model="filters.compare" type="radio" class="form-check-input" value="global">
+                      <span class="form-check-label">Global</span>
+                    </label>
+                    <label class="form-check mb-1">
+                      <input v-model="filters.compare" type="radio" class="form-check-input" value="friends">
+                      <span class="form-check-label">Friends</span>
+                    </label>
+                    <label class="form-check mb-1">
+                      <input v-model="filters.compare" type="radio" class="form-check-input" value="favorites">
+                      <span class="form-check-label">Favorites</span>
+                    </label>
                   </div>
                 </div>
                 <div class="form-group mb-3">
-                  <label class="form-label">Player</label>
+                  <label class="form-label subheader mb-2">Player</label>
                   <div>
                     <input
                       type="text"
                       class="form-control"
-                      name="example-text-input"
+                      v-model="filters.player"
                       placeholder="Search player"
                     />
                   </div>
                 </div>
                 <div class="form-group mb-3">
-                  <label class="form-label">Champion</label>
+                  <label class="form-label subheader mb-2">Champion</label>
                   <div>
-                    <select class="form-select">
-                      <option>Aatrox</option>
-                      <option>Ahri</option>
-                      <option>Akali</option>
-                      <option>Alistar</option>
-                      <option>Amumu</option>
-                      <option>Anivia</option>
+                    <select v-model="filters.champion" class="form-select">
+                      <option value="Aatrox">Aatrox</option>
+                      <option value="Ahri">Ahri</option>
+                      <option value="Akali">Akali</option>
+                      <option value="Alistar">Alistar</option>
+                      <option value="Amumu">Amumu</option>
+                      <option value="Anivia">Anivia</option>
                     </select>
                   </div>
                 </div>
                 <div class="form-group mb-3">
-                  <label class="form-label">Rank</label>
+                  <label class="form-label subheader mb-2">Rank</label>
                   <div>
-                    <select class="form-select">
-                      <option>Iron</option>
-                      <option>Bronze</option>
-                      <option>Silver</option>
-                      <option>Gold</option>
-                      <option>Platinum</option>
-                      <option>Diamond</option>
-                      <option>Master</option>
-                      <option>Grandmaster</option>
-                      <option>Challenger</option>
+                    <select v-model="filters.rank" class="form-select">
+                      <option value="iron">Iron</option>
+                      <option value="bronze">Bronze</option>
+                      <option value="silver">Silver</option>
+                      <option value="gold">Gold</option>
+                      <option value="platinum">Platinum</option>
+                      <option value="diamond">Diamond</option>
+                      <option value="master">Master</option>
+                      <option value="grandmaster">Grandmaster</option>
+                      <option value="challenger">Challenger</option>
                     </select>
                   </div>
                 </div>
-                <div class="mt-5">
-                  <button class="btn btn-primary w-100">Confirm changes</button>
+                <div class="mt-4">
+                  <button class="btn btn-primary w-100" @click="search">Confirm changes</button>
                   <a href="#" class="btn btn-link w-100"> Reset to defaults </a>
                 </div>
               </form>
             </div>
-            <div class="col-9">
+            <div class="col-10">
               <div class="card-tabs">
                 <!-- Cards navigation -->
                 <ul class="nav nav-tabs">
@@ -258,5 +265,22 @@
 <script>
 export default {
   name: 'AchievementsPage',
+  data() {
+    return {
+      filters: {
+        compare: 'global',
+        player: '',
+        champion: 'Aatrox',
+        rank: 'iron',
+      }
+    }
+  },
+  methods: {
+    search(e) {
+      console.log(this.filters.compare);
+      var request = 
+      e.preventDefault(e);
+    }
+  }
 }
 </script>
