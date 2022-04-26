@@ -98,7 +98,7 @@
             <a href="#" class="dropdown-item">Profile</a>
             <div class="dropdown-divider"></div>
             <a href="#" class="dropdown-item">Settings</a>
-            <a href="#" class="dropdown-item">Logout</a>
+            <NuxtLink to="/login" class="dropdown-item">Logout</NuxtLink>
           </div>
         </div>
       </div>
