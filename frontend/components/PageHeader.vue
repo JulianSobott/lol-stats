@@ -16,7 +16,7 @@
           pe-0 pe-md-3
         "
       >
-        <a href=".">League of Legends</a>
+        <NuxtLink to="/">League of Legends</NuxtLink>
       </h1>
       <div class="navbar-nav flex-row order-md-last">
         <div class="nav-item d-none d-md-flex me-3"></div>

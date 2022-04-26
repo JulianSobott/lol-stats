@@ -120,7 +120,7 @@
                           </tr>
                         </thead>
                         <tbody>
-                          <tr>
+                          <tr  v-for="index in 10" :key="index">
                             <td><span class="text-muted">321</span></td>
                             <td>Lorem Ipsum</td>
                             <td>
