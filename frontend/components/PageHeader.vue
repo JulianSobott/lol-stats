@@ -22,7 +22,8 @@
       </h1>
       <div class="navbar-nav flex-row order-md-last">
         <div class="nav-item d-none d-md-flex me-3"></div>
-        <div class="d-none d-md-flex">
+        <!--
+          <div class="d-none d-md-flex">
           <div class="nav-item dropdown d-none d-md-flex me-3">
             <a
               href="#"
@@ -31,7 +32,6 @@
               tabindex="-1"
               aria-label="Show notifications"
             >
-              <!-- Download SVG icon from http://tabler-icons.io/i/bell -->
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 class="icon"
@@ -80,6 +80,7 @@
             </div>
           </div>
         </div>
+        -->
         <div class="nav-item dropdown">
           <a
             href="#"
@@ -97,9 +98,8 @@
             </div>
           </a>
           <div class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
-            <a href="#" class="dropdown-item">Profile</a>
+            <NuxtLink to="/profiles/1" class="dropdown-item">Profile</NuxtLink>
             <div class="dropdown-divider"></div>
-            <a href="#" class="dropdown-item">Settings</a>
             <NuxtLink to="/login" class="dropdown-item">Logout</NuxtLink>
           </div>
         </div>
