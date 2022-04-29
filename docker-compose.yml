@@ -1,0 +1,32 @@
+version: "3"
+services:
+  riot-api-connector:
+    build: riot-api-connector
+    #restart: unless-stopped TODO: Add when service runs in endless loop
+    environment:
+      POSTGRES_HOST: psql-achievements
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      RIOT_API_KEY: ${RIOT_API_KEY}
+    depends_on:
+      psql-achievements:
+        condition: service_healthy
+
+  psql-achievements:
+    image: postgres:14.2
+    restart: unless-stopped
+    environment:
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      PGDATA: /data
+    ports:
+      - "5432:5432"
+    volumes:
+    - ./riot-api-connector/db_init:/docker-entrypoint-initdb.d
+    - pg_data:/data
+    healthcheck:
+      test: pg_isready -U postgres -d postgres
+      interval: 10s
+      timeout: 3s
+      retries: 3
+
+volumes:
+  pg_data: {}

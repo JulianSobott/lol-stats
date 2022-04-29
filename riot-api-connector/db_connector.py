@@ -1,3 +1,4 @@
+import os
 import psycopg2
 
 
@@ -9,7 +10,11 @@ class db:
         if self.connection is not None:
             return False
         try:
-            self.connection = psycopg2.connect(host='localhost', database='postgres', user='postgres', password='admin', port=5432)
+            self.connection = psycopg2.connect(host=os.environ.get('POSTGRES_HOST', 'localhost'),
+                                               database='postgres',
+                                               user='postgres',
+                                               password=os.environ.get('POSTGRES_PASSWORD', 'admin'),
+                                               port=5432)
             self.cursor = self.connection.cursor()
         except (Exception, psycopg2.DatabaseError) as error:
             print(error)
@@ -21,7 +26,7 @@ class db:
             self.connection.close()
 
     def create_tables(self) -> None:
-        self.cursor.execute(open('schema.sql', 'r').read())
+        self.cursor.execute(open('db_init/schema.sql', 'r').read())
         self.connection.commit()
 
     def add_summoner(self, puuid: str, level: int, icon_path: str, last_update_time: int):
