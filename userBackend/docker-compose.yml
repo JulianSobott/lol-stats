@@ -1,8 +1,12 @@
-version:'3.9'
-
+version: "3.9"
 services:
-  user-backend:
-    build: user-backend/api/
+  user-management:
+    build: api/
     ports:
       - "5000:5000"
     container_name: user-backend
+  db:
+    build: postgres
+    container_name: postgres-test
+    ports:
+    - "5432:5432"
