@@ -176,10 +176,20 @@ components:
       items:
         type: object
         properties:
-          champion_id:
-            $ref: '#/components/schemas/ChampionID'
+          champion:
+            type: object
+            properties:
+              name:
+                type: string
+              icon_path:
+                type: string
           player:
-            $ref: '#/components/schemas/Player'
+            type: object
+            properties:
+              id:
+                type: number
+              name:
+                type: string
           player_stats:
             type: array
             items:
