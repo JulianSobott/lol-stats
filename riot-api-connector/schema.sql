@@ -26,12 +26,14 @@ CREATE TABLE IF NOT EXISTS Items (
 
 CREATE TABLE IF NOT EXISTS ChallengeClasses (
    name		TEXT	PRIMARY KEY	NOT NULL,
-   class	TEXT			NOT NULL
+   class	TEXT			NOT NULL,
+   comparison_operator TEXT NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS StatClasses (
    name		TEXT	PRIMARY KEY	NOT NULL,
-   class	TEXT			NOT NULL
+   class	TEXT			NOT NULL,
+   comparison_operator TEXT NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS Challenges (

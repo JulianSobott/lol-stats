@@ -64,14 +64,14 @@ class db:
         self.cursor.execute(sql)
         self.connection.commit()
 
-    def add_challenge_class(self, name: str, class_name: str):
-        sql = """INSERT INTO challengeclasses(name, class) VALUES (%s, %s);"""
-        self.cursor.execute(sql, (name, class_name))
+    def add_challenge_class(self, name: str, class_name: str, operator: chr):
+        sql = """INSERT INTO challengeclasses(name, class, compare_operator) VALUES (%s, %s, %s);"""
+        self.cursor.execute(sql, (name, class_name, operator))
         self.connection.commit()
 
-    def add_stat_class(self, name: str, class_name: str):
-        sql = """INSERT INTO statclasses(name, class) VALUES (%s, %s);"""
-        self.cursor.execute(sql, (name, class_name))
+    def add_stat_class(self, name: str, class_name: str, operator: chr):
+        sql = """INSERT INTO statclasses(name, class, compare_operator) VALUES (%s, %s, %s);"""
+        self.cursor.execute(sql, (name, class_name, operator))
         self.connection.commit()
 
     def add_challenge(self, name: str, summoner_id: str, total: int, average_per_game: int, highscore: int):
