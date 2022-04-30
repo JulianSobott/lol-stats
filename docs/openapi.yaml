@@ -6,121 +6,6 @@ info:
 servers:
   - url: 'https'
 paths:
-  /players/{player}:
-    get:
-      description: Get statistics for the players dashboard
-      tags:
-        - player
-      parameters:
-        - name: player
-          in: path
-          required: true
-          schema:
-            type: string
-      responses:
-        '200':
-          description: Sucessfully returned statistics
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Player'
-        '404':
-          description: Player not found or no games played
-  /players/{player}/recent-games:
-    get:
-      tags:
-      - player
-      parameters:
-        - name: player
-          in: path
-          required: true
-          schema:
-            type: string
-      responses:
-        200:
-          description: Recent Games of the player
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Game'
-  /players/{player}/competitors:
-    get:
-      description: A list of all competitors, the player has saved
-      tags:
-        - player
-      parameters:
-        - name: player
-          in: path
-          required: true
-          schema:
-            type: string
-      responses:
-        '200':
-          description: Success
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    player:
-                      $ref: '#/components/schemas/Player'
-                    fav:
-                      type: boolean
-                    winrate:
-                      type: number
-                    games:
-                      type: number
-                      description: Number of played games (since the challenges began)
-                    average_kda:
-                      type: object
-                      properties:
-                        kills:
-                          type: number
-                        deaths:
-                          type: number
-                        assists:
-                          type: number
-                    rank:
-                      $ref: '#/components/schemas/Rank'
-        '404':
-          description: Player not found or no games played
-  /players/{player}/achievements:
-    get:
-      tags:
-        - player
-      parameters:
-        - name: player
-          in: path
-          required: true
-          schema:
-            type: string
-        - name: players
-          in: query
-          required: true
-          schema:
-            type: array
-            items:
-              type: string
-              description: Player IDs
-        - name: champion
-          in: query
-          required: false
-          schema:
-            $ref: '#/components/schemas/ChampionID'
-      description: Compare the players achievements with others
-      responses:
-        200:
-          description: Sucess
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Achievement'
   /matches/{match_id}:
     get:
       tags:
@@ -143,31 +28,8 @@ paths:
                     $ref: '#/components/schemas/Team'
                   team_blue:
                     $ref: '#/components/schemas/Team'
-
 components:
   schemas:
-    Game:
-      type: object
-      properties:
-        match_id:
-          type: string
-        victorious_team:
-          type: string
-          enum:
-            - red
-            - blue
-        ally_team:
-          $ref: '#/components/schemas/Team'
-        enemy_team:
-          $ref: '#/components/schemas/Team'
-
-        duration:
-          type: number
-          description: Duration in seconds
-        timestamp:
-          type: string
-          format: date-time
-          description: Timestamp when the game was played
     ChampionID:
       type: number
       description: Same ID as in the Riot API
@@ -208,31 +70,6 @@ components:
                   type: string
                 value:
                   type: number
-    Player:
-      type: object
-      properties:
-        id:
-          type: number
-        icon_path:
-          type: string
-        name:
-          type: string
-        avatar:
-          type: string
-          description: path
-        win_rate:
-          type: number
-        rank:
-          $ref: '#/components/schemas/Rank'
-        most_played:
-          type: array
-          items:
-            type: object
-            properties:
-              champion_id:
-                $ref: '#/components/schemas/ChampionID'
-              rank:
-                type: number
     Achievement:
       type: object
       properties:
@@ -250,13 +87,4 @@ components:
           type: number
           description: Average per game
         total:
-          type: number
-    Rank:
-      type: object
-      properties:
-        rank:
-          type: string
-        tier:
-          type: number
-        league_points:
           type: number
