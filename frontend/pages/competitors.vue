@@ -29,7 +29,7 @@
           <div class="row row-cards">
             <div class="col-12">
               <div class="card">
-                <div v-if="this.competitors.length > 0" class="table-responsive">
+                <div v-if="competitors.length > 0" class="table-responsive">
                   <table class="table table-vcenter card-table">
                     <thead>
                       <tr>
@@ -42,7 +42,7 @@
                       </tr>
                     </thead>
                     <tbody>
-                      <tr v-for="item in this.competitors" :key="item.id">
+                      <tr v-for="item in competitors" :key="item.id">
                         <td class="text-muted">{{item.id}}</td>
                         <td>
                           <div class="d-flex py-1 align-items-center">
@@ -118,7 +118,6 @@ export default {
   },
   methods: {
     removeCompetitor(id) {
-      console.log("Removing " + id)
       this.competitors = this.competitors.filter(function( obj ) {
         return obj.id !== id;
       });

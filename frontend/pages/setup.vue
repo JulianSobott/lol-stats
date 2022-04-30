@@ -63,7 +63,6 @@ export default {
       this.form.playername = playername;
     },
     setPlayerName() {
-      console.log(this.form.playerName);
       this.$router.push('/dashboard');
     }
   },
