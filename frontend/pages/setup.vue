@@ -19,14 +19,7 @@
         <div class="card-body">
           <div class="mb-3">
             <label class="form-label">Select your Player Name</label>
-            <div class="input-group input-group-flat">
-              <input
-                v-model="form.playerName"
-                class="form-control"
-                placeholder="Select your League of Legends player name"
-                autocomplete="off"
-              />
-            </div>
+            <PlayerSearchInput @changePlayername="changePlayername" />
             <div class="form-hint">
               In order for you to view player information and statistics, we still need your gamer tag. Please enter your gamer tag in this field, which you also use in <strong>League of Legends</strong>.
             </div>
@@ -66,6 +59,9 @@ export default {
     },
   },
   methods: {
+    changePlayername(playername) {
+      this.form.playername = playername;
+    },
     setPlayerName() {
       console.log(this.form.playerName);
       this.$router.push('/dashboard');

@@ -1,31 +1,52 @@
 <template>
   <div class="input-icon mb-3">
-    <input v-bind="playername" v-on:input="searchPlayerName()" type="text" class="form-control" placeholder="Search Player name" />
-    <span v-if="searching" class="input-icon-addon">
+    <input
+      v-model="playername"
+      :class="{ 'is-invalid': error }"
+      placeholder="Search Player name"
+      type="text"
+      class="form-control"
+      @input="searchPlayerName()"
+    />
+    <span v-if="loading && !error" class="input-icon-addon">
       <div
         class="spinner-border spinner-border-sm text-muted"
         role="status"
       ></div>
     </span>
+    <div v-if="error" class="invalid-feedback">Playername not found</div>
   </div>
 </template>
 
 <script>
 export default {
   name: 'PlayerSearchInput',
-  props: [],
   data() {
-      return {
-        playername: '',
-        error: true,
-        searching: false,
-      }
+    return {
+      playername: '',
+      error: false,
+      loading: false,
+    }
   },
   methods: {
-      searchPlayerName() {
-          this.searching = true;
-          console.log("changed" + this.playername);
+    searchPlayerName() {
+      this.loading = true
+      if (this.playername.length === 0) {
+        this.loading = false
+        this.error = false;
+        this.$emit('changePlayername', null)
       }
+
+      if (this.playername.length > 3) {
+        this.$emit('changePlayername', this.playername)
+
+        // simulate api search
+        setTimeout(() => {
+          this.loading = false;
+          this.error = true;
+        }, 500)
+      }
+    },
   },
 }
 </script>

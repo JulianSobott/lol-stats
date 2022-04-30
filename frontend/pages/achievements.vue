@@ -44,7 +44,7 @@
                 </div>
                 <div class="form-group mb-3">
                   <label class="form-label subheader mb-2">Player</label>
-                  <PlayerSearchInput />
+                  <PlayerSearchInput @changePlayername="playernameChanged" />
                 </div>
                 <div class="form-group mb-3">
                   <label class="form-label subheader mb-2">Champion</label>
@@ -263,9 +263,6 @@
 <script>
 export default {
   name: 'AchievementsPage',
-  mounted() {
-    // this.filters.player = this.$route.query.player
-  },
   data() {
     return {
       filters: {
@@ -283,10 +280,16 @@ export default {
       ]
     }
   },
+  mounted() {
+    this.filters.playername = this.$route.query.playername
+  },
   methods: {
     search(e) {
       e.preventDefault(e)
     },
+    playernameChanged(playername) {
+      this.filters.playname = playername;
+    }
   },
 }
 </script>

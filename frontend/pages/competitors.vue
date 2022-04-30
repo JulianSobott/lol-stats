@@ -54,9 +54,9 @@
                             ></span>
                             <div class="flex-fill">
                               <div class="font-weight-medium">
-                                <NuxtLink to="/profiles/1234" class="text-reset">{{item.player_name}}</NuxtLink>
+                                <NuxtLink to="/profiles/1234" class="text-reset">{{item.playername}}</NuxtLink>
                               </div>
-                              <div class="text-muted"><NuxtLink :to="'/achievements?player=' + item.player_name" class="text-reset">Achievements</NuxtLink></div>
+                              <div class="text-muted"><NuxtLink :to="'/achievements?playername=' + item.playername" class="text-reset">Achievements</NuxtLink></div>
                             </div>
                           </div>
                         </td>
@@ -102,15 +102,15 @@ export default {
     return {
       competitors: [{
         id: 1,
-        player_name: 'Test',
+        playername: 'Test',
       },
       {
         id: 2,
-        player_name: 'Test2',
+        playername: 'Test2',
       },
       {
         id: 3,
-        player_name: 'Test3',
+        playername: 'Test3',
       }],
       submitted: false,
       error: null
