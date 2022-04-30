@@ -22,65 +22,6 @@
       </h1>
       <div class="navbar-nav flex-row order-md-last">
         <div class="nav-item d-none d-md-flex me-3"></div>
-        <!--
-          <div class="d-none d-md-flex">
-          <div class="nav-item dropdown d-none d-md-flex me-3">
-            <a
-              href="#"
-              class="nav-link px-0"
-              data-bs-toggle="dropdown"
-              tabindex="-1"
-              aria-label="Show notifications"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                class="icon"
-                width="24"
-                height="24"
-                viewBox="0 0 24 24"
-                stroke-width="2"
-                stroke="currentColor"
-                fill="none"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              >
-                <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                <path
-                  d="M10 5a2 2 0 0 1 4 0a7 7 0 0 1 4 6v3a4 4 0 0 0 2 3h-16a4 4 0 0 0 2 -3v-3a7 7 0 0 1 4 -6"
-                />
-                <path d="M9 17v1a3 3 0 0 0 6 0v-1" />
-              </svg>
-              <span class="badge bg-red"></span>
-            </a>
-            <div
-              class="
-                dropdown-menu
-                dropdown-menu-arrow
-                dropdown-menu-end
-                dropdown-menu-card
-              "
-            >
-              <div class="card">
-                <div class="card-header">
-                  <h3 class="card-title">Notifications</h3>
-                </div>
-                <div class="list-group list-group-flush list-group-hoverable">
-                  <div class="list-group-item">
-                    <div class="row align-items-center">
-                      <div class="col text-truncate">
-                        <a href="#" class="text-body d-block">Test Notification</a>
-                        <div class="d-block text-muted text-truncate mt-n1">
-                          foo bar
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-        -->
         <div class="nav-item dropdown">
           <a
             href="#"
@@ -93,12 +34,12 @@
               style="background-image: url(https://i.imgur.com/6lCL9uU.png)"
             ></span>
             <div class="d-none d-xl-block ps-2">
-              <div>Player Name</div>
-              <div class="mt-1 small text-muted">Rank XYZ</div>
+              <div>{{ user.username }}</div>
+              <div class="mt-1 small text-muted">{{ user.rank }}</div>
             </div>
           </a>
           <div class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
-            <NuxtLink to="/profiles/1" class="dropdown-item">Profile</NuxtLink>
+            <NuxtLink :to="'/profiles/' + user.playerUuid" class="dropdown-item">Profile</NuxtLink>
             <div class="dropdown-divider"></div>
             <NuxtLink to="/login" class="dropdown-item">Logout</NuxtLink>
           </div>
@@ -111,5 +52,16 @@
 <script>
 export default {
   name: 'PageHeader',
+  data() {
+    return {
+      user: {
+        id: 0,
+        username: 'FooBar',
+        rank: 'Silver II',
+        playerUuid: '351123'
+      }
+      // user data fetched by nuxtjs/auth package on logins
+    }
+  }
 }
 </script>

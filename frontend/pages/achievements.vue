@@ -17,7 +17,7 @@
       <div class="page-body">
         <div class="container-xl">
           <div class="row g-4">
-            <div class="col-2">
+            <div class="col-3">
               <form ref="filters">
                 <div class="mb-3">
                   <label class="form-label subheader mb-2">Compare with</label>
@@ -44,26 +44,14 @@
                 </div>
                 <div class="form-group mb-3">
                   <label class="form-label subheader mb-2">Player</label>
-                  <div>
-                    <input
-                      type="text"
-                      class="form-control"
-                      v-model="filters.player"
-                      placeholder="Search player"
-                    />
-                  </div>
+                  <PlayerSearchInput />
                 </div>
                 <div class="form-group mb-3">
                   <label class="form-label subheader mb-2">Champion</label>
                   <div>
                     <select v-model="filters.champion" class="form-select">
                       <option value="*">All Champions</option>
-                      <option value="Aatrox">Aatrox</option>
-                      <option value="Ahri">Ahri</option>
-                      <option value="Akali">Akali</option>
-                      <option value="Alistar">Alistar</option>
-                      <option value="Amumu">Amumu</option>
-                      <option value="Anivia">Anivia</option>
+                      <option v-for="champ in allChampions" :key="champ" :value="champ">{{ champ }}</option>
                     </select>
                   </div>
                 </div>
@@ -92,7 +80,7 @@
                 </div>
               </form>
             </div>
-            <div class="col-10">
+            <div class="col-9">
               <div class="card-tabs">
                 <!-- Cards navigation -->
                 <ul class="nav nav-tabs">
@@ -276,16 +264,23 @@
 export default {
   name: 'AchievementsPage',
   mounted() {
-    this.filters.player = this.$route.query.player
+    // this.filters.player = this.$route.query.player
   },
   data() {
     return {
       filters: {
         compare: 'global',
-        player: '',
+        playername: '',
         champion: '*',
         rank: '*',
       },
+      // TODO: all champs fetched from backend
+      allChampions: [
+        'Aatrox',
+        'Ahri',
+        'Akali',
+        'FooBar',
+      ]
     }
   },
   methods: {
