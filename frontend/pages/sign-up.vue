@@ -89,7 +89,7 @@ export default {
           return;
       }
 
-      this.$router.push('/login');
+      this.$router.push('/setup');
     }
   }
 
