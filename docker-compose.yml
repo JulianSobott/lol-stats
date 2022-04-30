@@ -48,9 +48,10 @@ services:
   player-api:
     build: player-api
     environment:
-      REDIS_HOST: "redis-player-api"
+      POSTGRES_PASSWORD: $POSTGRES_PASSWORD
+      POSTGRES_HOST: psql-achievements
     networks:
-      - gravitee
+      - services
       - stats-storage
 
 volumes:
@@ -61,5 +62,5 @@ networks:
   stats-storage: {}
   traefik:
     external: true
-  gravitee:
+  services:
     external: true

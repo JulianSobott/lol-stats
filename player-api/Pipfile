@@ -10,11 +10,11 @@ pydantic = "*"
 sqlalchemy = "*"
 psycopg2-binary = "*"
 fastapi-sqlalchemy = "*"
+pydantic-factories = "*"
 
 [dev-packages]
 pytest = "*"
 requests = "*"
-pydantic-factories = "*"
 
 [requires]
 python_version = "3.10"
