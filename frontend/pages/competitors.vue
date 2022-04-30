@@ -53,18 +53,25 @@
                               "
                             ></span>
                             <div class="flex-fill">
-                              <div class="font-weight-medium">{{item.player_name}}</div>
-                              <div class="text-muted">
-                                <a href="#" class="text-reset">lmiona@livejournal.com</a>
+                              <div class="font-weight-medium">
+                                <NuxtLink to="/profiles/1234" class="text-reset">{{item.player_name}}</NuxtLink>
                               </div>
+                              <div class="text-muted"><NuxtLink :to="'/achievements?player=' + item.player_name" class="text-reset">Achievements</NuxtLink></div>
                             </div>
                           </div>
                         </td>
-                        <td>Gold II</td>
+                        <td>
+                          <div class="d-flex py-1 align-items-center">
+                            <span class="avatar avatar-rounded me-2" style="background-image: url(https://opgg-static.akamaized.net/images/medals/bronze_4.png?image=q_auto&image=q_auto,f_webp,w_auto&v=1651226741046)"></span>
+                            <div class="flex-fill">
+                              <div class="font-weight-medium">Bronze 4</div>
+                            </div>
+                          </div>
+                        </td>
                         <td>50%</td>
                         <td>5220</td>
                         <td>
-                          <a href="#" @click="removeCompetitor(item.id)">
+                          <a href="#" class="text-red" @click="removeCompetitor(item.id)">
                             Remove
                           </a>
                         </td>

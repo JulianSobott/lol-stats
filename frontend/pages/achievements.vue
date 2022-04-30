@@ -40,15 +40,6 @@
                       />
                       <span class="form-check-label">Friends</span>
                     </label>
-                    <label class="form-check mb-1">
-                      <input
-                        v-model="filters.compare"
-                        type="radio"
-                        class="form-check-input"
-                        value="favorites"
-                      />
-                      <span class="form-check-label">Favorites</span>
-                    </label>
                   </div>
                 </div>
                 <div class="form-group mb-3">
@@ -66,6 +57,7 @@
                   <label class="form-label subheader mb-2">Champion</label>
                   <div>
                     <select v-model="filters.champion" class="form-select">
+                      <option value="*">All Champions</option>
                       <option value="Aatrox">Aatrox</option>
                       <option value="Ahri">Ahri</option>
                       <option value="Akali">Akali</option>
@@ -79,6 +71,7 @@
                   <label class="form-label subheader mb-2">Rank</label>
                   <div>
                     <select v-model="filters.rank" class="form-select">
+                      <option value="*">All Ranks</option>
                       <option value="iron">Iron</option>
                       <option value="bronze">Bronze</option>
                       <option value="silver">Silver</option>
@@ -139,8 +132,8 @@
                           <tr>
                             <th class="w-1">ID</th>
                             <th>Achievement</th>
-                            <th>You</th>
-                            <th>Opponent</th>
+                            <th>You (Max/Average/Sum)</th>
+                            <th>Player (Max/Average/Sum)</th>
                           </tr>
                         </thead>
                         <tbody>
@@ -282,13 +275,16 @@
 <script>
 export default {
   name: 'AchievementsPage',
+  mounted() {
+    this.filters.player = this.$route.query.player
+  },
   data() {
     return {
       filters: {
         compare: 'global',
         player: '',
-        champion: 'Aatrox',
-        rank: 'iron',
+        champion: '*',
+        rank: '*',
       },
     }
   },
