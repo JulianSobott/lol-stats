@@ -9,9 +9,14 @@
           <div class="row align-items-center">
             <div class="col">
               <!-- Page pre-title -->
-              <h2 class="page-title">Home</h2>
+              <div class="page-pretitle">Profile</div>
+              <h2 class="page-title">Playername</h2>
             </div>
           </div>
+        </div>
+      </div>
+      <div class="page-body">
+        <div class="container-xl">
         </div>
       </div>
     </div>
@@ -20,6 +25,6 @@
 
 <script>
 export default {
-  name: 'IndexPage',
+  name: 'ProfilePage',
 }
 </script>
