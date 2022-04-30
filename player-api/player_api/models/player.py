@@ -34,7 +34,7 @@ class MostPlayed(BaseModel):
 
 
 class Player(BaseModel):
-    id: int
+    id: str
     icon_path: str
     name: str
     win_rate: float = Field(ge=0, le=100)

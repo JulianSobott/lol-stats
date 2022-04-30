@@ -1,57 +1,28 @@
-import json
 import os
 
-from fastapi import FastAPI
-from redis import Redis
-from player_api.models.player import Player, Rank, MostPlayed, RankEnum, TierEnum
+from fastapi import FastAPI, HTTPException
+from fastapi_sqlalchemy import DBSessionMiddleware, db
+
+from player_api.db import Summoners
+from player_api.models.factories import PlayerFactory
+from player_api.models.player import Player
 
 app = FastAPI()
-redis = Redis(host=os.environ.get("REDIS_HOST", "localhost"), port=6379, db=0)
+app.add_middleware(DBSessionMiddleware,
+                   db_url=f"postgresql://postgres:{os.environ['POSTGRES_PASSWORD']}@"
+                          f"{os.environ['POSTGRES_HOST']}/postgres")
 
-PlayerId = int
+
+PlayerId = str
 
 
 @app.get("/players/{player}", response_model=Player)
 async def get_player(player: PlayerId):
     player_id = player
-    res = redis.get(f"player:{player_id}")
-    if res:
-        print("taken from cache")
-        return Player(**json.loads(res))
-    else:
-        player = fetch_player(player_id)
-        cache_player_data(player_id, player)
-        return player
-
-
-def fetch_player(player_id: PlayerId) -> Player:
-    # TODO: fetch from Riot API
-    from pydantic_factories import ModelFactory, Use
-    import random
-
-    class PlayerFactory(ModelFactory):
-        __model__ = Player
-
-        win_rate = Use(random.randint, 0, 100)
-        rank = Use(lambda: RankFactory.build())
-        most_played = Use(lambda: MostPlayedFactory.batch(5))
-
-    class RankFactory(ModelFactory):
-        __model__ = Rank
-
-        rank = Use(random.choice, list(RankEnum))
-        tier = Use(random.choice, list(TierEnum))
-        league_points = Use(random.randint, 0, 100)
-
-    class MostPlayedFactory(ModelFactory):
-        __model__ = MostPlayed
-
-        champion_id = Use(random.randint, 0, 200)
-        rank = Use(random.randint, 0, 100)
-
-    return PlayerFactory.build(id=player_id)
-
-
-def cache_player_data(player_id: PlayerId, player: Player):
-    encoded = player.json()
-    redis.set(f"player:{player_id}", encoded)
+    players: list[Summoners] = db.session.query(Summoners).where(Summoners.puuid == player_id).all()
+    if not players:
+        raise HTTPException(status_code=404, detail="Player not found")
+    assert len(players) == 1, f"Player ID should be unique. Got {len(players)} players"
+    player = players[0]
+    # TODO: fetch all from Database
+    return PlayerFactory.build(id=player_id, icon_path=player.icon_path)
