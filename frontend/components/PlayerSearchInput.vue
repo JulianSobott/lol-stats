@@ -2,7 +2,7 @@
   <div class="input-icon mb-3">
     <input
       v-model="playername"
-      :class="{ 'is-invalid': error }"
+      :class="{ 'is-invalid': error, 'is-valid': success }"
       placeholder="Search Player name"
       type="text"
       class="form-control"
@@ -14,7 +14,10 @@
         role="status"
       ></div>
     </span>
-    <div v-if="error" class="invalid-feedback">Playername not found</div>
+    <div v-if="error" class="invalid-feedback">Playername not found.</div>
+    <div v-if="success" class="invalid-feedback text-green d-block">
+      Player found.
+    </div>
   </div>
 </template>
 
@@ -25,26 +28,36 @@ export default {
     return {
       playername: '',
       error: false,
+      success: false,
       loading: false,
     }
   },
   methods: {
-    searchPlayerName() {
+    async searchPlayerName() {
       this.loading = true
       if (this.playername.length === 0) {
         this.loading = false
-        this.error = false;
+        this.error = false
+        this.success = false
         this.$emit('changePlayername', null)
       }
 
       if (this.playername.length > 3) {
-        this.$emit('changePlayername', this.playername)
-
-        // simulate api search
-        setTimeout(() => {
-          this.loading = false;
-          this.error = true;
-        }, 500)
+        try {
+          await this.$axios.get(`/players/${this.playername}`)
+          this.$emit('changePlayername', this.playername)
+          this.error = false
+          this.success = true
+        } catch (err) {
+          console.log(err.response.status)
+          if (err.response.status === 404) {
+            this.loading = false
+            this.error = true
+            this.success = false
+          }
+        } finally {
+          this.loading = false
+        }
       }
     },
   },
