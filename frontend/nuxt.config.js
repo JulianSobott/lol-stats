@@ -86,7 +86,7 @@ export default {
             method: 'post'
           },
           user: {
-            url: '/api/auth/user',
+            url: '/api/auth/me',
             method: 'get'
           }
         }
@@ -96,7 +96,7 @@ export default {
   // Axios module configuration: https://go.nuxtjs.dev/config-axios
   axios: {
     // Workaround to avoid enforcing hard-coded localhost:3000: https://github.com/nuxt-community/axios-module/issues/308
-    baseURL: '/',
+    baseURL: 'https://lol-stats.de/api/',
   },
 
   // Build Configuration: https://go.nuxtjs.dev/config-build

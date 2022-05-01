@@ -18,12 +18,12 @@
         <div class="container-xl">
           <div class="row row-cards">
             <div class="col-sm-4 col-lg-4">
-              <div class="card h-100">
+              <div v-if="!loading" class="card h-100">
                 <div class="card-body">
                     <div class="d-flex align-items-center">
                       <div class="subheader">Winrate</div>
                     </div>
-                    <div class="h1 mb-3">75%</div>
+                    <div class="h1 mb-3">{{ stats.winRate }}%</div>
                     <div class="d-flex mb-2">
                       <div>Winrate</div>
                       <div class="ms-auto">
@@ -40,14 +40,32 @@
                     </div>
                   </div>
               </div>
+              <div v-else>
+                <div class="col">
+                  <div class="placeholder placeholder-xs col-9"></div>
+                  <div class="placeholder placeholder-xs col-7"></div>
+                </div>               
+              </div>
             </div>
             <div class="col-sm-4 col-lg-4">
-              <div class="card h-100">
+              <div v-if="!loading" class="card h-100">
                 <div class="card-body text-center">
                   <div class="mb-3">
                     <span class="avatar avatar-xl avatar-rounded" style="background-image: url(https://opgg-static.akamaized.net/images/medals/bronze_4.png?image=q_auto&image=q_auto,f_webp,w_auto&v=1651226741046)"></span>
                   </div>
-                  <div class="card-title mb-1">Bronze 4</div>
+                  <div class="card-title mb-1">{{ stats.rank.tier }} {{ stats.rank.rank }}</div>
+                  <div class="text-muted">{{ stats.rank.league_points }}</div>
+                </div>
+              </div>
+              <div v-else class="card h-100">
+                  <div class="card-body py-3 text-center">
+                  <div>
+                    <div class="avatar avatar-rounded avatar-lg placeholder mb-3"></div>
+                  </div>
+                  <div class="mt w-75 mx-auto">
+                    <div class="placeholder col-9 mb-3"></div>
+                    <div class="placeholder placeholder-xs col-10"></div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -65,7 +83,7 @@
                       </tr>
                     </thead>
                     <tbody>
-                      <tr  v-for="index in 3" :key="index">
+                      <tr v-for="champion in stats.mostPlayed" :key="champion.champion_id">
                         <td class="text-center p-0">
                           <span class="avatar avatar-xs avatar-rounded m-1" style="background-image: url(https://placekitten.com/48/48)"></span>
                         </td>
@@ -141,5 +159,28 @@
 <script>
 export default {
   name: 'IndexPage',
+  data() {
+    return {
+      stats: {
+        mostPlayed: [],
+        rank: '',
+        winRate: '',
+      },
+      loading: false,
+    }
+  },
+  mounted() {
+    this.getTestData();
+  },
+  methods: {
+    async getTestData() {
+      this.loading = true;
+      const res = await this.$axios.get('/players/TEST')
+      this.stats.mostPlayed = res.data.most_played.splice(0, 3);
+      this.stats.rank = res.data.rank;
+      this.stats.winRate = res.data.win_rate;
+      this.loading = false;
+    }
+  }
 }
 </script>
