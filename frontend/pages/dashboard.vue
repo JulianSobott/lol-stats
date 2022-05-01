@@ -83,7 +83,7 @@
                       </tr>
                     </thead>
                     <tbody>
-                      <tr v-for="champion in stats.mostPlayed" :key="champion.champion_id">
+                      <tr v-for="champion in mostPlayedChampions" :key="champion.champion_id">
                         <td class="text-center p-0">
                           <span class="avatar avatar-xs avatar-rounded m-1" style="background-image: url(https://placekitten.com/48/48)"></span>
                         </td>
@@ -157,12 +157,18 @@
 </template>
 
 <script>
+import { mapActions } from 'vuex';
+
 export default {
   name: 'IndexPage',
+  computed: {
+    mostPlayedChampions () {
+      return this.$store.state.dashboard.mostPlayedChampions;
+    }
+  },
   data() {
     return {
       stats: {
-        mostPlayed: [],
         rank: '',
         winRate: '',
       },
@@ -171,12 +177,15 @@ export default {
   },
   mounted() {
     this.getTestData();
+    this.getMostPlayedChampions();
   },
   methods: {
+    ...mapActions({
+      getMostPlayedChampions: 'dashboard/getMostPlayedChampions'
+    }),
     async getTestData() {
       this.loading = true;
       const res = await this.$axios.get('/players/TEST')
-      this.stats.mostPlayed = res.data.most_played.splice(0, 3);
       this.stats.rank = res.data.rank;
       this.stats.winRate = res.data.win_rate;
       this.loading = false;
