@@ -1,8 +1,10 @@
+import os
+
 import cassiopeia
 from db_connector import db
 from cassiopeia import Patch, Summoner
 
-cassiopeia.set_riot_api_key("RGAPI-eb8ae9eb-5b1f-4caa-9b94-378c2c4e5e24")
+cassiopeia.set_riot_api_key(os.environ["RIOT_API_KEY"])
 
 
 class riot_api_connector:
@@ -36,7 +38,10 @@ class riot_api_connector:
         for item in items:
             self.db.add_item(id=item.id, name=item.name, icon_path=item.image.url)
 
+
+print("Updating ...")
 x = riot_api_connector()
 x.update_champions()
 x.update_items()
 x.update_summoner_spells()
+print("Finished updating")
