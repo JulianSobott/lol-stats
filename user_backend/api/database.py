@@ -6,8 +6,8 @@ def get_all(model):
     return data
 
 
-def get_instance(model, mail, **kwargs):
-    instance = model.query.filter_by(id=id).all()[0]
+def get_instance(model, **kwargs):
+    instance = model.query.filter_by(**kwargs).first()
     return instance
 
 
@@ -23,7 +23,7 @@ def delete_instance(model, id):
 
 
 def edit_instance(model, id, **kwargs):
-    instance = model.query.filter_by(id=id).all()[0]
+    instance = model.query.filter_by(**kwargs).all()[0]
     for attr, new_value in kwargs.items():
         setattr(instance, attr, new_value)
     commit_changes()

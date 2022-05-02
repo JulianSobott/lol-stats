@@ -2,7 +2,7 @@ from marshmallow import Schema, fields
 
 
 class FormSchema(Schema):
-    mail = fields.Email(required=True)
+    email = fields.Email(required=True)
     password = fields.String(required=True)
 
 

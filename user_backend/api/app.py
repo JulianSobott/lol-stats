@@ -14,7 +14,7 @@ def create_app():
     flask_app.config['SQLALCHEMY_DATABASE_URI'] = config.DATABASE_CONNECTION_URI
     flask_app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     flask_app.app_context().push()
-    db.init_app(flask_app)  # link api to db
+    db.init_app(flask_app)
     db.create_all()
     flask_app.config["JWT_SECRET_KEY"] = config.JWT_SECRET_KEY
     JWTManager(flask_app)
@@ -48,14 +48,14 @@ def login():
     try:
         data = validation.form_schema.load(data)
     except ValidationError as err:
-        return err.messages, 422
-    user = database.get_instance(Users, data["email"])
+        return make_response(jsonify({"message": err.messages}), 400)
+    user = database.get_instance(Users, email=data["email"])
     if user:
         if user.password:
             hashed_pw = security.generate_password_hash(data["password"])
             if security.check_password_hash(hashed_pw, user.password):
                 access_token = create_access_token(identity=user.email)
-                return make_response(jsonify({"user": user, "token": access_token}), 200)
+                return make_response(jsonify({"user": user.email, "token": access_token}), 200)
             else:
                 return make_response(jsonify({"message": "Wrong password"}), 400)
         else:
@@ -77,10 +77,10 @@ def register():
     try:
         data = validation.form_schema.load(data)
     except ValidationError as err:
-        return err.messages, 422
+        return make_response(jsonify({"message": err.messages}), 400)
     hashed_pw = security.generate_password_hash(data["password"])
-    if not database.get_instance(Users, data["email"]):
-        database.add_instance(Users, mail=data["email"], password=hashed_pw)
+    if not database.get_instance(Users, email=data["email"]):
+        database.add_instance(Users, email=data["email"], password=hashed_pw)
         return make_response(jsonify({"email": data["email"]}), 200)
 
 
