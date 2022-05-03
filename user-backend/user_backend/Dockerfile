@@ -2,7 +2,7 @@
 
 FROM python:3.9
 
-WORKDIR /api
+WORKDIR /user_backendp
 
 RUN python3 -m venv venv
 COPY requirements.txt requirements.txt

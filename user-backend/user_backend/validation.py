@@ -1,7 +1,7 @@
 from marshmallow import Schema, fields
 
 
-class FormSchema(Schema):
+class UserSchema(Schema):
     email = fields.Email(required=True)
     password = fields.String(required=True)
 
@@ -15,6 +15,6 @@ class CompetitorSchema(Schema):
     token = fields.Nested(TokenSchema())
 
 
-form_schema = FormSchema()
+user_schema = UserSchema()
 token_schema = TokenSchema()
 competitor_schema = CompetitorSchema()

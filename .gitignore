@@ -48,5 +48,10 @@ Thumbs.db
 *.mov
 *.wmv
 
-/user_backend/venv/
-/user_backend/.env
+# python local virtual env
+/user-backend/.env
+/user-backend/venv/
+
+# vs workspace settings
+.vscode/
+
