@@ -25,7 +25,7 @@
     </div>
     <div class="form-group mb-3">
       <label class="form-label subheader mb-2">Player</label>
-      <PlayerSearchInput @changePlayername="playernameChanged" ref="PlayerSearchInput" />
+      <PlayerSearchInput ref="PlayerSearchInput" @changePlayername="playernameChanged" />
     </div>
     <div class="form-group mb-3">
       <label class="form-label subheader mb-2">Champion</label>
@@ -56,7 +56,7 @@
       </div>
     </div>
     <div class="mt-4">
-      <button class="btn btn-primary w-100" @click="search" data-bs-dismiss="offcanvas">
+      <button class="btn btn-primary w-100" data-bs-dismiss="offcanvas" @click="search">
         Confirm changes
       </button>
       <a class="btn btn-link w-100" @click="clearFilters"> Reset to defaults </a>

@@ -228,6 +228,12 @@
   </div>
 </template>
 
+<script>
+export default {
+  name: 'AchievementsPage',
+}
+</script>
+
 <style>
 @media screen and (max-width: 575px) {
   .col-achievements-filter {
@@ -239,9 +245,3 @@
   }
 }
 </style>
-
-<script>
-export default {
-  name: 'AchievementsPage',
-}
-</script>
