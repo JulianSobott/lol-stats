@@ -4,83 +4,56 @@
     <PageNavigation />
     <div class="page-wrapper">
       <div class="container-xl">
-        <!-- Page title -->
         <div class="page-header d-print-none">
-          <div class="row align-items-center">
+          <div class="row g-2 align-items-center">
             <div class="col">
+              <!-- Page pre-title -->
               <h2 class="page-title">Achievements</h2>
               <div class="text-muted mt-1">99999 results</div>
             </div>
+            <!-- Page title actions -->
+            <div class="col-auto col-md-auto ms-auto d-print-none">
+              <div class="btn-list">
+                <a
+                  class="btn btn-primary d-sm-none btn-icon"
+                  data-bs-toggle="offcanvas"
+                  href="#achivement-filters"
+                  role="button"
+                  aria-controls="achivement-filters"
+                  aria-label="Open Filters"
+                >
+                  <!-- Download SVG icon from http://tabler-icons.io/i/plus -->
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    class="icon icon-tabler icon-tabler-filter"
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    stroke-width="2"
+                    stroke="currentColor"
+                    fill="none"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                    <path
+                      d="M5.5 5h13a1 1 0 0 1 .5 1.5l-5 5.5l0 7l-4 -3l0 -4l-5 -5.5a1 1 0 0 1 .5 -1.5"
+                    ></path>
+                  </svg>
+                </a>
+              </div>
+            </div>
           </div>
         </div>
+        <!-- Page title -->
       </div>
       <div class="page-body">
         <div class="container-xl">
           <div class="row g-4">
-            <div class="col-3">
-              <form ref="filters">
-                <div class="mb-3">
-                  <label class="form-label subheader mb-2">Compare with</label>
-                  <div>
-                    <label class="form-check mb-1">
-                      <input
-                        v-model="filters.compare"
-                        type="radio"
-                        class="form-check-input"
-                        value="global"
-                      />
-                      <span class="form-check-label">Global</span>
-                    </label>
-                    <label class="form-check mb-1">
-                      <input
-                        v-model="filters.compare"
-                        type="radio"
-                        class="form-check-input"
-                        value="friends"
-                      />
-                      <span class="form-check-label">Friends</span>
-                    </label>
-                  </div>
-                </div>
-                <div class="form-group mb-3">
-                  <label class="form-label subheader mb-2">Player</label>
-                  <PlayerSearchInput @changePlayername="playernameChanged" />
-                </div>
-                <div class="form-group mb-3">
-                  <label class="form-label subheader mb-2">Champion</label>
-                  <div>
-                    <select v-model="filters.champion" class="form-select">
-                      <option value="*">All Champions</option>
-                      <option v-for="champ in allChampions" :key="champ" :value="champ">{{ champ }}</option>
-                    </select>
-                  </div>
-                </div>
-                <div class="form-group mb-3">
-                  <label class="form-label subheader mb-2">Rank</label>
-                  <div>
-                    <select v-model="filters.rank" class="form-select">
-                      <option value="*">All Ranks</option>
-                      <option value="iron">Iron</option>
-                      <option value="bronze">Bronze</option>
-                      <option value="silver">Silver</option>
-                      <option value="gold">Gold</option>
-                      <option value="platinum">Platinum</option>
-                      <option value="diamond">Diamond</option>
-                      <option value="master">Master</option>
-                      <option value="grandmaster">Grandmaster</option>
-                      <option value="challenger">Challenger</option>
-                    </select>
-                  </div>
-                </div>
-                <div class="mt-4">
-                  <button class="btn btn-primary w-100" @click="search">
-                    Confirm changes
-                  </button>
-                  <a href="#" class="btn btn-link w-100"> Reset to defaults </a>
-                </div>
-              </form>
+            <div class="col-3 col-achievements-filter">
+              <AchievementFilters />
             </div>
-            <div class="col-9">
+            <div class="col-9 col-achivements-table">
               <div class="card-tabs">
                 <!-- Cards navigation -->
                 <ul class="nav nav-tabs">
@@ -108,13 +81,7 @@
                   <div id="tab-favorites" class="card tab-pane show active">
                     <div class="table-responsive">
                       <table
-                        class="
-                          table
-                          card-table
-                          table-vcenter
-                          text-nowrap
-                          datatable
-                        "
+                        class="table card-table table-vcenter text-nowrap datatable"
                       >
                         <thead>
                           <tr>
@@ -255,41 +222,26 @@
             </div>
           </div>
         </div>
+        <SidebarAchievementFilters />
       </div>
     </div>
   </div>
 </template>
 
+<style>
+@media screen and (max-width: 575px) {
+  .col-achievements-filter {
+    display: none;
+  }
+
+  .col-achivements-table {
+    width: 100%;
+  }
+}
+</style>
+
 <script>
 export default {
   name: 'AchievementsPage',
-  data() {
-    return {
-      filters: {
-        compare: 'global',
-        playername: '',
-        champion: '*',
-        rank: '*',
-      },
-      // TODO: all champs fetched from backend
-      allChampions: [
-        'Aatrox',
-        'Ahri',
-        'Akali',
-        'FooBar',
-      ]
-    }
-  },
-  mounted() {
-    this.filters.playername = this.$route.query.playername
-  },
-  methods: {
-    search(e) {
-      e.preventDefault(e)
-    },
-    playernameChanged(playername) {
-      this.filters.playname = playername;
-    }
-  },
 }
 </script>
