@@ -33,8 +33,13 @@ export default {
     }
   },
   methods: {
+    clear() {
+      this.playername = ''
+      this.loading = false
+      this.error = false
+      this.success = false
+    },
     async searchPlayerName() {
-     
       if (this.playername.length === 0) {
         this.loading = false
         this.error = false

@@ -25,7 +25,7 @@
     </div>
     <div class="form-group mb-3">
       <label class="form-label subheader mb-2">Player</label>
-      <PlayerSearchInput @changePlayername="playernameChanged" />
+      <PlayerSearchInput @changePlayername="playernameChanged" ref="PlayerSearchInput" />
     </div>
     <div class="form-group mb-3">
       <label class="form-label subheader mb-2">Champion</label>
@@ -59,7 +59,7 @@
       <button class="btn btn-primary w-100" @click="search" data-bs-dismiss="offcanvas">
         Confirm changes
       </button>
-      <a href="#" class="btn btn-link w-100"> Reset to defaults </a>
+      <a class="btn btn-link w-100" @click="clearFilters"> Reset to defaults </a>
     </div>
   </form>
 </template>
@@ -89,6 +89,15 @@ export default {
     playernameChanged(playername) {
       this.filters.playname = playername
     },
+    clearFilters() {
+      this.$refs.PlayerSearchInput.clear();
+      this.filters = {
+        compare: 'global',
+        playername: '',
+        champion: '*',
+        rank: '*',
+      }
+    }
   },
 }
 </script>
