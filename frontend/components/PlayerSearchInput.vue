@@ -33,8 +33,13 @@ export default {
     }
   },
   methods: {
+    clear() {
+      this.playername = ''
+      this.loading = false
+      this.error = false
+      this.success = false
+    },
     async searchPlayerName() {
-      this.loading = true
       if (this.playername.length === 0) {
         this.loading = false
         this.error = false
@@ -42,14 +47,14 @@ export default {
         this.$emit('changePlayername', null)
       }
 
-      if (this.playername.length > 3) {
+      if (this.playername.length >= 1) {
         try {
+          this.loading = true
           await this.$axios.get(`/players/${this.playername}`)
           this.$emit('changePlayername', this.playername)
           this.error = false
           this.success = true
         } catch (err) {
-          console.log(err.response.status)
           if (err.response.status === 404) {
             this.loading = false
             this.error = true

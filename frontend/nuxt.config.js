@@ -78,15 +78,15 @@ export default {
         },
         endpoints: {
           login: {
-            url: '/api/auth/login',
+            url: '/auth/login',
             method: 'post'
           },
           logout: {
-            url: '/api/auth/logout',
+            url: '/auth/logout',
             method: 'post'
           },
           user: {
-            url: '/api/auth/me',
+            url: '/auth/me',
             method: 'get'
           }
         }
