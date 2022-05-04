@@ -39,8 +39,6 @@
             </div>
           </a>
           <div class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
-            <NuxtLink :to="'/profiles/' + user.playerUuid" class="dropdown-item">Profile</NuxtLink>
-            <div class="dropdown-divider"></div>
             <NuxtLink to="/login" class="dropdown-item">Logout</NuxtLink>
           </div>
         </div>
