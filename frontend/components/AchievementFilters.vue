@@ -86,7 +86,7 @@ export default {
     search(e) {
       e.preventDefault(e)
     },
-    playernameChanged(playername) {
+    playernameChanged(playerUuid, playername) {
       this.filters.playname = playername
     },
     clearFilters() {
