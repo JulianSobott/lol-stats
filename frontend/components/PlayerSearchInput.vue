@@ -50,8 +50,8 @@ export default {
       if (this.playername.length >= 1) {
         try {
           this.loading = true
-          await this.$axios.get(`/players/${this.playername}`)
-          this.$emit('changePlayername', this.playername)
+          const response = await this.$axios.get(`/players/${this.playername}`)
+          this.$emit('changePlayername', response.name, this.playername)
           this.error = false
           this.success = true
         } catch (err) {
