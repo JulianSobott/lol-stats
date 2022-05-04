@@ -17,7 +17,7 @@
       ></button>
     </div>
     <div class="offcanvas-body">
-        <AchievementFilters />
+        <AchievementFilters @filterApplied="filterApplied" />
     </div>
   </div>
 </template>
@@ -25,5 +25,11 @@
 <script>
 export default {
   name: 'SidebarAchievementFilters',
+  methods: {
+    filterApplied(filters) {
+      // pass the data also to the achievements page
+      this.$emit('filterApplied', filters)
+    }
+  }
 }
 </script>

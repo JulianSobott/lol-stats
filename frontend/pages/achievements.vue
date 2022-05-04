@@ -51,7 +51,7 @@
         <div class="container-xl">
           <div class="row g-4">
             <div class="col-3 col-achievements-filter">
-              <AchievementFilters />
+              <AchievementFilters @filterApplied="filterApplied" />
             </div>
             <div class="col-9 col-achivements-table">
               <div class="card-tabs">
@@ -81,7 +81,13 @@
                   <div id="tab-favorites" class="card tab-pane show active">
                     <div class="table-responsive">
                       <table
-                        class="table card-table table-vcenter text-nowrap datatable"
+                        class="
+                          table
+                          card-table
+                          table-vcenter
+                          text-nowrap
+                          datatable
+                        "
                       >
                         <thead>
                           <tr>
@@ -222,7 +228,7 @@
             </div>
           </div>
         </div>
-        <SidebarAchievementFilters />
+        <SidebarAchievementFilters @filterApplied="filterApplied" />
       </div>
     </div>
   </div>
@@ -231,6 +237,24 @@
 <script>
 export default {
   name: 'AchievementsPage',
+  methods: {
+    async filterApplied(filters) {
+      try {
+        const query = { ...filters }
+        if (!query.playername) {
+          query.playername = '*'
+        }
+        const response = await this.$axios.get(
+          `/achievements?compare=${query.compare}&playername=${query.playername}&champions=${query.champion}&rank=${query.rank}`
+        )
+        console.log(response)
+      } catch (err) {
+        console.log(err)
+      } finally {
+        console.log('done')
+      }
+    },
+  },
 }
 </script>
 

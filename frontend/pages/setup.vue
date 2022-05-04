@@ -22,7 +22,7 @@
         <div class="card-body">
           <div class="mb-3">
             <label class="form-label">Select your Player Name</label>
-            <PlayerSearchInput @changePlayername="changePlayername" />
+            <PlayerSearchInput @playernameSelected="playernameSelected" />
             <div class="form-hint">
               In order for you to view player information and statistics, we
               still need your gamer tag. Please enter your gamer tag in this
@@ -70,12 +70,12 @@ export default {
     },
   },
   methods: {
-    changePlayername(playerUuid, playername) {
+    playernameSelected(playerUuid, playername) {
       this.form.player_uuid = playerUuid
     },
     async savePlayername() {
       try {
-        await this.$axios.patch('/users/1234', {
+        await this.$axios.put('/users/1234', {
           player_uuid: this.form.player_uuid,
         })
         this.$router.push('/dashboard')
