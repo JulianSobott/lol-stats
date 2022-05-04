@@ -75,7 +75,7 @@ export default {
     },
     async savePlayername() {
       try {
-        await this.$axios.patch('/users/1234', {
+        await this.$axios.put('/users/1234', {
           player_uuid: this.form.player_uuid,
         })
         this.$router.push('/dashboard')
