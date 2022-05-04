@@ -16,7 +16,7 @@
               <!-- Page title actions -->
               <div class="col-12 col-md-auto ms-auto d-print-none">
                 <div class="btn-list">
-                  <a href="#" class="btn btn-primary d-none d-sm-inline-block" data-bs-toggle="modal" data-bs-target="#modal-add-competitor">
+                  <a href="#" class="btn btn-primary d-sm-inline-block" data-bs-toggle="modal" data-bs-target="#modal-add-competitor">
                     Add Competitor
                   </a>
                 </div>
