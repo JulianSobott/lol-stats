@@ -25,7 +25,10 @@
     </div>
     <div class="form-group mb-3">
       <label class="form-label subheader mb-2">Player</label>
-      <PlayerSearchInput ref="PlayerSearchInput" @changePlayername="playernameChanged" />
+      <PlayerSearchInput
+        ref="PlayerSearchInput"
+        @playernameSelected="playernameChanged"
+      />
     </div>
     <div class="form-group mb-3">
       <label class="form-label subheader mb-2">Champion</label>
@@ -56,10 +59,16 @@
       </div>
     </div>
     <div class="mt-4">
-      <button class="btn btn-primary w-100" data-bs-dismiss="offcanvas" @click="search">
+      <button
+        class="btn btn-primary w-100"
+        data-bs-dismiss="offcanvas"
+        @click="search"
+      >
         Confirm changes
       </button>
-      <a class="btn btn-link w-100" @click="clearFilters"> Reset to defaults </a>
+      <a class="btn btn-link w-100" @click="clearFilters">
+        Reset to defaults
+      </a>
     </div>
   </form>
 </template>
@@ -81,23 +90,26 @@ export default {
   },
   mounted() {
     this.filters.playername = this.$route.query.playername
+    if (this.filters.playername !== null) {
+      this.$refs.PlayerSearchInput.setPlayername(this.filters.playername)
+    }
   },
   methods: {
     search(e) {
       e.preventDefault(e)
     },
     playernameChanged(playerUuid, playername) {
-      this.filters.playname = playername
+      this.filters.playername = playername
     },
     clearFilters() {
-      this.$refs.PlayerSearchInput.clear();
+      this.$refs.PlayerSearchInput.clear()
       this.filters = {
         compare: 'global',
         playername: '',
         champion: '*',
         rank: '*',
       }
-    }
+    },
   },
 }
 </script>

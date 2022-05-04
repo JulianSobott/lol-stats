@@ -39,23 +39,29 @@ export default {
       this.error = false
       this.success = false
     },
+    setPlayername(playername) {
+      this.playername = playername
+      this.searchPlayerName()
+    },
     async searchPlayerName() {
       if (this.playername.length === 0) {
         this.loading = false
         this.error = false
         this.success = false
-        this.$emit('changePlayername', null)
+        this.$emit('playernameSelected', null)
       }
 
       if (this.playername.length >= 1) {
         try {
           this.loading = true
           const response = await this.$axios.get(`/players/${this.playername}`)
-          this.$emit('changePlayername', response.name, this.playername)
+          this.$emit('playernameSelected', response.name, this.playername)
           this.error = false
           this.success = true
         } catch (err) {
-          if (err.response.status === 404) {
+          if (err.response.status !== 200) {
+            this.$emit('playernameSelected', null, null)
+
             this.loading = false
             this.error = true
             this.success = false

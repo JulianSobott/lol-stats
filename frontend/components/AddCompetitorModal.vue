@@ -1,28 +1,50 @@
 <template>
-<div class="modal modal-blur fade" id="modal-add-competitor" tabindex="-1" role="dialog" aria-hidden="true">
-  <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title">Add Competitor</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-        <div class="mb-3">
-          <label class="form-label">Player</label>
-          <input v-model="form.player" type="text" class="form-control" placeholder="Search player">
+  <div
+    id="modal-add-competitor"
+    class="modal modal-blur fade"
+    tabindex="-1"
+    role="dialog"
+    aria-hidden="true"
+  >
+    <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Add Competitor</h5>
+          <button
+            type="button"
+            class="btn-close"
+            data-bs-dismiss="modal"
+            aria-label="Close"
+          ></button>
         </div>
-      </div>
-      <div class="modal-footer">
-        <a href="#" class="btn btn-link link-secondary" data-bs-dismiss="modal">
-          Cancel
-        </a>
-        <a href="#" class="btn btn-primary ms-auto" @click="addCompetitor()">
-          Add competitor
-        </a>
+        <div class="modal-body">
+          <div class="mb-3">
+            <label class="form-label">Player</label>
+            <PlayerSearchInput
+              ref="PlayerSearchInput"
+              @playernameSelected="playernameSelected"
+            />
+          </div>
+        </div>
+        <div class="modal-footer">
+          <a
+            href="#"
+            class="btn btn-link link-secondary"
+            data-bs-dismiss="modal"
+          >
+            Cancel
+          </a>
+          <button
+            class="btn btn-primary ms-auto"
+            :class="{ disabled: !form.playername }"
+            @click="addCompetitor()"
+          >
+            Add competitor
+          </button>
+        </div>
       </div>
     </div>
   </div>
-</div>
 </template>
 
 <script>
@@ -31,18 +53,41 @@ export default {
   data() {
     return {
       form: {
-        player: '',
+        playername: '',
       },
       submitted: false,
-      error: null
+      error: null,
     }
   },
   methods: {
-    addCompetitor() {
-      console.log(this.form.player + ' added!');
-      const element = document.getElementById("modal-add-competitor");
-      element.classList.remove("show");
-    }
-  }
+    async addCompetitor() {
+      try {
+        await this.$axios.post('/users', {
+          player_uuid: this.form.player_uuid,
+        })
+        this.$router.push('/competitors')
+      } catch (e) {
+        this.error = true
+      }
+
+      if (this.error) return
+
+      this.$refs.PlayerSearchInput.clear()
+
+      // remove modal
+      const modal = document.getElementById('modal-add-competitor')
+      modal.classList.remove('show')
+      modal.style.removeProperty('display')
+
+      document.querySelectorAll('.modal-backdrop').forEach((el) => el.remove())
+
+      const body = document.getElementsByTagName('body')[0]
+      body.classList.remove('modal-open')
+      body.style.removeProperty('overflow')
+    },
+    playernameSelected(playerUuid, playername) {
+      this.form.playername = playername
+    },
+  },
 }
 </script>
