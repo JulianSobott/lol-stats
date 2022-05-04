@@ -7,6 +7,7 @@
         </NuxtLink>
       </div>
       <div class="card card-md">
+        <div v-if="error" class="card-status-top bg-danger"></div>
         <div class="card-body">
           <h2 class="card-title text-center mb-4">Login to your account</h2>
           <div class="mb-3">
@@ -98,12 +99,16 @@ export default {
 
       this.$v.$touch()
       if (this.$v.$invalid) {
+        this.error = true
         return
       }
 
       try {
         const response = await this.$auth.loginWith('local', {
-          data: this.form,
+          data: {
+            email: this.form.email,
+            password: btoa(this.form.email)
+          }
         })
         // TODO Redirect to /setup page if no username is empty
         if (response.data.player_uuid === null) {

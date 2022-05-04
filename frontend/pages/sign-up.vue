@@ -1,13 +1,13 @@
 <template>
   <div class="page page-center">
-    <form class="container-tight py-4" @submit.prevent="login">
+    <form class="container-tight py-4" @submit.prevent="register">
       <div class="text-center mb-4">
         <NuxtLink to="/login">
           <img src="~/assets/images/logo.png" height="36" />
         </NuxtLink>
       </div>
       <div class="card card-md">
-        <div v-if="$v.form.email.$error || error" class="card-status-top bg-danger"></div>
+        <div v-if="error" class="card-status-top bg-danger"></div>
         <div class="card-body">
           <h2 class="card-title text-center mb-4">Create new account</h2>
           <div class="mb-3">
@@ -24,13 +24,19 @@
               v-if="submitted && !$v.form.email.required"
               class="invalid-feedback d-block"
             >
-              Email is required
+              Email is required.
             </div>
             <div
               v-if="submitted && !$v.form.email.email"
               class="invalid-feedback d-block"
             >
-              Email is invalid
+              Email is invalid.
+            </div>
+            <div
+              v-if="submitted && emailExists"
+              class="invalid-feedback d-block"
+            >
+              Email is already in use.
             </div>
           </div>
           <div class="mb-3">
@@ -122,6 +128,7 @@ export default {
       },
       submitted: false,
       error: false,
+      emailExists: false
     }
   },
   head: {
@@ -148,17 +155,20 @@ export default {
   methods: {
     async register() {
       this.submitted = true
+      this.error = false
 
       this.$v.$touch()
       if (this.$v.$invalid) {
+        this.error = true
         return
       }
 
       try {
         await this.$axios.post('/auth/register', {
-          email: this.email,
-          password: this.password,
+          email: this.form.email,
+          password: btoa(this.form.password),
         })
+
         this.$router.push('/login')
       } catch (e) {
         this.error = true
