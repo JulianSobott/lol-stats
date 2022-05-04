@@ -96,7 +96,8 @@ export default {
   },
   methods: {
     search(e) {
-      e.preventDefault(e)
+      this.$emit('filterApplied', {...this.filters})
+      e.preventDefault();
     },
     playernameChanged(playerUuid, playername) {
       this.filters.playername = playername

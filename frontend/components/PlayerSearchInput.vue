@@ -44,14 +44,14 @@ export default {
       this.searchPlayerName()
     },
     async searchPlayerName() {
-      if (this.playername.length === 0) {
+      if (!this.playername) {
         this.loading = false
         this.error = false
         this.success = false
         this.$emit('playernameSelected', null)
       }
 
-      if (this.playername.length >= 1) {
+      if (this.playername && this.playername.length >= 1) {
         try {
           this.loading = true
           const response = await this.$axios.get(`/players/${this.playername}`)
