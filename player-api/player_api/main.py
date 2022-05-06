@@ -61,7 +61,15 @@ async def get_player(player_name: PlayerName):
             )
         )
 
-    win_rate = 0  # TODO
+    result = (
+        db.session.query(
+            func.count(Games.summoner_id).label("num_played"),
+            func.count(case([(Games.win, 1)])).label("won"),
+        )
+            .where(Games.summoner_id == player_id)
+            .first()
+    )
+    win_rate = calc_win_rate(result.num_played, result.won)
     return Player(
         id=player_id,
         icon_path=player.icon_path,
