@@ -24,12 +24,11 @@ class Summoners(Base):
 
     puuid = Column(String, primary_key=True)
     name = Column(String, nullable=False)
-    win_rate = Column(Integer, nullable=False)
     level = Column(Integer, nullable=False)
     icon_path = Column(String, nullable=False)
     last_update = Column(DateTime, nullable=False)
     tier = Column(Enum(TierEnum))
-    rank = Column(Integer, CheckConstraint("rank >= 1 AND rank <= 5"))
+    rank = Column(Integer, CheckConstraint("rank >= 1 AND rank <= 4"))
     league_points = Column(
         Integer, CheckConstraint("league_points >= 0 AND league_points <= 100")
     )
@@ -82,14 +81,14 @@ class Games(Base):
     stats = Column(String, nullable=False)
     challenges = Column(String, nullable=False)
 
-    summoner = relationship("summoners", foreign_keys=[summoner_id])
-    champion = relationship("champions", foreign_keys=[champion_id])
+    summoner = relationship("Summoners", foreign_keys=[summoner_id])
+    champion = relationship("Champions", foreign_keys=[champion_id])
 
 
 def setup_db():
     engine = create_engine(
-        f"postgresql://postgres:{os.environ['POSTGRES_PASSWORD']}@"
-        f"{os.environ['POSTGRES_HOST']}/postgres"
+        f"postgresql://postgres:{os.environ.get('POSTGRES_PASSWORD', 'postgres')}@"
+        f"{os.environ.get('POSTGRES_HOST', 'localhost')}/postgres",
     )
     engine.connect()
     Base.metadata.create_all(engine)

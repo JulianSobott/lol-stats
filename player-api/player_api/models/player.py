@@ -32,5 +32,6 @@ class Player(BaseModel):
     icon_path: str
     name: str
     win_rate: int = Field(ge=0, le=100)
+    level: int
     rank: Rank
     most_played: list[MostPlayed]
