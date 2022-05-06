@@ -1,239 +1,164 @@
-openapi: 3.0.3
+openapi: 3.0.2
 info:
-  title: Player
-  description: Player
+  title: Player API
   version: 1.0.0
 servers:
-  - url: 'https://lol-stats.de/api'
+- url: https://lol-stats.de/api
+  name: production
 paths:
   /players/{player}:
     get:
-      description: Get statistics for the players dashboard
-      tags:
-        - player
+      summary: Get Player
+      operationId: get_player_players__player__get
       parameters:
-        - name: player
-          in: path
-          required: true
-          schema:
-            type: string
+      - required: true
+        schema:
+          title: Player
+          type: string
+        name: player
+        in: path
       responses:
         '200':
-          description: Sucessfully returned statistics
+          description: Successful Response
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Player'
         '404':
-          description: Player not found or no games played
-  /players/{player}/recent-games:
-    get:
-      tags:
-        - player
-      parameters:
-        - name: player
-          in: path
-          required: true
-          schema:
-            type: string
-      responses:
-        200:
-          description: Recent Games of the player
+          description: Player not found
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Game'
-  /players/{player}/competitors:
-    get:
-      description: A list of all competitors, the player has saved
-      tags:
-        - player
-      parameters:
-        - name: player
-          in: path
-          required: true
-          schema:
-            type: string
-      responses:
-        '200':
-          description: Success
+                $ref: '#/components/schemas/ExceptionMessage'
+        '422':
+          description: Validation Error
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    player:
-                      $ref: '#/components/schemas/Player'
-                    fav:
-                      type: boolean
-                    winrate:
-                      type: number
-                    games:
-                      type: number
-                      description: Number of played games (since the challenges began)
-                    average_kda:
-                      type: object
-                      properties:
-                        kills:
-                          type: number
-                        deaths:
-                          type: number
-                        assists:
-                          type: number
-                    rank:
-                      $ref: '#/components/schemas/Rank'
-        '404':
-          description: Player not found or no games played
-  /players/{player}/achievements:
-    get:
-      tags:
-        - player
-      parameters:
-        - name: player
-          in: path
-          required: true
-          schema:
-            type: string
-        - name: players
-          in: query
-          required: true
-          schema:
-            type: array
-            items:
-              type: string
-              description: Player IDs
-        - name: champion
-          in: query
-          required: false
-          schema:
-            $ref: '#/components/schemas/ChampionID'
-      description: Compare the players achievements with others
-      responses:
-        200:
-          description: Sucess
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Achievement'
+                $ref: '#/components/schemas/HTTPValidationError'
 components:
   schemas:
-    Game:
+    ExceptionMessage:
+      title: ExceptionMessage
+      required:
+      - detail
       type: object
       properties:
-        match_id:
+        detail:
+          title: Detail
           type: string
-        victorious_team:
-          type: string
-          enum:
-            - red
-            - blue
-        ally_team:
-          $ref: '#/components/schemas/Team'
-        enemy_team:
-          $ref: '#/components/schemas/Team'
-
-        duration:
-          type: number
-          description: Duration in seconds
-        timestamp:
-          type: string
-          format: date-time
-          description: Timestamp when the game was played
-    ChampionID:
-      type: number
-      description: Same ID as in the Riot API
-    Team:
-      type: array
-      items:
-        type: object
-        properties:
-          champion:
-            type: object
-            properties:
-              name:
-                type: string
-              icon_path:
-                type: string
-          player:
-            type: object
-            properties:
-              id:
-                type: number
-              name:
-                type: string
-          player_stats:
-            type: array
-            items:
-              type: object
-              properties:
-                name:
-                  type: string
-                value:
-                  type: number
-          achievements:
-            type: array
-            items:
-              type: object
-              properties:
-                name:
-                  type: string
-                value:
-                  type: number
+    HTTPValidationError:
+      title: HTTPValidationError
+      type: object
+      properties:
+        detail:
+          title: Detail
+          type: array
+          items:
+            $ref: '#/components/schemas/ValidationError'
+    MostPlayed:
+      title: MostPlayed
+      required:
+      - champion_id
+      - games
+      - win_rate
+      type: object
+      properties:
+        champion_id:
+          title: Champion Id
+          type: integer
+        games:
+          title: Games
+          type: integer
+        win_rate:
+          title: Win Rate
+          maximum: 100.0
+          minimum: 0.0
+          type: integer
     Player:
+      title: Player
+      required:
+      - id
+      - icon_path
+      - name
+      - win_rate
+      - rank
+      - most_played
       type: object
       properties:
         id:
-          type: number
+          title: Id
+          type: string
         icon_path:
+          title: Icon Path
           type: string
         name:
+          title: Name
           type: string
-        avatar:
-          type: string
-          description: path
         win_rate:
-          type: number
+          title: Win Rate
+          maximum: 100.0
+          minimum: 0.0
+          type: integer
         rank:
           $ref: '#/components/schemas/Rank'
         most_played:
+          title: Most Played
           type: array
           items:
-            type: object
-            properties:
-              champion_id:
-                $ref: '#/components/schemas/ChampionID'
-              rank:
-                type: number
-    Achievement:
-      type: object
-      properties:
-        name:
-          type: string
-        type:
-          type: string
-          description: type to allow ordering in tabs
-          example: kills
-        greater_is_better:
-          type: boolean
-        highscore:
-          type: number
-        average:
-          type: number
-          description: Average per game
-        total:
-          type: number
+            $ref: '#/components/schemas/MostPlayed'
     Rank:
+      title: Rank
+      required:
+      - rank
+      - tier
+      - league_points
       type: object
       properties:
         rank:
-          type: string
+          title: Rank
+          maximum: 5.0
+          minimum: 1.0
+          type: integer
         tier:
-          type: number
+          $ref: '#/components/schemas/TierEnum'
         league_points:
-          type: number
+          title: League Points
+          maximum: 100.0
+          minimum: 0.0
+          type: integer
+    TierEnum:
+      title: TierEnum
+      enum:
+      - IRON
+      - BRONZE
+      - SILVER
+      - GOLD
+      - PLATINUM
+      - DIAMOND
+      - MASTER
+      - GRANDMASTER
+      - CHALLENGER
+      type: string
+      description: An enumeration.
+    ValidationError:
+      title: ValidationError
+      required:
+      - loc
+      - msg
+      - type
+      type: object
+      properties:
+        loc:
+          title: Location
+          type: array
+          items:
+            anyOf:
+            - type: string
+            - type: integer
+        msg:
+          title: Message
+          type: string
+        type:
+          title: Error Type
+          type: string

@@ -1,7 +1,7 @@
 from pydantic_factories import ModelFactory, Use
 import random
 
-from player_api.models.player import Player, Rank, RankEnum, TierEnum, MostPlayed
+from player_api.models.player import Player, Rank, TierEnum, MostPlayed
 
 
 class PlayerFactory(ModelFactory):
@@ -15,7 +15,7 @@ class PlayerFactory(ModelFactory):
 class RankFactory(ModelFactory):
     __model__ = Rank
 
-    rank = Use(random.choice, list(RankEnum))
+    rank = Use(random.randint, 1, 4)
     tier = Use(random.choice, list(TierEnum))
     league_points = Use(random.randint, 0, 100)
 
