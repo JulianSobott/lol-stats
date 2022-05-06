@@ -4,18 +4,18 @@ info:
   version: 1.0.0
 servers:
 - url: https://lol-stats.de/api
-  name: production
 paths:
-  /players/{player}:
+  /players/{player_name}:
     get:
       summary: Get Player
-      operationId: get_player_players__player__get
+      description: Get a player by player name
+      operationId: get_player_players__player_name__get
       parameters:
       - required: true
         schema:
-          title: Player
+          title: Player Name
           type: string
-        name: player
+        name: player_name
         in: path
       responses:
         '200':
@@ -82,6 +82,7 @@ components:
       - icon_path
       - name
       - win_rate
+      - level
       - rank
       - most_played
       type: object
@@ -99,6 +100,9 @@ components:
           title: Win Rate
           maximum: 100.0
           minimum: 0.0
+          type: integer
+        level:
+          title: Level
           type: integer
         rank:
           $ref: '#/components/schemas/Rank'

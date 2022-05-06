@@ -2,15 +2,16 @@ import string
 import random
 from datetime import datetime, timedelta
 
+import pytest
 from pytest import fixture
 from fastapi.testclient import TestClient
 from requests import Session
 from sqlalchemy import create_engine
 
-from player_api.db import Champions, Summoners, Base, Games
-from player_api.main import app, calc_win_rate
 from fastapi_sqlalchemy import db
 
+from player_api.db import Champions, Summoners, Base, Games
+from player_api.main import app, calc_win_rate
 from player_api.models.factories import PlayerModelFactory
 from player_api.models.player import Player
 
@@ -73,7 +74,7 @@ def test_get_most_played_many_champs(db_session):
         player.play_n_games(10).with_champion("Thresh").win(1)
         player.play_n_games(9).with_champion("Aatrox").win(1)
         player.play_n_games(8).with_champion("Quinn").win(1)
-        player.play_n_games(7).with_champion("braum").win(1)
+        player.play_n_games(7).with_champion("Braum").win(1)
     res = _player_reqeust(player)
     assert len(res.most_played) == 5
     assert res.most_played[0].champion_id == Champion("Lux").id
@@ -81,6 +82,17 @@ def test_get_most_played_many_champs(db_session):
     assert res.most_played[2].champion_id == Champion("Annie").id
     assert res.most_played[3].champion_id == Champion("Thresh").id
     assert res.most_played[4].champion_id == Champion("Aatrox").id
+
+
+@pytest.mark.skip
+def test_performance(db_session, benchmark):
+    players = PlayerFactory().n_players(5000)
+    with players:
+        for player in players:
+            player.play_n_games(100).with_champion("Lux").win(44)
+            player.play_n_games(50).with_champion("Azir").win(30)
+            player.play_n_games(3).with_champion("Braum").win(1)
+    _player_reqeust(players[0])
 
 
 def test_win_rate(db_session):
@@ -107,6 +119,10 @@ class PlayerFactory:
         self.players.append(Testplayer())
         return self
 
+    def n_players(self, num_players: int) -> "PlayerFactory":
+        self.players.extend(Testplayer() for i in range(num_players))
+        return self
+
     def __enter__(self):
         pass
 
@@ -122,6 +138,10 @@ class PlayerFactory:
 
     def __getitem__(self, item):
         return self.players[item]
+
+    def __iter__(self):
+        for player in self.players:
+            yield player
 
 
 class Testplayer:
