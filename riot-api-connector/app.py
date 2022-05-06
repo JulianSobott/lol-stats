@@ -1,10 +1,17 @@
 import os
+import time
 
-import cassiopeia
+import cassiopeia as cass
+from cassiopeia import Patch, Summoner, Match
+from cassiopeia.core.match import Participant
+
 from db_connector import db
-from cassiopeia import Patch, Summoner
+import static_data
+import challenges
+import match_history
 
-cassiopeia.set_riot_api_key(os.environ["RIOT_API_KEY"])
+# cassiopeia.set_riot_api_key(os.environ["RIOT_API_KEY"])
+cass.set_riot_api_key('RGAPI-ba00cb63-7be0-4e50-8610-eb749b1ea70d')
 
 
 class riot_api_connector:
@@ -12,36 +19,58 @@ class riot_api_connector:
         self.db = db()
         self.db.connect()
 
-    def add_new_summoner(self, id: str, region: str):
-        summoner: Summoner = cassiopeia.get_summoner(id=id, region=region)
-        # check if summoner exists in database
-        # if not
-        match_history = summoner.match_history(
-            begin_time=Patch.from_str('10.12', region=region).start)
-        # store match history in db
+    def add_summoner(self, summoner: Summoner):
+        self.db.add_summoner(puuid=summoner.puuid, name=summoner.name, level=summoner.level,
+                             icon_path=summoner.profile_icon().url, last_update_time=time.time())
 
-    def update_champions(self):
-        self.db.clear_champions()
-        champions = cassiopeia.get_champions(region='EUW')
-        for champ in champions:
-            self.db.add_champion(id=champ.id, name=champ.name, icon_path=champ.image.url)
+    def get_summoner(self, name: str, region: str) -> Summoner:
+        summoner: Summoner = cass.get_summoner(name=name, region=region)
+        db_summoner = self.db.get_summoner(puuid=summoner.puuid)
+        if db_summoner is None:
+            self.add_summoner(summoner=summoner)
+            mh = match_history.get_match_history(summoner=summoner)
+            match_history.add_missing_games_to_db(
+                db=self.db, match_history=mh, puuid=summoner.puuid)
+        else:
+            last_update = db_summoner[3]
+            mh = match_history.get_match_history(summoner=summoner)
+            match_history.add_missing_games_to_db(
+                db=self.db, match_history=mh, puuid=summoner.puuid)
+            # only update games since last update timestamp, currently not possible
 
-    def update_summoner_spells(self):
-        self.db.clear_summoner_spells()
-        summoner_spells = cassiopeia.get_summoner_spells(region='EUW')
-        for spell in summoner_spells:
-            self.db.add_summoner_spell(id=spell.id, name=spell.name, icon_path=spell.image.url)
+        return summoner
 
-    def update_items(self):
-        self.db.clear_items()
-        items = cassiopeia.get_items(region='EUW')
-        for item in items:
-            self.db.add_item(id=item.id, name=item.name, icon_path=item.image.url)
+    # def test(self):
+    #     summoner = self.get_summoner('LinkX20', 'EUW')
+    #     # self.add_summoner(summoner=summoner)
+    #     test: Match = Match(
+    #         id='EUW1_5858029465', region='EUW')
+    #     c = challenges.Challenges()
+    #     self.store_game(test, summoner.puuid)
+    #     #c.store_challenges(self.db, test.participants[0].stats, summoner.puuid)
+
+    # def test_match_history(self):
+    #     summoner = self.get_summoner('LinkX20', 'EUW')
+    #     total_matches = 20
+    #     history = cass.get_match_history(
+    #         continent=summoner.region.continent,
+    #         region=summoner.region,
+    #         platform=summoner.region.platform,
+    #         puuid=summoner.puuid,
+    #         begin_time=Patch.from_str('10.12', region=summoner.region).start,
+    #         begin_index=total_matches,
+    #         end_index=total_matches+100)
+    #     print(history[0].id)
+    #     print(len(history))
 
 
 print("Updating ...")
 x = riot_api_connector()
-x.update_champions()
-x.update_items()
-x.update_summoner_spells()
+# x.test_match_history()
+x.get_summoner('LinkX20', region='EUW')
+#x.get_summoner('LinkX20', 'EUW')
+# x.db.create_tables()
+# static_data.update_summoner_icons(x.db)
+# c = challenges.Challenges()
+# c.store_classes_in_db(x.db)
 print("Finished updating")
