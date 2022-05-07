@@ -3,40 +3,35 @@ from enum import Enum
 from pydantic import BaseModel, Field
 
 
-class RankEnum(str, Enum):
-    I = "I"
-    II = "II"
-    III = "III"
-    IV = "IV"
-    V = "V"
-
-
 class TierEnum(str, Enum):
     IRON = "IRON"
     BRONZE = "BRONZE"
     SILVER = "SILVER"
     GOLD = "GOLD"
-    PLATIN = "PLATIN"
+    PLATINUM = "PLATINUM"
     DIAMOND = "DIAMOND"
     MASTER = "MASTER"
+    GRANDMASTER = "GRANDMASTER"
     CHALLENGER = "CHALLENGER"
 
 
 class Rank(BaseModel):
-    rank: RankEnum
+    rank: int = Field(ge=1, le=5)
     tier: TierEnum
     league_points: int = Field(ge=0, le=100)
 
 
 class MostPlayed(BaseModel):
     champion_id: int
-    rank: int
+    games: int
+    win_rate: int = Field(ge=0, le=100)
 
 
 class Player(BaseModel):
     id: str
     icon_path: str
     name: str
-    win_rate: float = Field(ge=0, le=100)
+    win_rate: int = Field(ge=0, le=100)
+    level: int
     rank: Rank
     most_played: list[MostPlayed]

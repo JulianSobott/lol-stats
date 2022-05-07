@@ -11,10 +11,16 @@ sqlalchemy = "*"
 psycopg2-binary = "*"
 fastapi-sqlalchemy = "*"
 pydantic-factories = "*"
+opentelemetry-instrumentation-fastapi = "*"
+opentelemetry-exporter-otlp = "*"
+opentelemetry-distro = "*"
+opentelemetry-instrumentation-sqlalchemy = "*"
 
 [dev-packages]
 pytest = "*"
 requests = "*"
+black = "*"
+locust = "*"
 
 [requires]
 python_version = "3.10"
