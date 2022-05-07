@@ -125,9 +125,9 @@ class db:
         self.cursor.execute(sql, (name, puuid))
         return self.cursor.fetchone()
 
-    def add_game(self, match_id: str, summoner_id: str, start_time: int, duration: int, win: bool, lane: str, challenges: str) -> None:
-        sql = """INSERT INTO games(match_id, summoner_id, start_time, duration, win, lane, challenges) VALUES (%s, %s, %s, %s, %s, %s, %s);"""
-        self.cursor.execute(sql, (match_id, summoner_id,
+    def add_game(self, match_id: str, summoner_id: str, champ_id: int, start_time: int, duration: int, win: bool, lane: str, challenges: str) -> None:
+        sql = """INSERT INTO games(match_id, summoner_id, champ_id, start_time, duration, win, lane, challenges) VALUES (%s, %s, %s, %s, %s, %s, %s, %s);"""
+        self.cursor.execute(sql, (match_id, summoner_id, champ_id,
                             start_time, duration, win, lane, challenges))
         self.connection.commit()
 

@@ -29,20 +29,17 @@ class Challenges:
 
     def store_challenges(self, db: db, stats: ParticipantStats, puuid: str):
         total_games = db.get_games_played_count(puuid=puuid)
-        print(total_games)
         total_games = total_games[0]
         for class_ in self.classes:
             for challenge in self.classes[class_]:
-                row = db.get_challenge_entry(
+                old_values = db.get_challenge_entry(
                     name=challenge['name'], puuid=puuid)
                 new_stat = self.get_stat(
                     challenge_name=challenge['name'], stats=stats)
-                if row is None:
+                if old_values is None:
                     db.add_challenge(
                         name=challenge['name'], summoner_id=puuid, total=new_stat, average_per_game=new_stat, highscore=new_stat)
                 else:
-                    old_values = db.get_challenge_entry(
-                        name=challenge['name'], puuid=puuid)
                     operator = db.get_challenge_class(
                         name=challenge['name'])[3]
                     db.update_challenge(name=challenge['name'], puuid=puuid,

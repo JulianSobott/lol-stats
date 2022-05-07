@@ -32,6 +32,6 @@ def add_missing_games_to_db(db: db, match_history: MatchHistory, puuid: str):
             win = match.blue_team.win
         else:
             win = match.red_team.win
-        db.add_game(match_id=match.id, summoner_id=puuid, start_time=match.start.int_timestamp, duration=match.duration.seconds,
+        db.add_game(match_id=match.id, summoner_id=puuid, champ_id=participant.champion.id, start_time=match.start.int_timestamp, duration=match.duration.seconds,
                     win=win, lane=participant.individual_position.value, challenges=c.get_json_string(participant.stats))
         c.store_challenges(db=db, stats=participant.stats, puuid=puuid)

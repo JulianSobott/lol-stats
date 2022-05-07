@@ -52,6 +52,7 @@ CREATE TABLE IF NOT EXISTS Challenges (
 CREATE TABLE IF NOT EXISTS Games (
    match_id     TEXT                    NOT NULL,
    summoner_id  TEXT                    NOT NULL,
+   champ_id     INT                     NOT NULL,
    start_time   INT                     NOT NULL,
    duration     INT                     NOT NULL,
    win          BOOLEAN                 NOT NULL,
@@ -59,5 +60,7 @@ CREATE TABLE IF NOT EXISTS Games (
    challenges   TEXT                    NOT NULL,
    PRIMARY KEY (match_id, summoner_id),
    FOREIGN KEY (summoner_id)
-        REFERENCES Summoners (puuid)
+        REFERENCES Summoners (puuid),
+   FOREIGN KEY (champ_id)
+        REFERENCES Champions (id)
 );

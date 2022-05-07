@@ -66,8 +66,10 @@ class riot_api_connector:
 
 print("Updating ...")
 x = riot_api_connector()
+x.db.create_tables()
 # x.test_match_history()
-x.get_summoner('LinkX20', region='EUW')
+# x.get_summoner('LinkX20', region='EUW')
+x.get_summoner('gravitysuit', region='EUW')
 #x.get_summoner('LinkX20', 'EUW')
 # x.db.create_tables()
 # static_data.update_summoner_icons(x.db)

@@ -468,7 +468,7 @@
         {
             "name": "maxKillDeficit",
             "description": "Maximum kill deficit",
-            "operator": "<"
+            "operator": ">"
         },
         {
             "name": "maxLevelLeadLaneOpponent",
