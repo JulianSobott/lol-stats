@@ -52,7 +52,7 @@ services:
       POSTGRES_HOST: psql-achievements
       OTEL_METRICS_EXPORTER: none
       OTEL_RESOURCE_ATTRIBUTES: service.name=player-api
-      OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector:4318
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector:4317
     networks:
       - services
       - stats-storage
