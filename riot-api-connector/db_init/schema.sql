@@ -1,8 +1,17 @@
+create type tierenum as enum ('IRON', 'BRONZE', 'SILVER', 'GOLD', 'PLATINUM', 'DIAMOND', 'MASTER', 'GRANDMASTER', 'CHALLENGER');
+
 CREATE TABLE IF NOT EXISTS Summoners (
    puuid        TEXT    PRIMARY KEY     NOT NULL,
    level        INT                     NOT NULL,
    icon_path    TEXT                    NOT NULL,
    last_update  INT                     NOT NULL
+   tier          tierenum,
+   rank          integer
+      constraint summoners_rank_check
+         check ((rank >= 1) AND (rank <= 4)),
+   league_points integer
+      constraint summoners_league_points_check
+         check ((league_points >= 0) AND (league_points <= 100))
 );
 
 CREATE TABLE IF NOT EXISTS SummonerSpells (
