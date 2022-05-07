@@ -1,16 +1,12 @@
-import string
 import random
+import string
 from datetime import datetime, timedelta
 
 import pytest
-from pytest import fixture
 from fastapi.testclient import TestClient
-from requests import Session
-from sqlalchemy import create_engine
-
 from fastapi_sqlalchemy import db
 
-from player_api.db import Champions, Summoners, Base, Games
+from player_api.db import Champions, Summoners, Games
 from player_api.main import app, calc_win_rate
 from player_api.models.factories import PlayerModelFactory
 from player_api.models.player import Player

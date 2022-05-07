@@ -1,16 +1,27 @@
+import json
 import os
 import string
 import random
 import time
+from urllib.parse import urlencode
+from datetime import datetime
 from pathlib import Path
 
 from fastapi import FastAPI, HTTPException, Request
 from fastapi_sqlalchemy import DBSessionMiddleware, db
-from sqlalchemy import func, text, case
+from sqlalchemy import func, text, case, desc
 import logging.config
 from opentelemetry.instrumentation.fastapi import FastAPIInstrumentor
 
-
+from player_api.models.game import (
+    Game,
+    Page,
+    TeamSide,
+    TeamMember,
+    Champion,
+    GamePlayer,
+    NameValue,
+)
 from player_api.db import Summoners, Games, Champions
 from player_api.models.player import Player, Rank, MostPlayed, BasicPlayer
 from player_api.models.responses import ExceptionMessage
@@ -35,6 +46,8 @@ app.add_middleware(
 
 PlayerId = str
 PlayerName = str
+
+DEFAULT_GAMES_PER_PAGE = 5
 
 
 @app.middleware("http")
@@ -144,6 +157,63 @@ def get_player_by_id(player_id: str) -> Summoners | None:
             db.session.query(Summoners).where(Summoners.puuid == player_id).first()
         )
         return player
+
+
+@app.get(
+    "/players/{player_name}/recent-games",
+    response_model=Page[Game],
+    responses={404: {"model": ExceptionMessage, "description": "Player not found"}},
+)
+def recent_games(
+    player_name: PlayerName,
+    request: Request,
+    start_after: datetime = None,
+    limit: int = DEFAULT_GAMES_PER_PAGE,
+):
+    logger.debug(f"method=recent_games {player_name=}")
+    player = get_player_by_name(player_name)
+    if player is None:
+        raise HTTPException(status_code=404, detail="player not found")
+    logger.debug(f"method=recent_games {player_name=} {player.puuid=}")
+    if start_after is None:
+        start_after = datetime(1970, 1, 1)
+    games: list[Games] = (
+        db.session.query(Games)
+        .where(Summoners.puuid == player.puuid and Games.start_time > start_after)
+        .order_by(desc(Games.start_time))
+        .limit(limit)
+        .all()
+    )
+    if len(games) == 0:
+        return Page[Game](items=[], next="")
+    next_start_after = games[0].start_time.isoformat()
+    next_link = (
+        str(request.url.path)
+        + "?"
+        + urlencode({"start_after": next_start_after, "limit": limit})
+    )
+    ret_games = []
+    for game in games:
+        stats = [NameValue(name=k, value=v) for k, v in json.loads(game.stats).items()]
+        ret_games.append(
+            Game(
+                match_id=game.match_id,
+                victorious_team=TeamSide.red,
+                ally_team=[
+                    TeamMember(
+                        champion=Champion(
+                            name=game.champion.name, icon_path=game.champion.icon_path
+                        ),
+                        player=GamePlayer(id=player.puuid, name=player.name),
+                        player_stats=stats,
+                    )
+                ],
+                enemy_team=[],
+                duration=game.duration,
+                timestamp=game.start_time,
+            )
+        )
+    return Page[Game](items=ret_games, next=str(next_link))
 
 
 def get_player_by_name(player_name: str) -> Summoners | None:
