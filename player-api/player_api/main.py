@@ -67,12 +67,12 @@ async def get_player(player_name: PlayerName):
 
     most_played_db = (
         db.session.query(
-            Games.champion_id,
-            func.count(Games.champion_id).label("num_played"),
+            Games.champ_id,
+            func.count(Games.champ_id).label("num_played"),
             func.count(case([(Games.win, 1)])).label("won"),
         )
         .where(Games.summoner_id == player.puuid)
-        .group_by(Games.champion_id)
+        .group_by(Games.champ_id)
         .order_by(text("num_played DESC"))
         .limit(5)
         .all()

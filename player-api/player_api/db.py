@@ -73,7 +73,7 @@ class Games(Base):
     summoner_id = Column(
         String, ForeignKey("summoners.puuid"), nullable=False, primary_key=True
     )
-    champion_id = Column(Integer, ForeignKey("champions.id"), nullable=False)
+    champ_id = Column(Integer, ForeignKey("champions.id"), nullable=False)
     start_time = Column(DateTime, nullable=False)
     duration = Column(Integer, nullable=False)
     win = Column(Boolean, nullable=False)
@@ -82,7 +82,7 @@ class Games(Base):
     challenges = Column(String, nullable=False)
 
     summoner = relationship("Summoners", foreign_keys=[summoner_id])
-    champion = relationship("Champions", foreign_keys=[champion_id])
+    champion = relationship("Champions", foreign_keys=[champ_id])
 
 
 def setup_db():
