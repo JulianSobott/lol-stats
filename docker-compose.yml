@@ -50,13 +50,16 @@ services:
     environment:
       POSTGRES_PASSWORD: $POSTGRES_PASSWORD
       POSTGRES_HOST: psql-achievements
+      OTEL_METRICS_EXPORTER: none
+      OTEL_RESOURCE_ATTRIBUTES: service.name=player-api
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector:4318
     networks:
       - services
       - stats-storage
+      - otel
 
 volumes:
   pg_data: {}
-  redis_player_api_data: {}
 
 networks:
   stats-storage: {}

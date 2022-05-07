@@ -12,3 +12,23 @@ services:
       interval: 10s
       timeout: 3s
       retries: 3
+    networks:
+      - stats-storage
+
+  player-api:
+    build: .
+    ports:
+      - "8000:80"
+    environment:
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_HOST: psql-achievements
+      OTEL_RESOURCE_ATTRIBUTES: service.name=player-api
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector:4317
+    networks:
+      - stats-storage
+      - clickhouse-setup_default  # TODO: external network
+
+networks:
+  clickhouse-setup_default:
+    external: true
+  stats-storage: {}

@@ -8,6 +8,7 @@ from fastapi import FastAPI, HTTPException, Request
 from fastapi_sqlalchemy import DBSessionMiddleware, db
 from sqlalchemy import func, text, case
 import logging.config
+from opentelemetry.instrumentation.fastapi import FastAPIInstrumentor
 
 
 from player_api.db import Summoners, Games
@@ -124,3 +125,6 @@ def calc_win_rate(games: int, won: int) -> int:
     if won > games:
         raise ValueError(f"Won more games than played. {games=} {won=}")
     return int((won / games) * 100)
+
+
+FastAPIInstrumentor.instrument_app(app)

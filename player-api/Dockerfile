@@ -7,4 +7,4 @@ RUN pipenv requirements > /code/requirements.txt &&  pip install --no-cache-dir 
 
 COPY . .
 
-CMD ["uvicorn", "player_api.main:app", "--host", "0.0.0.0", "--port", "80"]
+CMD ["opentelemetry-instrument", "uvicorn", "player_api.main:app", "--host", "0.0.0.0", "--port", "80"]
