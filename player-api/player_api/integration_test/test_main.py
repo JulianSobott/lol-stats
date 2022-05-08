@@ -19,19 +19,6 @@ client = TestClient(app)
 random.seed(1)
 
 
-@fixture
-def db_session():
-    engine = create_engine(
-        f"postgresql://postgres:postgres@localhost/postgres",
-    )
-    Champion.cache = {}
-    Base.metadata.drop_all(engine)
-    Base.metadata.create_all(engine)
-    session = Session()
-    yield session
-    session.close()
-
-
 def test_get_most_played(db_session):
     players = PlayerFactory().player()
     player = players[0]
@@ -116,7 +103,7 @@ def test_win_rate(db_session):
 
 
 def _player_reqeust(player: "Testplayer") -> Player:
-    response = client.get(f"/players/{player.name}")
+    response = client.get(f"/players/{player.player.id}")
     assert response.status_code == 200
     return Player(**response.json())
 
