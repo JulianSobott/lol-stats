@@ -56,7 +56,7 @@
                               <div class="font-weight-medium">
                                 <NuxtLink to="/profiles/1234" class="text-reset">{{item.playername}}</NuxtLink>
                               </div>
-                              <div class="text-muted"><NuxtLink :to="'/achievements?playername=' + item.playername" class="text-reset">Achievements</NuxtLink></div>
+                              <div class="text-muted"><NuxtLink :to="'/achievements?player_name=' + item.playername" class="text-reset">Achievements</NuxtLink></div>
                             </div>
                           </div>
                         </td>

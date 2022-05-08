@@ -280,7 +280,10 @@ export default {
           puuids.push('123')
           puuids.push('123')
         } else if (query.compare === 'player') {
-          puuids.push(query.playername)
+          // get id of player
+          console.log(query);
+          const response = await this.$axios.get(`/players?player_name=${query.player.playername}`)
+          puuids.push(response.data.id)
         }
 
         await this.$axios.get(

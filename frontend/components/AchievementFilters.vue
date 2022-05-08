@@ -92,7 +92,7 @@ export default {
     return {
       filters: {
         compare: 'global',
-        playername: null,
+        player: {},
         champion: '*',
         rank: '*',
       },
@@ -103,12 +103,12 @@ export default {
   mounted() {
     this.$refs.PlayerSearchInput.disable(true)
 
-    // TODO: Fix
-    if (this.$route.query.playername !== undefined) {
+    if (this.$route.query.player_name !== undefined) {
       this.filters.compare = 'player'
-      this.filters.player.playername = this.$route.query.playername
-      this.$refs.PlayerSearchInput.setPlayerData(this.filters.playername)
+      this.filters.player.playername = this.$route.query.player_name
+      this.$refs.PlayerSearchInput.setPlayerData(this.filters.player.playername, null)
       this.$refs.PlayerSearchInput.disable(false)
+      console.log(this.filters)
     }
   },
   methods: {
@@ -123,7 +123,7 @@ export default {
       this.$refs.PlayerSearchInput.clear()
       this.filters = {
         compare: 'global',
-        playername: null,
+        player: {},
         champion: '*',
         rank: '*',
       }

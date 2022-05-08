@@ -63,10 +63,10 @@ export default {
         try {
           this.loading = true
           // TODO: Change to new API
-          const response = await this.$axios.get(`/players/${this.playername}`)
-          this.$emit('playerSelected', response.name, {
-            playername: this.playername,
-            player_uuid: this.playerUuid
+          const response = await this.$axios.get(`/players?player_name=${this.playername}`)
+          this.$emit('playerSelected', {
+            playername: response.data.name,
+            player_uuid: response.data.id
           })
           this.error = false
           this.success = true
