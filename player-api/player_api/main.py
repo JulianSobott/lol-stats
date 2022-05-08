@@ -12,10 +12,12 @@ from opentelemetry.instrumentation.fastapi import FastAPIInstrumentor
 
 
 from player_api.db import Summoners, Games, Champions
-from player_api.models.player import Player, Rank, MostPlayed
+from player_api.models.player import Player, Rank, MostPlayed, BasicPlayer
 from player_api.models.responses import ExceptionMessage
 
-logging.config.fileConfig(Path(__file__).parent.joinpath("logging.conf"), disable_existing_loggers=False)
+logging.config.fileConfig(
+    Path(__file__).parent.joinpath("logging.conf"), disable_existing_loggers=False
+)
 
 logger = logging.getLogger(__name__)
 
@@ -53,17 +55,17 @@ async def log_requests(request: Request, call_next):
 
 
 @app.get(
-    "/players/{player_name}",
+    "/players/{player_id}",
     response_model=Player,
     responses={404: {"model": ExceptionMessage, "description": "Player not found"}},
 )
-async def get_player(player_name: PlayerName):
-    """Get a player by player name"""
-    logger.debug(f"method=get_player {player_name=}")
-    player = get_player_by_name(player_name)
+async def get_player(player_id: PlayerId):
+    """Get a player by riots puuid"""
+    logger.debug(f"method=get_player {player_id=}")
+    player = get_player_by_id(player_id)
     if player is None:
         raise HTTPException(status_code=404, detail="player not found")
-    logger.debug(f"method=get_player {player_name=} {player.puuid=}")
+    logger.debug(f"method=get_player {player_id=} {player.name=}")
 
     most_played_db = (
         db.session.query(
@@ -73,6 +75,7 @@ async def get_player(player_name: PlayerName):
             func.count(Games.champ_id).label("num_played"),
             func.count(case([(Games.win, 1)])).label("won"),
         )
+        .join(Champions)
         .where(Games.summoner_id == player.puuid)
         .group_by(Games.champ_id, Champions.name, Champions.icon_path)
         .order_by(text("num_played DESC"))
@@ -113,6 +116,34 @@ async def get_player(player_name: PlayerName):
         most_played=most_played,
         win_rate=win_rate,
     )
+
+
+@app.get(
+    "/players",
+    response_model=BasicPlayer,
+    responses={404: {"model": ExceptionMessage, "description": "Player not found"}},
+)
+def find_player(player_name: str, region: str = None):
+    player = get_player_by_name(player_name)
+    if player is None:
+        raise HTTPException(status_code=404, detail="player not found")
+    return BasicPlayer(
+        id=player.puuid,
+        player_icon_path=player.icon_path,
+        name=player.name,
+        level=player.level,
+        rank=Rank(
+            rank=player.rank, tier=player.tier, league_points=player.league_points
+        ),
+    )
+
+
+def get_player_by_id(player_id: str) -> Summoners | None:
+    with db():
+        player: Summoners | None = (
+            db.session.query(Summoners).where(Summoners.puuid == player_id).first()
+        )
+        return player
 
 
 def get_player_by_name(player_name: str) -> Summoners | None:

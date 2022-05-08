@@ -37,3 +37,11 @@ class Player(BaseModel):
     level: int
     rank: Rank
     most_played: list[MostPlayed]
+
+
+class BasicPlayer(BaseModel):
+    id: str
+    player_icon_path: str
+    name: str
+    level: int
+    rank: Rank

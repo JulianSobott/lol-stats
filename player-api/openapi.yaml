@@ -5,17 +5,17 @@ info:
 servers:
 - url: https://lol-stats.de/api
 paths:
-  /players/{player_name}:
+  /players/{player_id}:
     get:
       summary: Get Player
-      description: Get a player by player name
-      operationId: get_player_players__player_name__get
+      description: Get a player by riots puuid
+      operationId: get_player_players__player_id__get
       parameters:
       - required: true
         schema:
-          title: Player Name
+          title: Player Id
           type: string
-        name: player_name
+        name: player_id
         in: path
       responses:
         '200':
@@ -36,8 +36,68 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/HTTPValidationError'
+  /players:
+    get:
+      summary: Find Player
+      operationId: find_player_players_get
+      parameters:
+      - required: true
+        schema:
+          title: Player Name
+          type: string
+        name: player_name
+        in: query
+      - required: false
+        schema:
+          title: Region
+          type: string
+        name: region
+        in: query
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BasicPlayer'
+        '404':
+          description: Player not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionMessage'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
 components:
   schemas:
+    BasicPlayer:
+      title: BasicPlayer
+      required:
+      - id
+      - player_icon_path
+      - name
+      - level
+      - rank
+      type: object
+      properties:
+        id:
+          title: Id
+          type: string
+        player_icon_path:
+          title: Player Icon Path
+          type: string
+        name:
+          title: Name
+          type: string
+        level:
+          title: Level
+          type: integer
+        rank:
+          $ref: '#/components/schemas/Rank'
     ExceptionMessage:
       title: ExceptionMessage
       required:
