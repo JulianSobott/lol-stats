@@ -62,7 +62,6 @@ export default {
       if (this.playername && this.playername.length >= 1) {
         try {
           this.loading = true
-          // TODO: Change to new API
           const response = await this.$axios.get(`/players?player_name=${this.playername}`)
           this.$emit('playerSelected', {
             playername: response.data.name,

@@ -103,9 +103,9 @@ export default {
   mounted() {
     this.$refs.PlayerSearchInput.disable(true)
 
-    if (this.$route.query.player_name !== undefined) {
+    if (this.$route.query.playername !== undefined) {
       this.filters.compare = 'player'
-      this.filters.player.playername = this.$route.query.player_name
+      this.filters.player.playername = this.$route.query.playername
       this.$refs.PlayerSearchInput.setPlayerData(this.filters.player.playername, null)
       this.$refs.PlayerSearchInput.disable(false)
       console.log(this.filters)
