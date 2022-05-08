@@ -36,7 +36,7 @@
           </a>
           <button
             class="btn btn-primary ms-auto"
-            :class="{ disabled: !form.player.playername }"
+            :class="{ disabled: !form.player }"
             @click="addCompetitor()"
           >
             Add competitor
@@ -63,7 +63,7 @@ export default {
     async addCompetitor() {
       try {
         await this.$axios.post('/users', {
-          player_uuid: this.form.player_uuid,
+          player_uuid: this.form.player.player_uuid,
         })
         this.$router.push('/competitors')
       } catch (e) {
