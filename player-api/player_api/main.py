@@ -104,7 +104,7 @@ async def get_player(player_name: PlayerName):
     logging.debug(f"method=get_player {win_rate=}")
     return Player(
         id=player.puuid,
-        icon_path=player.icon_path,
+        player_icon_path=player.icon_path,
         name=player.name,
         level=player.level,
         rank=Rank(

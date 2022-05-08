@@ -87,7 +87,7 @@ components:
       title: Player
       required:
       - id
-      - icon_path
+      - player_icon_path
       - name
       - win_rate
       - level
@@ -98,8 +98,8 @@ components:
         id:
           title: Id
           type: string
-        icon_path:
-          title: Icon Path
+        player_icon_path:
+          title: Player Icon Path
           type: string
         name:
           title: Name

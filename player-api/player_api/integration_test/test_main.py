@@ -227,7 +227,7 @@ class GamesFactory:
                 Games(
                     match_id=random_name(),
                     summoner_id=self.player.summoner.puuid,
-                    champion_id=Champion(self.champion).id,
+                    champ_id=Champion(self.champion).id,
                     start_time=datetime.now() - timedelta(hours=1),
                     duration=timedelta(minutes=30).total_seconds(),
                     win=won,
