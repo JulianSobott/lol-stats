@@ -9,6 +9,7 @@
             type="radio"
             class="form-check-input"
             value="global"
+            @change="globalFriendsRadioSelected()"
           />
           <span class="form-check-label">Global</span>
         </label>
@@ -18,8 +19,19 @@
             type="radio"
             class="form-check-input"
             value="friends"
+            @change="globalFriendsRadioSelected()"
           />
           <span class="form-check-label">Friends</span>
+        </label>
+        <label class="form-check mb-1">
+          <input
+            v-model="filters.compare"
+            type="radio"
+            class="form-check-input"
+            value="player"
+            @change="playerRadioSelected()"
+          />
+          <span class="form-check-label">Player</span>
         </label>
       </div>
     </div>
@@ -27,7 +39,7 @@
       <label class="form-label subheader mb-2">Player</label>
       <PlayerSearchInput
         ref="PlayerSearchInput"
-        @playernameSelected="playernameChanged"
+        @playerSelected="playerChanged"
       />
     </div>
     <div class="form-group mb-3">
@@ -59,13 +71,13 @@
       </div>
     </div>
     <div class="mt-4">
-      <button
+      <a
         class="btn btn-primary w-100"
         data-bs-dismiss="offcanvas"
         @click="search"
       >
         Confirm changes
-      </button>
+      </a>
       <a class="btn btn-link w-100" @click="clearFilters">
         Reset to defaults
       </a>
@@ -80,7 +92,7 @@ export default {
     return {
       filters: {
         compare: 'global',
-        playername: '',
+        player: {},
         champion: '*',
         rank: '*',
       },
@@ -89,27 +101,38 @@ export default {
     }
   },
   mounted() {
-    this.filters.playername = this.$route.query.playername
-    if (this.filters.playername !== null) {
-      this.$refs.PlayerSearchInput.setPlayername(this.filters.playername)
+    this.$refs.PlayerSearchInput.disable(true)
+
+    if (this.$route.query.player_name !== undefined) {
+      this.filters.compare = 'player'
+      this.filters.player.playername = this.$route.query.player_name
+      this.$refs.PlayerSearchInput.setPlayerData(this.filters.player.playername, null)
+      this.$refs.PlayerSearchInput.disable(false)
+      console.log(this.filters)
     }
   },
   methods: {
     search(e) {
-      this.$emit('filterApplied', {...this.filters})
-      e.preventDefault();
+      this.$emit('filterApplied', { ...this.filters })
+      e.preventDefault()
     },
-    playernameChanged(playerUuid, playername) {
-      this.filters.playername = playername
+    playerChanged(playerData) {
+      this.filters.player = playerData
     },
     clearFilters() {
       this.$refs.PlayerSearchInput.clear()
       this.filters = {
         compare: 'global',
-        playername: '',
+        player: {},
         champion: '*',
         rank: '*',
       }
+    },
+    playerRadioSelected() {
+      this.$refs.PlayerSearchInput.disable(false)
+    },
+    globalFriendsRadioSelected() {
+      this.$refs.PlayerSearchInput.disable(true)
     },
   },
 }

@@ -75,6 +75,36 @@
                       >Gold</a
                     >
                   </li>
+                  <li class="nav-item">
+                    <a href="#tab-gold" class="nav-link" data-bs-toggle="tab"
+                      >Multikills</a
+                    >
+                  </li>
+                  <li class="nav-item">
+                    <a href="#tab-gold" class="nav-link" data-bs-toggle="tab"
+                      >Utility</a
+                    >
+                  </li>
+                  <li class="nav-item">
+                    <a href="#tab-gold" class="nav-link" data-bs-toggle="tab"
+                      >Special Kills</a
+                    >
+                  </li>
+                  <li class="nav-item">
+                    <a href="#tab-gold" class="nav-link" data-bs-toggle="tab"
+                      >Combat</a
+                    >
+                  </li>
+                  <li class="nav-item">
+                    <a href="#tab-gold" class="nav-link" data-bs-toggle="tab"
+                      >Survival</a
+                    >
+                  </li>
+                  <li class="nav-item">
+                    <a href="#tab-gold" class="nav-link" data-bs-toggle="tab"
+                      >Objectives</a
+                    >
+                  </li>
                 </ul>
                 <div class="tab-content">
                   <!-- Content of card #1 -->
@@ -241,17 +271,28 @@ export default {
     async filterApplied(filters) {
       try {
         const query = { ...filters }
-        if (!query.playername) {
-          query.playername = '*'
+        const puuids = []
+
+        if (query.compare === 'global') {
+          // keep puuids empty
+        } else if (query.compare === 'friends') {
+          puuids.push('123')
+          puuids.push('123')
+          puuids.push('123')
+        } else if (query.compare === 'player') {
+          // get id of player
+          console.log(query);
+          const response = await this.$axios.get(`/players?player_name=${query.player.playername}`)
+          puuids.push(response.data.id)
         }
-        const response = await this.$axios.get(
-          `/achievements?compare=${query.compare}&playername=${query.playername}&champions=${query.champion}&rank=${query.rank}`
+
+        await this.$axios.get(
+          `/achievements?compare=[${puuids.join()}]&champion=${
+            query.champion
+          }&rank=${query.rank}`
         )
-        console.log(response)
       } catch (err) {
         console.log(err)
-      } finally {
-        console.log('done')
       }
     },
   },

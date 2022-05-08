@@ -107,7 +107,7 @@ export default {
         const response = await this.$auth.loginWith('local', {
           data: {
             email: this.form.email,
-            password: btoa(this.form.email)
+            password: this.form.email
           }
         })
         // TODO Redirect to /setup page if no username is empty

@@ -16,7 +16,7 @@
               <!-- Page title actions -->
               <div class="col-12 col-md-auto ms-auto d-print-none">
                 <div class="btn-list">
-                  <a href="#" class="btn btn-primary d-none d-sm-inline-block" data-bs-toggle="modal" data-bs-target="#modal-add-competitor">
+                  <a href="#" class="btn btn-primary d-sm-inline-block" data-bs-toggle="modal" data-bs-target="#modal-add-competitor">
                     Add Competitor
                   </a>
                 </div>
@@ -56,7 +56,7 @@
                               <div class="font-weight-medium">
                                 <NuxtLink to="/profiles/1234" class="text-reset">{{item.playername}}</NuxtLink>
                               </div>
-                              <div class="text-muted"><NuxtLink :to="'/achievements?playername=' + item.playername" class="text-reset">Achievements</NuxtLink></div>
+                              <div class="text-muted"><NuxtLink :to="'/achievements?player_name=' + item.playername" class="text-reset">Achievements</NuxtLink></div>
                             </div>
                           </div>
                         </td>
