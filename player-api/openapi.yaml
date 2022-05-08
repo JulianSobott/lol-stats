@@ -60,6 +60,8 @@ components:
       title: MostPlayed
       required:
       - champion_id
+      - champion_name
+      - icon_path
       - games
       - win_rate
       type: object
@@ -67,6 +69,12 @@ components:
         champion_id:
           title: Champion Id
           type: integer
+        champion_name:
+          title: Champion Name
+          type: string
+        icon_path:
+          title: Icon Path
+          type: string
         games:
           title: Games
           type: integer

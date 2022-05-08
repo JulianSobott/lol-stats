@@ -11,7 +11,7 @@ import logging.config
 from opentelemetry.instrumentation.fastapi import FastAPIInstrumentor
 
 
-from player_api.db import Summoners, Games
+from player_api.db import Summoners, Games, Champions
 from player_api.models.player import Player, Rank, MostPlayed
 from player_api.models.responses import ExceptionMessage
 
@@ -68,11 +68,13 @@ async def get_player(player_name: PlayerName):
     most_played_db = (
         db.session.query(
             Games.champ_id,
+            Champions.name,
+            Champions.icon_path,
             func.count(Games.champ_id).label("num_played"),
             func.count(case([(Games.win, 1)])).label("won"),
         )
         .where(Games.summoner_id == player.puuid)
-        .group_by(Games.champ_id)
+        .group_by(Games.champ_id, Champions.name, Champions.icon_path)
         .order_by(text("num_played DESC"))
         .limit(5)
         .all()
@@ -82,8 +84,10 @@ async def get_player(player_name: PlayerName):
         most_played.append(
             MostPlayed(
                 champion_id=champ[0],
-                games=champ[1],
-                win_rate=calc_win_rate(games=champ[1], won=champ[2]),
+                champion_name=champ[1],
+                icon_path=champ[2],
+                games=champ[3],
+                win_rate=calc_win_rate(games=champ[3], won=champ[4]),
             )
         )
     logging.debug(f"method=get_player {most_played=}")

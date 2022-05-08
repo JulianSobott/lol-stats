@@ -64,6 +64,16 @@ def test_no_games_played(db_session):
     assert res.most_played == []
 
 
+def test_get_most_played_champ_name(db_session):
+    players = PlayerFactory().player()
+    player = players[0]
+    with players:
+        player.play_n_games(30).with_champion("Lux").win(4)
+    res = _player_reqeust(player)
+    assert len(res.most_played) == 1
+    assert res.most_played[0].champion_name == "Lux"
+
+
 def test_get_most_played_many_champs(db_session):
     players = PlayerFactory().player()
     player = players[0]
@@ -160,7 +170,7 @@ class Testplayer:
             puuid=self.player.id,
             name=self.player.name,
             level=self.player.level,
-            icon_path=self.player.icon_path,
+            icon_path=self.player.player_icon_path,
             last_update=datetime.now(),
             tier=self.player.rank.tier,
             rank=self.player.rank.rank,

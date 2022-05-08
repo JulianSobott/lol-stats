@@ -23,6 +23,8 @@ class Rank(BaseModel):
 
 class MostPlayed(BaseModel):
     champion_id: int
+    champion_name: str
+    icon_path: str
     games: int
     win_rate: int = Field(ge=0, le=100)
 
