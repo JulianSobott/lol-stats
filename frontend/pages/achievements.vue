@@ -287,7 +287,7 @@ export default {
         }
 
         await this.$axios.get(
-          `/achievements?compare=[${puuids.join()}]&champion=${
+          `/achievements?puuids=[${puuids.join()}]&champion=${
             query.champion
           }&rank=${query.rank}`
         )
