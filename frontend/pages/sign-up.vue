@@ -166,7 +166,7 @@ export default {
       try {
         await this.$axios.post('/auth/register', {
           email: this.form.email,
-          password: btoa(this.form.password),
+          password: this.form.password,
         })
 
         this.$router.push('/login')
