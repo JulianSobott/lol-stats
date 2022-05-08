@@ -15,7 +15,7 @@ export const actions = {
   async getPlayerData({
     commit
   }) {
-    const response = await this.$axios.get('/players/LinkX20');
+    const response = await this.$axios.get('/players/i6rhuj9rVlNXt0WRoGzMelbaGItog4yYs6mC8yZXQOY2rpuY68virbdeyvnoptwJ07u1cgZKW1tBPA');
     commit("setPlayerData", response.data);
   }
 }

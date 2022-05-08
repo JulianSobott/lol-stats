@@ -22,7 +22,7 @@
         <div class="card-body">
           <div class="mb-3">
             <label class="form-label">Select your Player Name</label>
-            <PlayerSearchInput @playernameSelected="playernameSelected" />
+            <PlayerSearchInput @playerSelected="playerSelected" />
             <div class="form-hint">
               In order for you to view player information and statistics, we
               still need your gamer tag. Please enter your gamer tag in this
@@ -57,7 +57,7 @@ export default {
   data() {
     return {
       form: {
-        player_uuid: '',
+        player: {}
       },
       submitted: false,
       error: null,
@@ -70,13 +70,13 @@ export default {
     },
   },
   methods: {
-    playernameSelected(playerUuid, playername) {
-      this.form.player_uuid = playerUuid
+    playerSelected(playerData) {
+      this.form.player = playerData
     },
     async savePlayername() {
       try {
         await this.$axios.put('/users/1234', {
-          player_uuid: this.form.player_uuid,
+          player_uuid: this.form.player.player_uuid,
         })
         this.$router.push('/dashboard')
       } catch (e) {

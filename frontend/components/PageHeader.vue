@@ -66,12 +66,10 @@ export default {
   methods: {
     async getUserData() {
       try {
-        const response = await this.$axios.get('/players/LinkX20')
+        const response = await this.$axios.get('/players/i6rhuj9rVlNXt0WRoGzMelbaGItog4yYs6mC8yZXQOY2rpuY68virbdeyvnoptwJ07u1cgZKW1tBPA')
         this.user = response.data
       } catch (err) {
         console.log(err)
-      } finally {
-        console.log('done')
       }
     },
   },

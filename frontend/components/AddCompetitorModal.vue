@@ -22,7 +22,7 @@
             <label class="form-label">Player</label>
             <PlayerSearchInput
               ref="PlayerSearchInput"
-              @playernameSelected="playernameSelected"
+              @playerSelected="playerSelected"
             />
           </div>
         </div>
@@ -36,7 +36,7 @@
           </a>
           <button
             class="btn btn-primary ms-auto"
-            :class="{ disabled: !form.playername }"
+            :class="{ disabled: !form.player.playername }"
             @click="addCompetitor()"
           >
             Add competitor
@@ -53,7 +53,7 @@ export default {
   data() {
     return {
       form: {
-        playername: '',
+        player: {}
       },
       submitted: false,
       error: null,
@@ -85,8 +85,8 @@ export default {
       body.classList.remove('modal-open')
       body.style.removeProperty('overflow')
     },
-    playernameSelected(playerUuid, playername) {
-      this.form.playername = playername
+    playerSelected(playerData) {
+      this.form.player = playerData
     },
   },
 }

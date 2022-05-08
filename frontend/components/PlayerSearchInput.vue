@@ -6,6 +6,7 @@
       placeholder="Search Player name"
       type="text"
       class="form-control"
+      :disabled="disabled"
       @input="searchPlayerName()"
     />
     <span v-if="loading && !error" class="input-icon-addon">
@@ -27,20 +28,27 @@ export default {
   data() {
     return {
       playername: '',
+      player_uuid: '',
       error: false,
       success: false,
       loading: false,
+      disabled: false,
     }
   },
   methods: {
+    disable(value) {
+      this.disabled = value
+    },
     clear() {
       this.playername = ''
+      this.player_uuid = ''
       this.loading = false
       this.error = false
       this.success = false
     },
-    setPlayername(playername) {
+    setPlayerData(playername, playerUuid) {
       this.playername = playername
+      this.player_uuid = playerUuid
       this.searchPlayerName()
     },
     async searchPlayerName() {
@@ -48,19 +56,23 @@ export default {
         this.loading = false
         this.error = false
         this.success = false
-        this.$emit('playernameSelected', null)
+        this.$emit('playerSelected', null)
       }
 
       if (this.playername && this.playername.length >= 1) {
         try {
           this.loading = true
+          // TODO: Change to new API
           const response = await this.$axios.get(`/players/${this.playername}`)
-          this.$emit('playernameSelected', response.name, this.playername)
+          this.$emit('playerSelected', response.name, {
+            playername: this.playername,
+            player_uuid: this.playerUuid
+          })
           this.error = false
           this.success = true
         } catch (err) {
           if (err.response.status !== 200) {
-            this.$emit('playernameSelected', null, null)
+            this.$emit('playerSelected', null)
 
             this.loading = false
             this.error = true
