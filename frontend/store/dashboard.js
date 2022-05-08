@@ -1,28 +1,28 @@
 // state
 export const state = () => ({
-  mostPlayedChampions: []
+  playerData: {}
 })
 
 // getters
 export const getters = {
-  getMostPlayedChampions(state) {
-    return state.mostPlayedChampions;
+  getPlayerData(state) {
+    return state.playerData;
   }
 }
 
 // actions
 export const actions = {
-  async getMostPlayedChampions({
+  async getPlayerData({
     commit
   }) {
-    const response = await this.$axios.get('/players/TEST');
-    commit("addMostPlayedChampions", response.data.most_played.splice(0, 3));
+    const response = await this.$axios.get('/players/LinkX20');
+    commit("setPlayerData", response.data);
   }
 }
 
 // mutations
 export const mutations = {
-  addMostPlayedChampions(state, mostPlayedChampions) {
-    state.mostPlayedChampions = mostPlayedChampions;
+  setPlayerData(state, data) {
+    state.playerData = data;
   }
 }

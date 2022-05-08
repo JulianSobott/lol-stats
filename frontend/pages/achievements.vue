@@ -75,6 +75,36 @@
                       >Gold</a
                     >
                   </li>
+                  <li class="nav-item">
+                    <a href="#tab-gold" class="nav-link" data-bs-toggle="tab"
+                      >Multikills</a
+                    >
+                  </li>
+                  <li class="nav-item">
+                    <a href="#tab-gold" class="nav-link" data-bs-toggle="tab"
+                      >Utility</a
+                    >
+                  </li>
+                  <li class="nav-item">
+                    <a href="#tab-gold" class="nav-link" data-bs-toggle="tab"
+                      >Special Kills</a
+                    >
+                  </li>
+                  <li class="nav-item">
+                    <a href="#tab-gold" class="nav-link" data-bs-toggle="tab"
+                      >Combat</a
+                    >
+                  </li>
+                  <li class="nav-item">
+                    <a href="#tab-gold" class="nav-link" data-bs-toggle="tab"
+                      >Survival</a
+                    >
+                  </li>
+                  <li class="nav-item">
+                    <a href="#tab-gold" class="nav-link" data-bs-toggle="tab"
+                      >Objectives</a
+                    >
+                  </li>
                 </ul>
                 <div class="tab-content">
                   <!-- Content of card #1 -->

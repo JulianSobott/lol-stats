@@ -17,25 +17,25 @@
         "
       >
         <NuxtLink to="/">
-          <img src="~/assets/images/logo.png" height="20"/>
+          <img src="~/assets/images/logo.png" height="20" />
         </NuxtLink>
       </h1>
       <div class="navbar-nav flex-row order-md-last">
         <div class="nav-item d-none d-md-flex me-3"></div>
         <div class="nav-item dropdown">
           <a
+            v-if="user"
             href="#"
             class="nav-link d-flex lh-1 text-reset p-0"
             data-bs-toggle="dropdown"
             aria-label="Open user menu"
           >
-            <span
-              class="avatar avatar-sm"
-              style="background-image: url(https://i.imgur.com/6lCL9uU.png)"
-            ></span>
+            <span class="avatar avatar-sm" :style="userIcon"></span>
             <div class="d-none d-xl-block ps-2">
-              <div>{{ user.username }}</div>
-              <div class="mt-1 small text-muted">{{ user.rank }}</div>
+              <div>{{ user.name }}</div>
+              <div class="mt-1 small text-muted">
+                {{ user.rank.tier }} {{ user.rank.rank }}
+              </div>
             </div>
           </a>
           <div class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
@@ -50,16 +50,30 @@
 <script>
 export default {
   name: 'PageHeader',
+  computed: {
+    userIcon() {
+      return `background-image: url("${this.user.player_icon_path}");`
+    },
+  },
+  mounted() {
+    this.getUserData()
+  },
   data() {
     return {
-      user: {
-        id: 0,
-        username: 'FooBar',
-        rank: 'Silver II',
-        playerUuid: '351123'
-      }
-      // user data fetched by nuxtjs/auth package on logins
+      user: null,
     }
-  }
+  },
+  methods: {
+    async getUserData() {
+      try {
+        const response = await this.$axios.get('/players/LinkX20')
+        this.user = response.data
+      } catch (err) {
+        console.log(err)
+      } finally {
+        console.log('done')
+      }
+    },
+  },
 }
 </script>
