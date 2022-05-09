@@ -6,15 +6,10 @@ class UserSchema(Schema):
     password = fields.String(min=6, required=True, error="Invalid Input", allow_none=False)
 
 
-class TokenSchema(Schema):
-    token = fields.String(required=True)
-
-
 class CompetitorSchema(Schema):
+    user_id = fields.Integer(required=True)
     player_uuid = fields.String(required=True)
-    token = fields.Nested(TokenSchema())
 
 
 user_schema = UserSchema()
-token_schema = TokenSchema()
 competitor_schema = CompetitorSchema()

@@ -9,7 +9,8 @@ import config
 import jwt
 from functools import wraps
 import datetime
-from validation import user_schema
+from validation import user_schema, competitor_schema
+import requests
 
 
 def create_app():
@@ -68,7 +69,7 @@ def token_required(f):
         except:
             return jsonify({'message': 'Token is invalid'}, 400)
 
-        return f(current_user, token, *args, **kwargs)
+        return f(*(current_user, token) + args, **kwargs)
 
     return decorator
 
@@ -84,6 +85,7 @@ def get_own_data(current_user, access_token):
     }
 
     # TODO implement call to player endpoint and retrieve player data
+    player_stats = {}
 
     competitors = Competitors.query.filter_by(user_id=current_user.id).all()
     competitor_output = []
@@ -96,7 +98,9 @@ def get_own_data(current_user, access_token):
         }
         competitor_output.append(data)
 
-    return make_response(jsonify({"status": "success", "User": user, "competitors": competitor_output}), 200)
+    return make_response(
+        jsonify({"status": "success", "User": user, "player_stats": player_stats, "competitors": competitor_output}),
+        200)
 
 
 @app.route('/api/auth/login', methods=['POST'])
@@ -117,7 +121,8 @@ def login():
                 access_token = jwt.encode(
                     {'user_id': user.id, 'exp': datetime.datetime.utcnow() + datetime.timedelta(minutes=45)},
                     app.config['JWT_SECRET_KEY'], "HS256")
-                db_token = AccessToken(user_id=user.id, token=access_token, created_at=datetime.datetime.utcnow(), updated_at=datetime.datetime.utcnow() + datetime.timedelta(minutes=45))
+                db_token = AccessToken(user_id=user.id, token=access_token, created_at=datetime.datetime.utcnow(),
+                                       updated_at=datetime.datetime.utcnow() + datetime.timedelta(minutes=45))
                 db.session.add(db_token)
                 db.session.commit()
                 return make_response(jsonify({"status": "success", "id": user.id, "player_uuid": user.player_uuid,
@@ -130,11 +135,12 @@ def login():
         return make_response(jsonify({"status": "error", "message": "User not found"}), 404)
 
 
-@app.route('/api/auth/token', methods=['GET'])
+@app.route('/api/token/token-id', methods=['GET'])
 @token_required
 def verify_token(current_user, access_token):
     if current_user is not None:
-        return make_response(jsonify({"status": "success", "id": current_user.id, "player_uuid": current_user.player_uuid,
+        return make_response(
+            jsonify({"status": "success", "id": current_user.id, "player_uuid": current_user.player_uuid,
                                       "email": current_user.email, "token": access_token}), 200)
     else:
         return make_response(jsonify({"status": "error", "message": "Invalid token"}), 400)
@@ -167,11 +173,15 @@ def register():
         usr = Users(email=data["email"], password=hashed_pw)
         db.session.add(usr)
         db.session.commit()
+        user = Users.query.filter_by(email=data["email"]).first()
         return make_response(
-            jsonify({"status": "success", "message": "Successfully created account", "email": data["email"]}), 200)
+            jsonify({"status": "success",
+                     "id": user.id,
+                     "player_uuid": user.player_uuid,
+                     "email": user.email}), 200)
     else:
         return make_response(
-            jsonify({"status": "error", "message": "Account with given mail already exists", "email": data["email"]}),
+            jsonify({"status": "error", "message": "Account with given mail already exists"}),
             409)
 
 
@@ -191,8 +201,90 @@ def put_player_uuid(current_user, access_token, player_uuid):
                      "email": current_user.email,
                      "token": access_token}), 200)
     else:
-        return make_response(
-            jsonify({"status": "error", "message": "User not found"}), 404)
+        return make_response(jsonify({"status": "error", "message": "User not found"}), 404)
+
+
+@app.route('/api/users/<user_id>/competitors/', methods=['GET', 'POST'])
+@token_required
+def get_list_of_or_add_competitor(current_user, token, user_id):
+    if request.method == "GET":
+
+        competitors = Competitors.query.filter_by(user_id=user_id).all()
+
+        competitor_output = []
+        for competitor in competitors:
+            # TODO make request to player endpoint :get competitors ingame data
+
+            data = {
+                "id": competitor.id,
+                "player_uuid": competitor.player_uuid,
+                "username": competitor.username,
+                "player_stats": {}
+            }
+            competitor_output.append(data)
+        return make_response(jsonify({"status": "success",
+                                      "competitors": competitor_output}), 200)
+
+    elif request.method == "POST":
+
+        data = request.get_json()
+        if not data:
+            return jsonify({"status": "error", "message": "No input data provided"}, 400)
+        try:
+            data = competitor_schema.load({"user_id": user_id, "player_uuid": data["player_uuid"]})
+        except ValidationError as err:
+            return make_response(jsonify({"status": "error", "message": err.messages}), 400)
+
+        if Competitors.query.filter_by(user_id=user_id, player_uuid=data["player_uuid"]).first() is None:
+            username = None
+            # TODO get username of data["player_uuid"] from player endpoint
+            username = "mockUsername"
+            if username is not None:
+                competitor = Competitors(user_id=user_id, player_uuid=data["player_uuid"], username=username)
+                db.session.add(competitor)
+                db.session.commit()
+                return make_response(
+                    jsonify({"status": "success",
+                             "message": "No content"}), 200)
+            else:
+                return make_response(jsonify({"status": "error", "message": "Competitor not found"}), 404)
+        else:
+            return make_response(
+                    jsonify(
+                        {"status": "error", "message": "Competitorship already exists"}),
+                    409)
+
+
+@app.route('/api/users/>user_id>/competitors/<competitor_puuid>', methods=['GET, DELETE'])
+@token_required
+def get_or_delete_competitor(current_user, token, user_id, competitor_puuid):
+    competitor = Competitors.query.filter_by(user_id=user_id, player_uuid=competitor_puuid).first()
+    if competitor is None:
+        return make_response(jsonify({"status": "error",
+                                      "message": "Competitor not found in your competitorship"}), 404)
+
+    if request.method == "GET":
+
+        # TODO make request to player endpoint :get competitors ingame data
+
+        competitor_data = {
+            "id": competitor.id,
+            "player_uuid": competitor.player_uuid,
+            "username": competitor.username,
+            "player_stats": {}
+        }
+
+        return make_response(jsonify({"status": "success",
+                                      "competitors": competitor_data}), 200)
+
+    elif request.method == "DELETE":
+
+        db.session.delete(competitor)
+        db.session.commit()
+
+    return make_response(jsonify({"status": "success",
+                                  "message": "No content",
+                                  }), 200)
 
 
 if __name__ == '__main__':

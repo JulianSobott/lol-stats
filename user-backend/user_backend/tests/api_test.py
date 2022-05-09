@@ -71,7 +71,7 @@ def test_register_no_password():
 
 @pytest.mark.skip("Account already exist")
 def test_register_correctly():
-    test_email = "shadrach@check.de"
+    test_email = "shadrach@live.de"
     response = app.app.test_client().post(
         '/api/auth/register',
         data=json.dumps({'email': test_email, 'password': "testest"}),
