@@ -6,44 +6,6 @@ info:
 servers:
   - url: 'https'
 paths:
-  /api/users/{user_id}:
-    patch:
-      summary: Set new ingame user id
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/player_uuid'
-      parameters:
-        - name: token
-          in: header
-          required: true
-          schema:
-            type: string
-        - name: user_id
-          in: path
-          required: true
-          schema:
-            type: string
-      responses:
-        '200':
-          description: Sucessfully patched ingame user id
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/User'
-        '404':
-          description: User not found or invalid 
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  status:
-                    type: string
-                  message:
-                    type: string
   /api/auth/me:
     get:
       description: Get own data
@@ -61,7 +23,16 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/User'
+                type: object
+                properties:
+                  User:
+                    $ref: '#/components/schemas/User'
+                  player_stats:
+                    $ref: '#/components/schemas/Player'
+                  competitors:
+                    type: array
+                    items: 
+                      $ref: '#/components/schemas/Competitor'
         '404':
           description: Invalid token
           content:
@@ -113,6 +84,61 @@ paths:
                     type: string
                   message:
                     type: string
+  /api/auth/token:
+    get:
+      description: Verify token
+      tags:
+        - user
+      parameters:
+        - name: token
+          in: header
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Sucessfully updated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  User:
+                    $ref: '#/components/schemas/User'
+        '400':
+          description: Invalid token
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                  message:
+                    type: string
+  /api/auth/logout:
+    post:
+      description: Log out from website
+      tags:
+        - user
+      parameters:
+        - name: token
+          in: header
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successfully logged out
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                  message:
+                    type: string
   /api/auth/register:
     post:
       description: Register new account
@@ -128,12 +154,9 @@ paths:
         '200':
           description: Sucessfully returned mail of registered acc
           content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  mail:
-                    type: string
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/User'
         '400':
           description: Invalid input
           content:
@@ -142,7 +165,7 @@ paths:
                 type: object
                 properties:
                   status:
-                      type: string
+                    type: string
                   message:
                     type: string
         '409':
@@ -156,7 +179,47 @@ paths:
                       type: string
                   message:
                     type: string
-  /api/competitors/:
+  /api/users/{user_id}:
+    put:
+      tags:
+      - user
+      summary: Set new ingame user id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/player_uuid'
+      parameters:
+        - name: token
+          in: header
+          required: true
+          schema:
+            type: string
+        - name: user_id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Sucessfully patched ingame user id
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '404':
+          description: User not found or invalid 
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                  message:
+                    type: string
+  /api/users/{user_id}/competitors/:
     get:
       description: List of competitors of user
       tags:
@@ -167,6 +230,11 @@ paths:
           required: true
           schema:
             type: string
+        - name: user_id
+          in: path
+          required: true
+          schema:
+            type: integer
       responses:
         '200':
           description: Sucessfully returned list of competitors
@@ -176,7 +244,56 @@ paths:
                 type: array
                 items: 
                   $ref: '#/components/schemas/Competitor'
-  /api/competitors/{competitor}:
+    post:
+      description: Add new competitor of user
+      tags:
+        - competitor
+      parameters:
+        - name: token
+          in: header
+          required: true
+          schema:
+            type: string
+        - name: user_id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                user_id:
+                  type: integer
+                player_uuid:
+                  type: string
+      responses:
+        '200':
+          description: No content
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                  message:
+                    type: string
+        '400':
+          description: Competitor not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                  message:
+                    type: string
+  /api/users/{user_id}/competitors/{competitor_puuid}:
       get:
         description: Get specific competitor
         tags:
@@ -187,7 +304,12 @@ paths:
             required: true
             schema:
               type: string
-          - name: competitor
+          - name: user_id
+            in: path
+            required: true
+            schema:
+              type: integer
+          - name: competitor_puuid
             in: path
             required: true
             schema:
@@ -199,44 +321,6 @@ paths:
               application/json:
                 schema:
                   $ref: '#/components/schemas/Competitor'
-      post:
-        description: Add new competitor of user
-        tags:
-          - competitor
-        parameters:
-          - name: token
-            in: header
-            required: true
-            schema:
-              type: string
-          - name: competitor
-            in: path
-            required: true
-            schema:
-              type: string
-        responses:
-          '200':
-            description: No content
-            content:
-              application/json:
-                schema:
-                  type: object
-                  properties:
-                    status:
-                      type: string
-                    message:
-                      type: string
-          '400':
-            description: Competitor not found
-            content:
-              application/json:
-                schema:
-                  type: object
-                  properties:
-                    status:
-                      type: string
-                    message:
-                      type: string
       delete:
         description: Delete specific competitor of user
         tags:
@@ -247,7 +331,12 @@ paths:
             required: true
             schema:
               type: string
-          - name: competitor
+          - name: user_id
+            in: path
+            required: true
+            schema:
+              type: integer
+          - name: competitor_puuid
             in: path
             required: true
             schema:
@@ -293,6 +382,8 @@ components:
     Competitor:
       type: object
       properties:
+        id:
+          type: integer
         player_uuid: 
           type: string
         username: 
@@ -313,6 +404,7 @@ components:
       description: Same ID as in the Riot API
     Player:
       type: object
+      description: Retrieve from Player-Endpoint without Winrate and "Most Played"-Object 
       properties:
         id:
           type: number
@@ -323,19 +415,8 @@ components:
         avatar:
           type: string
           description: path
-        win_rate:
-          type: number
         rank:
           $ref: '#/components/schemas/Rank'
-        most_played:
-          type: array
-          items:
-            type: object
-            properties:
-              champion_id:
-                $ref: '#/components/schemas/ChampionID'
-              rank:
-                type: number
     player_uuid:
       type: object
       properties:
@@ -348,3 +429,4 @@ components:
           type: string
         password:
           type: string
+          description: encoded
