@@ -2,8 +2,8 @@ from marshmallow import Schema, fields
 
 
 class UserSchema(Schema):
-    email = fields.Email(required=True)
-    password = fields.String(required=True)
+    email = fields.Email(required=True, allow_none=False, error="Invalid Input")
+    password = fields.String(min=6, required=True, error="Invalid Input", allow_none=False)
 
 
 class TokenSchema(Schema):
