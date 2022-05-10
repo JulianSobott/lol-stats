@@ -389,7 +389,7 @@ export default {
   name: 'AchievementsPage',
   data() {
     return {
-      showImportPlayerModal: true,
+      showImportPlayerModal: false,
       showImportProgressbar: true,
       isImportingData: false,
     }
