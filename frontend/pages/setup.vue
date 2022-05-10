@@ -18,11 +18,13 @@
             </p>
           </div>
         </div>
-        <div class="hr-text hr-text-center hr-text-spaceless">SETUP</div>
+        <div class="hr-text hr-text-center hr-text-spaceless">
+          ACCOUNT SETUP
+        </div>
         <div class="card-body">
           <div class="mb-3">
             <label class="form-label">Region</label>
-            <select v-model="form.region"  class="form-select mb-0">
+            <select v-model="form.region" class="form-select mb-0">
               <option value="euw">Europe West</option>
               <option value="br">Brazil</option>
               <option value="eunue">Europe Nordic & East</option>
@@ -38,7 +40,7 @@
           </div>
           <div class="mb-3">
             <label class="form-label">Select your Player Name</label>
-            <PlayerSearchInput @playerSelected="playerSelected" />
+            <PlayerSearchInput ref="playerSearchInput" @playerSelected="playerSelected" />
             <div class="form-hint">
               In order for you to view player information and statistics, we
               still need your gamer tag. Please enter your gamer tag in this
@@ -57,7 +59,11 @@
             >
               Cancel
             </NuxtLink>
-            <button class="btn btn-primary" :disabled="!form.player" @click="savePlayername()">
+            <button
+              class="btn btn-primary"
+              :disabled="!form.player"
+              @click="savePlayername()"
+            >
               Continue
             </button>
           </div>
@@ -70,6 +76,16 @@
 <script>
 export default {
   name: 'SetupPage',
+  mounted() {
+    if (this.$route.query.firstsetup !== undefined) {
+      this.firstSetup = this.$route.query.firstsetup === 'true'
+    } else {
+      this.firstSetup = false
+      // TODO: Make query to player backend
+      // Fetch current player settings
+      this.getPlayerData()
+    }
+  },
   data() {
     return {
       form: {
@@ -78,7 +94,7 @@ export default {
       },
       submitted: false,
       error: null,
-      firstSetup: true,
+      firstSetup: false,
     }
   },
   head: {
@@ -89,6 +105,14 @@ export default {
   methods: {
     playerSelected(playerData) {
       this.form.player = playerData
+    },
+    async getPlayerData() {
+      // get current player uuid from vue store
+      // fetch current player uuid
+      const response = await this.$axios.get(
+        '/players/i6rhuj9rVlNXt0WRoGzMelbaGItog4yYs6mC8yZXQOY2rpuY68virbdeyvnoptwJ07u1cgZKW1tBPA'
+      )
+      this.$refs.playerSearchInput.setPlayerData(response.data.name)
     },
     async savePlayername() {
       try {

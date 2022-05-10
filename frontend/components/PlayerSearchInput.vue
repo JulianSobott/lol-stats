@@ -7,7 +7,7 @@
       type="text"
       class="form-control"
       :disabled="disabled"
-      @input="searchPlayerName()"
+      @input="debouncePlayerSearch"
     />
     <span v-if="loading && !error" class="input-icon-addon">
       <div
@@ -33,6 +33,7 @@ export default {
       success: false,
       loading: false,
       disabled: false,
+      debounce: null,
     }
   },
   methods: {
@@ -49,9 +50,18 @@ export default {
     setPlayerData(playername, playerUuid) {
       this.playername = playername
       this.player_uuid = playerUuid
-      this.searchPlayerName()
+      this.searchPlayerName(playername)
     },
-    async searchPlayerName() {
+    debouncePlayerSearch(event) {
+      this.loading = true
+      clearTimeout(this.debounce)
+      this.debounce = setTimeout(() => {
+        this.searchPlayerName(event.target.value)
+        this.loading = false
+      }, 500)
+    },
+    async searchPlayerName(playername) {
+      this.playername = playername
       if (!this.playername) {
         this.loading = false
         this.error = false
@@ -62,10 +72,12 @@ export default {
       if (this.playername && this.playername.length >= 1) {
         try {
           this.loading = true
-          const response = await this.$axios.get(`/players?player_name=${this.playername}&region=ewu`)
+          const response = await this.$axios.get(
+            `/players?player_name=${this.playername}&region=ewu`
+          )
           this.$emit('playerSelected', {
             playername: response.data.name,
-            player_uuid: response.data.id
+            player_uuid: response.data.id,
           })
           this.error = false
           this.success = true

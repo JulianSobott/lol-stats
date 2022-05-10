@@ -112,7 +112,7 @@ export default {
         })
         // TODO Redirect to /setup page if no username is empty
         if (response.data.player_uuid === null) {
-          this.$router.push('/set-up')
+          this.$router.push('/setup?firstsetup=true')
         } else {
           this.$router.push('/dashboard')
         }
