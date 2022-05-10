@@ -18,11 +18,11 @@
             </p>
           </div>
         </div>
-        <div class="hr-text hr-text-center hr-text-spaceless">SETUP</div>
+        <div class="hr-text hr-text-center hr-text-spaceless">ACCOUNT SETUP</div>
         <div class="card-body">
           <div class="mb-3">
             <label class="form-label">Region</label>
-            <select v-model="form.region"  class="form-select mb-0">
+            <select v-model="form.region" class="form-select mb-0">
               <option value="euw">Europe West</option>
               <option value="br">Brazil</option>
               <option value="eunue">Europe Nordic & East</option>
@@ -57,7 +57,11 @@
             >
               Cancel
             </NuxtLink>
-            <button class="btn btn-primary" :disabled="!form.player" @click="savePlayername()">
+            <button
+              class="btn btn-primary"
+              :disabled="!form.player"
+              @click="savePlayername()"
+            >
               Continue
             </button>
           </div>
@@ -70,6 +74,16 @@
 <script>
 export default {
   name: 'SetupPage',
+  mounted() {
+    if (this.$route.query.firstsetup !== undefined) {
+      this.firstSetup = this.$route.query.firstsetup === 'true'
+    } else {
+      this.firstSetup = false
+    }
+
+    // TODO: Make query to player backend
+    // Fetch current player settings
+  },
   data() {
     return {
       form: {
@@ -78,7 +92,7 @@ export default {
       },
       submitted: false,
       error: null,
-      firstSetup: true,
+      firstSetup: false,
     }
   },
   head: {
