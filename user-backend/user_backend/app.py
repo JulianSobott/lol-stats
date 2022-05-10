@@ -1,22 +1,20 @@
+import datetime
 import os
+from functools import wraps
 
+import jwt
 from flask import Flask, request, make_response, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from marshmallow import ValidationError
 from werkzeug import security
 
 import config
-import jwt
-from functools import wraps
-import datetime
 from validation import user_schema, competitor_schema
-import requests
 
 
 def create_app():
     flask_app = Flask(__name__)
     flask_app.config['SQLALCHEMY_DATABASE_URI'] = config.DATABASE_CONNECTION_URI
-    # flask_app.config['SQLALCHEMY_DATABASE_URI'] = "postgresql://postgres:password@localhost:5432/userbackend"
     flask_app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     flask_app.app_context().push()
     db.init_app(flask_app)
@@ -35,23 +33,26 @@ class Users(db.Model):
     player_uuid = db.Column(db.String(255))
     email = db.Column(db.String(255))
     password = db.Column(db.String(255))
+    region = db.Column(db.String(20), default="EUW")
+    competitors = db.relationship('Competitorship', backref='user', lazy=True)
+    access_token = db.relationship('token', backref='user', lazy=True)
 
 
 class Competitors(db.Model):
     __tablename__ = 'competitors'
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    user_id = db.Column(db.String(255))
-    player_uuid = db.Column(db.String(255))
-    username = db.Column(db.String(255))
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    player_uuid = db.Column(db.String(255), nullable=False)
+    username = db.Column(db.String(255), nullable=False)
 
 
 class AccessToken(db.Model):
     __tablename__ = 'access_token'
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    user_id = db.Column(db.String(255))
-    token = db.Column(db.String(255))
-    created_at = db.Column(db.TIMESTAMP)
-    updated_at = db.Column(db.TIMESTAMP)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    token = db.Column(db.String(255), nullable=False)
+    created_at = db.Column(db.TIMESTAMP, nullable=False)
+    updated_at = db.Column(db.TIMESTAMP, nullable=False)
 
 
 def token_required(f):
@@ -141,7 +142,7 @@ def verify_token(current_user, access_token):
     if current_user is not None:
         return make_response(
             jsonify({"status": "success", "id": current_user.id, "player_uuid": current_user.player_uuid,
-                                      "email": current_user.email, "token": access_token}), 200)
+                     "email": current_user.email, "token": access_token}), 200)
     else:
         return make_response(jsonify({"status": "error", "message": "Invalid token"}), 400)
 
@@ -250,9 +251,9 @@ def get_list_of_or_add_competitor(current_user, token, user_id):
                 return make_response(jsonify({"status": "error", "message": "Competitor not found"}), 404)
         else:
             return make_response(
-                    jsonify(
-                        {"status": "error", "message": "Competitorship already exists"}),
-                    409)
+                jsonify(
+                    {"status": "error", "message": "Competitorship already exists"}),
+                409)
 
 
 @app.route('/api/users/>user_id>/competitors/<competitor_puuid>', methods=['GET, DELETE'])
