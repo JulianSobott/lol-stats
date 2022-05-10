@@ -57,7 +57,7 @@
             >
               Cancel
             </NuxtLink>
-            <button class="btn btn-primary" @click="savePlayername()">
+            <button class="btn btn-primary" :disabled="!form.player" @click="savePlayername()">
               Continue
             </button>
           </div>
@@ -74,7 +74,7 @@ export default {
     return {
       form: {
         region: 'euw',
-        player: {},
+        player: null,
       },
       submitted: false,
       error: null,
