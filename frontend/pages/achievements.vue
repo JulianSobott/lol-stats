@@ -106,7 +106,7 @@
                     >
                   </li>
                 </ul>
-                <div v-if="importingPlayer" class="tab-content">
+                <div v-if="showImportPlayerModal" class="tab-content">
                   <!-- Content of card #1 -->
                   <div id="tab-favorites" class="card show active">
                     <div class="card-body">
@@ -175,15 +175,31 @@
                             />
                           </svg>
                         </div>
-                        <p class="empty-title">No player stats not imported</p>
-                        <p class="empty-subtitle text-muted">
-                          There is no player data in our system yet. To be able
-                          to compare you with the player, please click the
-                          button below import the player.
-                        </p>
+                        <div class="mb-2">
+                          <p class="empty-title">
+                            No player stats not imported
+                          </p>
+                          <p class="empty-subtitle text-muted">
+                            There is no player data in our system yet. To be
+                            able to compare you with the player, please click
+                            the button below import the player.
+                          </p>
+                        </div>
+                        <div v-if="showImportProgressbar" class="w-100">
+                          <div class="mb-2 text-center">
+                            <i>Import: Recent matches 1 / 20 ....</i>
+                          </div>
+                          <div class="progress mb-2">
+                            <div
+                              role="progressbar"
+                              class="progress-bar bg-lime"
+                              style="width: 38%"
+                            ></div>
+                          </div>
+                        </div>
                         <div class="empty-action">
-                          <a href="#" class="btn btn-primary">
-                            <svg
+                          <a href="#" class="btn btn-primary" @click="importPlayer" :class="{'disabled': isImportingData}">
+                            <svg v-if="!isImportingData"
                               xmlns="http://www.w3.org/2000/svg"
                               class="icon icon-tabler icon-tabler-database-import"
                               width="24"
@@ -208,6 +224,7 @@
                                 d="M11.252 20.987c.246 .009 .496 .013 .748 .013c4.418 0 8 -1.343 8 -3v-6m-18 7h7m-3 -3l3 3l-3 3"
                               />
                             </svg>
+                            <span v-else class="spinner-border spinner-border-sm icon icon-tabler " role="status" aria-hidden="true"></span>
                             Import Player
                           </a>
                         </div>
@@ -372,10 +389,15 @@ export default {
   name: 'AchievementsPage',
   data() {
     return {
-      importingPlayer: false,
+      showImportPlayerModal: true,
+      showImportProgressbar: true,
+      isImportingData: false,
     }
   },
   methods: {
+    importPlayer() {
+      this.isImportingData = true;
+    },
     async filterApplied(filters) {
       try {
         const query = { ...filters }
