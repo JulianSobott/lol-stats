@@ -17,6 +17,53 @@
       <div class="page-body">
         <div class="container-xl">
           <div class="row row-cards">
+            <div v-if="importPlayerData" class="col-md-12 col-lg-12">
+              <div class="card bg-primary mb-3">
+                <div class="card-stamp">
+                  <div class="card-stamp-icon bg-white text-primary">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      class="icon icon-tabler icon-tabler-coffee"
+                      width="24"
+                      height="24"
+                      viewBox="0 0 24 24"
+                      stroke-width="2"
+                      stroke="currentColor"
+                      fill="none"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                      <path
+                        d="M3 14c.83 .642 2.077 1.017 3.5 1c1.423 .017 2.67 -.358 3.5 -1c.83 -.642 2.077 -1.017 3.5 -1c1.423 -.017 2.67 .358 3.5 1"
+                      />
+                      <path d="M8 3a2.4 2.4 0 0 0 -1 2a2.4 2.4 0 0 0 1 2" />
+                      <path d="M12 3a2.4 2.4 0 0 0 -1 2a2.4 2.4 0 0 0 1 2" />
+                      <path
+                        d="M3 10h14v5a6 6 0 0 1 -6 6h-2a6 6 0 0 1 -6 -6v-5z"
+                      />
+                      <path d="M16.746 16.726a3 3 0 1 0 .252 -5.555" />
+                    </svg>
+                  </div>
+                </div>
+                <div class="card-body">
+                  <h3 class="card-title">
+                    Your player data is being imported!
+                  </h3>
+                  <p>
+                    Please wait, your player data is being imported from the
+                    League of Legends database. Get yourself a tea or a coffee
+                    :)
+                  </p>
+                  <div class="d-flex mb-2"><i>Current Status ....</i></div>
+                  <div class="progress mb-2">
+                    <div class="progress-bar bg-lime" style="width: 38%" role="progressbar" aria-valuenow="38" aria-valuemin="0" aria-valuemax="100" aria-label="38% Complete">
+                      <span class="visually-hidden">38% Complete</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
             <div class="col-sm-4 col-lg-4">
               <div v-if="playerData" class="card h-100">
                 <div class="card-body">
@@ -213,6 +260,11 @@ export default {
   },
   mounted() {
     this.getPlayerData()
+  },
+  data() {
+    return {
+      importPlayerData: true,
+    }
   },
   methods: {
     ...mapActions({

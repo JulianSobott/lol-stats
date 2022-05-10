@@ -62,7 +62,7 @@ export default {
       if (this.playername && this.playername.length >= 1) {
         try {
           this.loading = true
-          const response = await this.$axios.get(`/players?player_name=${this.playername}`)
+          const response = await this.$axios.get(`/players?player_name=${this.playername}&region=ewu`)
           this.$emit('playerSelected', {
             playername: response.data.name,
             player_uuid: response.data.id

@@ -21,6 +21,22 @@
         <div class="hr-text hr-text-center hr-text-spaceless">SETUP</div>
         <div class="card-body">
           <div class="mb-3">
+            <label class="form-label">Region</label>
+            <select v-model="form.region"  class="form-select mb-0">
+              <option value="euw">Europe West</option>
+              <option value="br">Brazil</option>
+              <option value="eunue">Europe Nordic & East</option>
+              <option value="jp">Japan</option>
+              <option value="kr">Korea</option>
+              <option value="lan">Latein America North</option>
+              <option value="las">Latein America South</option>
+              <option value="na">North America</option>
+              <option value="oce">Oceania</option>
+              <option value="ru">Russia</option>
+              <option value="tr">Turkey</option>
+            </select>
+          </div>
+          <div class="mb-3">
             <label class="form-label">Select your Player Name</label>
             <PlayerSearchInput @playerSelected="playerSelected" />
             <div class="form-hint">
@@ -41,7 +57,7 @@
             >
               Cancel
             </NuxtLink>
-            <button class="btn btn-primary" @click="savePlayername()">
+            <button class="btn btn-primary" :disabled="!form.player" @click="savePlayername()">
               Continue
             </button>
           </div>
@@ -57,7 +73,8 @@ export default {
   data() {
     return {
       form: {
-        player: {}
+        region: 'euw',
+        player: null,
       },
       submitted: false,
       error: null,
@@ -76,6 +93,7 @@ export default {
     async savePlayername() {
       try {
         await this.$axios.put('/users/1234', {
+          region: this.form.region,
           player_uuid: this.form.player.player_uuid,
         })
         this.$router.push('/dashboard')
