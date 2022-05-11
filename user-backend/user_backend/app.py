@@ -34,8 +34,8 @@ class Users(db.Model):
     email = db.Column(db.String(255))
     password = db.Column(db.String(255))
     region = db.Column(db.String(20), default="EUW")
-    competitors = db.relationship('Competitorship', backref='user', lazy=True)
-    access_token = db.relationship('token', backref='user', lazy=True)
+    competitors = db.relationship('Competitors', backref='user', lazy=True)
+    access_token = db.relationship('AccessToken', backref='user', lazy=True)
 
 
 class Competitors(db.Model):
@@ -63,12 +63,12 @@ def token_required(f):
             token = request.headers['x-access-tokens']
 
         if not token:
-            return jsonify({"status": "error", 'message': 'No token'}, 404)
+            return make_response(jsonify({"status": "error", 'message': 'No token'}), 404)
         try:
             data = jwt.decode(token, app.config['JWT_SECRET_KEY'], algorithms=["HS256"])
             current_user = Users.query.filter_by(id=data['user_id']).first()
         except:
-            return jsonify({'message': 'Token is invalid'}, 400)
+            return make_response(jsonify({"status": "error", 'message': 'Token is invalid'}), 400)
 
         return f(*(current_user, token) + args, **kwargs)
 
@@ -100,7 +100,7 @@ def get_own_data(current_user, access_token):
         competitor_output.append(data)
 
     return make_response(
-        jsonify({"status": "success", "User": user, "player_stats": player_stats, "competitors": competitor_output}),
+        jsonify({"status": "success", "user": user, "player_stats": player_stats, "competitors": competitor_output}),
         200)
 
 
