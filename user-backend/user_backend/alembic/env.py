@@ -4,7 +4,7 @@ from sqlalchemy import engine_from_config
 from sqlalchemy import pool
 
 from alembic import context
-from config import DATABASE_CONNECTION_URI
+# from config import DATABASE_CONNECTION_URI
 from app import db
 
 # this is the Alembic Config object, which provides
@@ -40,8 +40,8 @@ def run_migrations_offline():
     script output.
 
     """
-    # url = config.get_main_option("sqlalchemy.url")
-    url = DATABASE_CONNECTION_URI
+    url = config.get_main_option("sqlalchemy.url")
+    # url = DATABASE_CONNECTION_URI
     context.configure(
         url=url,
         target_metadata=target_metadata,

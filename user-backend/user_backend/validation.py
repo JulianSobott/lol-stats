@@ -1,9 +1,9 @@
-from marshmallow import Schema, fields
+from marshmallow import Schema, fields, validate
 
 
 class UserSchema(Schema):
     email = fields.Email(required=True, allow_none=False, error="Invalid Input")
-    password = fields.String(min=6, required=True, error="Invalid Input", allow_none=False)
+    password = fields.String(validate=validate.Length(min=6, max=20), error="Invalid Input", allow_none=True)
 
 
 class CompetitorSchema(Schema):

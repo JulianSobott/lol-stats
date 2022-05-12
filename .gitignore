@@ -55,3 +55,4 @@ Thumbs.db
 # vs workspace settings
 .vscode/
 
+user-backend/user_backend/test.db

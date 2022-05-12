@@ -34,7 +34,7 @@ def test_register_no_input():
     data = json.loads(response.get_data(as_text=True))
 
     assert response.status_code == 400
-    assert data["message"] == {'email': ['Not a valid email address.']}
+    assert data["message"] == {'email': ['Not a valid email address.'], 'password': ['Length must be between 6 and 20.']}
 
 
 def test_register_no_mail():
@@ -53,7 +53,6 @@ def test_register_no_mail():
     assert data["status"] == "error"
     assert data["message"] == {'email': ['Not a valid email address.']}
 
-
 def test_register_no_password():
     response = app.app.test_client().post(
         '/api/auth/register',
@@ -66,10 +65,9 @@ def test_register_no_password():
     data = json.loads(response.get_data(as_text=True))
 
     assert response.status_code == 400
-    assert data["message"] == {'email': ['Not a valid email address.']}
+    assert data["message"] == {'password': ['Length must be between 6 and 20.']}
 
 
-@pytest.mark.skip("Account already exist")
 def test_register_correctly():
     test_email = "shadrach@live.de"
     response = app.app.test_client().post(
@@ -82,7 +80,6 @@ def test_register_correctly():
     data = json.loads(response.get_data(as_text=True))
 
     assert response.status_code == 200
-    assert data["message"] == "Successfully created account"
     assert data["email"] == test_email
 
 
@@ -104,10 +101,12 @@ def test_login():
     assert data["status"] == "success"
 
 
-@pytest.mark.skip("TODO: implement header")
+def test_put_player_uuid():
+    response = app.app.test_client().put(
         '/api/users/kjshds',
         content_type='application/json',
-        follow_redirects=True
+        follow_redirects=True,
+        headers={'x-access-tokens': Header.token}
     )
 
     data = json.loads(response.get_data(as_text=True))
@@ -116,16 +115,12 @@ def test_login():
     assert data["status"] == "success"
 
 
-@pytest.mark.skip("TODO: implement header")
 def test_logout():
-    test_email = "shadrach@live.de"
-    password = "testest"
-    # TODO implement header in test
     response = app.app.test_client().post(
         '/api/auth/logout',
         content_type='application/json',
         follow_redirects=True,
-        **{"x-access-tokens": Header.token}
+        headers={'x-access-tokens': Header.token}
     )
 
     data = json.loads(response.get_data(as_text=True))
@@ -163,11 +158,10 @@ def test_login_no_password():
     )
 
     data = json.loads(response.get_data(as_text=True))
-    # TODO handle empty password input
 
     assert response.status_code == 400
     assert data["status"] == "error"
-    assert data["message"] == "Invalid Input"
+    assert data["message"] == {'password': ['Length must be between 6 and 20.']}
 
 
 def test_login_no_mail():
@@ -202,3 +196,19 @@ def test_login_wrong_mail():
     assert response.status_code == 404
     assert data["status"] == "error"
     assert data["message"] == "User not found"
+
+
+def test_delete():
+    test_login()
+    response = app.app.test_client().delete(
+        '/api/auth/delete',
+        content_type='application/json',
+        follow_redirects=True,
+        headers={'x-access-tokens': Header.token}
+    )
+
+    data = json.loads(response.get_data(as_text=True))
+
+    assert response.status_code == 200
+    assert data["status"] == "success"
+    assert data["message"] == "No content"
