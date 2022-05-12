@@ -189,7 +189,11 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/player_uuid'
+              type: object
+              properties:
+                region:
+                  type: string
+                $ref: '#/components/schemas/player_uuid'
       parameters:
         - name: token
           in: header
@@ -376,6 +380,8 @@ components:
         username:
           type: string
         mail:
+          type: string
+        region:
           type: string
         token:
           type: string
