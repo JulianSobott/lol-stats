@@ -190,6 +190,25 @@ def register():
             409)
 
 
+@app.route('/api/auth/delete', methods=['DELETE'])
+@token_required
+def delete_user(current_user, token):
+    user = Users.query.filter_by(id=current_user.id).first()
+    if user is None:
+        return make_response(jsonify({"status": "error",
+                                      "message": "User not found"}), 404)
+
+    AccessToken.query.filter_by(user_id=current_user.id).delete()
+    Competitors.query.filter_by(user_id=current_user.id).delete()
+
+    db.session.delete(user)
+    db.session.commit()
+
+    return make_response(jsonify({"status": "success",
+                                  "message": "No content",
+                                  }), 200)
+
+
 @app.route('/api/users/<player_uuid>', methods=['PUT'])
 @token_required
 def put_player_uuid(current_user, access_token, player_uuid):
