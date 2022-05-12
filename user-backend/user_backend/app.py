@@ -149,13 +149,17 @@ def verify_token(current_user, access_token):
 
 @app.route('/api/auth/logout', methods=['POST'])
 def logout():
-    db_token = AccessToken.query.filter_by(token=request.headers['token']).first()
-    if db_token is not None:
-        db.session.delete(db_token)
-        db.session.commit()
-        return make_response(jsonify({"status": "success", "message": "Successfully logged out"}), 200)
+    if 'x-access-tokens' in request.headers:
+        token = request.headers['x-access-tokens']
+        db_token = AccessToken.query.filter_by(token=token).first()
+        if db_token is not None:
+            db.session.delete(db_token)
+            db.session.commit()
+            return make_response(jsonify({"status": "success", "message": "Successfully logged out"}), 200)
+        else:
+            return make_response(jsonify({"status": "error", "message": "Session already expired"}), 400)
     else:
-        return make_response(jsonify({"status": "error", "message": "Session already expired"}), 400)
+        return make_response(jsonify({"status": "error", "message": "No token"}), 400)
 
 
 @app.route('/api/auth/register', methods=['POST'])
