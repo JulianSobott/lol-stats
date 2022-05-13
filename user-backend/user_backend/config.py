@@ -1,6 +1,6 @@
 import os
 
-DEVELOPMENT = True
+DEVELOPMENT = False
 
 if not DEVELOPMENT:
     user = os.environ['POSTGRES_USER']

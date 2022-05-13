@@ -2,7 +2,7 @@
 
 FROM python:3.9
 
-WORKDIR /user_backendp
+WORKDIR /user_backend
 
 RUN python3 -m venv venv
 COPY requirements.txt requirements.txt
@@ -11,4 +11,5 @@ RUN pip3 install -r requirements.txt
 COPY . .
 
 CMD [".venv/bin/activate"]
+CMD ["alembic", "upgrade", "head"]
 CMD [ "python3", "-m" , "flask", "run", "--host=127.0.0.1"]

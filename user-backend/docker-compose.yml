@@ -14,7 +14,7 @@ services:
       - POSTGRES_PORT=5432
       - JWT_SECRET_KEY=${JWT_SECRET_KEY}
       - PYTHONPATH=.
-      - FLASK_ENV=development
+      - FLASK_ENV=production
   db:
     image: postgres:14
     restart: unless-stopped
