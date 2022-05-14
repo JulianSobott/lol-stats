@@ -56,3 +56,5 @@ Thumbs.db
 .vscode/
 
 user-backend/user_backend/test.db
+.env
+.idea

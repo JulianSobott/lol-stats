@@ -1,0 +1,90 @@
+openapi: 3.0.3
+info:
+  title: League Challenges
+  description: League Challenges
+  version: 1.0.0
+servers:
+  - url: 'https'
+paths:
+  /matches/{match_id}:
+    get:
+      tags:
+        - match
+      parameters:
+        - name: match_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Statistics with achievements for a game
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  team_red:
+                    $ref: '#/components/schemas/Team'
+                  team_blue:
+                    $ref: '#/components/schemas/Team'
+components:
+  schemas:
+    ChampionID:
+      type: number
+      description: Same ID as in the Riot API
+    Team:
+      type: array
+      items:
+        type: object
+        properties:
+          champion:
+            type: object
+            properties:
+              name:
+                type: string
+              icon_path:
+                type: string
+          player:
+            type: object
+            properties:
+              id:
+                type: number
+              name:
+                type: string
+          player_stats:
+            type: array
+            items:
+              type: object
+              properties:
+                name:
+                  type: string
+                value:
+                  type: number
+          achievements:
+            type: array
+            items:
+              type: object
+              properties:
+                name:
+                  type: string
+                value:
+                  type: number
+    Achievement:
+      type: object
+      properties:
+        name:
+          type: string
+        type:
+          type: string
+          description: type to allow ordering in tabs
+          example: kills
+        greater_is_better:
+          type: boolean
+        highscore:
+          type: number
+        average:
+          type: number
+          description: Average per game
+        total:
+          type: number

@@ -1,0 +1,71 @@
+version: "3"
+services:
+  riot-api-connector:
+    build: riot-api-connector
+    #restart: unless-stopped TODO: Add when service runs in endless loop
+    environment:
+      POSTGRES_HOST: psql-achievements
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      RIOT_API_KEY: ${RIOT_API_KEY}
+    depends_on:
+      psql-achievements:
+        condition: service_healthy
+    networks:
+      - stats-storage
+
+  psql-achievements:
+    image: postgres:14.2
+    restart: unless-stopped
+    environment:
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      PGDATA: /data
+    ports:
+      - "5432:5432"
+    volumes:
+    - ./riot-api-connector/db_init:/docker-entrypoint-initdb.d
+    - pg_data:/data
+    healthcheck:
+      test: pg_isready -U postgres -d postgres
+      interval: 10s
+      timeout: 3s
+      retries: 3
+    networks:
+      - stats-storage
+
+  frontend:
+    build: frontend/
+    container_name: frontend
+    labels:
+      - traefik.enable=true
+      - traefik.docker.network=traefik
+      - traefik.http.routers.frontend.rule=Host(`lol-stats.de`)
+      - traefik.http.services.frontend_lb.loadbalancer.server.port=3000
+      - traefik.http.routers.frontend.entrypoints=websecure
+      - traefik.http.routers.frontend.tls.certresolver=le
+    networks:
+      - traefik
+
+  player-api:
+    build: player-api
+    environment:
+      POSTGRES_PASSWORD: $POSTGRES_PASSWORD
+      POSTGRES_HOST: psql-achievements
+      OTEL_METRICS_EXPORTER: none
+      OTEL_RESOURCE_ATTRIBUTES: service.name=player-api
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector:4317
+    networks:
+      - services
+      - stats-storage
+      - tracing
+
+volumes:
+  pg_data: {}
+
+networks:
+  stats-storage: {}
+  traefik:
+    external: true
+  services:
+    external: true
+  tracing:
+    external: true
