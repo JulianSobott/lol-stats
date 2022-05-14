@@ -1,8 +1,9 @@
 import os
 import time
+import sys
 
 import cassiopeia as cass
-from cassiopeia import Patch, Summoner, Match
+from cassiopeia import Patch, Summoner, Match, Rank, Queue, Tier, Division
 from cassiopeia.core.match import Participant
 
 from db_connector import db
@@ -20,12 +21,13 @@ class riot_api_connector:
         self.db.connect()
 
     def add_summoner(self, summoner: Summoner):
-        self.db.add_summoner(puuid=summoner.puuid, name=summoner.name, level=summoner.level,
-                             icon_path=summoner.profile_icon().url, last_update_time=time.time())
+        self.db.add_summoner(puuid=summoner.puuid, region_id=summoner.id, name=summoner.name, level=summoner.level, tier=summoner.ranks[Queue.ranked_solo_fives].tier.name,
+                             division=summoner.ranks[Queue.ranked_solo_fives].division.name, icon_path=summoner.profile_icon().url, last_update_time=time.time())
 
-    def get_summoner(self, name: str, region: str) -> Summoner:
-        summoner: Summoner = cass.get_summoner(name=name, region=region)
-        db_summoner = self.db.get_summoner(puuid=summoner.puuid)
+    def update_summoner(self, puuid: str, region: str) -> Summoner:
+        db_summoner = self.db.get_summoner(puuid=puuid)
+        summoner: Summoner = cass.get_summoner(
+            id=db_summoner[1], region=region)
         if db_summoner is None:
             self.add_summoner(summoner=summoner)
             mh = match_history.get_match_history(summoner=summoner)
@@ -33,12 +35,29 @@ class riot_api_connector:
                 db=self.db, match_history=mh, puuid=summoner.puuid)
         else:
             last_update = db_summoner[3]
+            self.db.update_summoner(puuid=summoner.puuid, name=summoner.name, level=summoner.level, tier=summoner.ranks[Queue.ranked_solo_fives].tier.name,
+                                    division=summoner.ranks[Queue.ranked_solo_fives].division.name, icon_path=summoner.profile_icon().url, last_update_time=time.time())
             mh = match_history.get_match_history(summoner=summoner)
             match_history.add_missing_games_to_db(
                 db=self.db, match_history=mh, puuid=summoner.puuid)
             # only update games since last update timestamp, currently not possible
-
         return summoner
+
+    def update_summoner_by_name(self, name: str, region: str):
+        self.update_summoner(puuid=cass.get_summoner(
+            name=name, region=region).puuid, region=region)
+
+    def update_all(self, region: str) -> None:
+        rows = self.db.get_all_full_summoners()
+        i = 0
+        n = len(rows)
+        for row in rows:
+            j = (i + 1) / n
+            sys.stdout.write('\r')
+            sys.stdout.write("[%-20s] %d%%" % ('='*int(20*j), 100*j))
+            sys.stdout.flush()
+            self.update_summoner(puuid=row[0], region=region)
+            i += 1
 
     # def test(self):
     #     summoner = self.get_summoner('LinkX20', 'EUW')
@@ -66,13 +85,11 @@ class riot_api_connector:
 
 print("Updating ...")
 x = riot_api_connector()
-x.db.create_tables()
-# x.test_match_history()
-# x.get_summoner('LinkX20', region='EUW')
-x.get_summoner('gravitysuit', region='EUW')
-#x.get_summoner('LinkX20', 'EUW')
+x.update_summoner_by_name(name='Gemmling', region='EUW')
+# x.update_all(region='EUW')
 # x.db.create_tables()
+#x.update_summoner_by_name('LinkX20', region='EUW')
+# x.get_summoner('gravitysuit', region='EUW')
+# x.get_summoner('LinkX20', 'EUW')
 # static_data.update_summoner_icons(x.db)
-# c = challenges.Challenges()
-# c.store_classes_in_db(x.db)
 print("Finished updating")

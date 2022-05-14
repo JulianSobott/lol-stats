@@ -7,6 +7,8 @@ from cassiopeia.core.match import ParticipantStats
 
 
 class Challenges:
+    operator_cache = None
+
     wrong_fields = {
         'summoner_1_casts': 'summoner_spell_1_casts',
         'summoner_2_casts': 'summoner_spell_2_casts',
@@ -30,21 +32,31 @@ class Challenges:
     def store_challenges(self, db: db, stats: ParticipantStats, puuid: str):
         total_games = db.get_games_played_count(puuid=puuid)
         total_games = total_games[0]
+        rows = db.get_challenge_entries(puuid=puuid)
+        old_values = {}
+        for row in rows:
+            old_values[row[0]] = (row[2], row[3], row[4])
         for class_ in self.classes:
             for challenge in self.classes[class_]:
-                old_values = db.get_challenge_entry(
-                    name=challenge['name'], puuid=puuid)
                 new_stat = self.get_stat(
                     challenge_name=challenge['name'], stats=stats)
-                if old_values is None:
-                    db.add_challenge(
-                        name=challenge['name'], summoner_id=puuid, total=new_stat, average_per_game=new_stat, highscore=new_stat)
-                else:
-                    operator = db.get_challenge_class(
-                        name=challenge['name'])[3]
+                if challenge['name'] in old_values:
+                    old_value = old_values[challenge['name']]
+                    if self.operator_cache is None:
+                        rows = db.get_challenge_classes()
+                        self.operator_cache = {}
+                        for row in rows:
+                            self.operator_cache[row[0]] = row[3]
+                    # operator = db.get_challenge_class(
+                    #     name=challenge['name'])[3]
+                    operator = self.operator_cache[challenge['name']]
                     db.update_challenge(name=challenge['name'], puuid=puuid,
-                                        total=new_stat + old_values[2], average_per_game=(new_stat + (total_games - 1) * old_values[3]) / total_games,
-                                        highscore=max(new_stat, old_values[4]) if operator == '>' else min(new_stat, old_values[4]))
+                                        total=new_stat + old_value[0], average_per_game=(new_stat + (total_games - 1) * old_value[1]) / total_games,
+                                        highscore=max(new_stat, old_value[2]) if operator == '>' else min(new_stat, old_value[2]), no_commit=True)
+                else:
+                    db.add_challenge(
+                        name=challenge['name'], summoner_id=puuid, total=new_stat, average_per_game=new_stat, highscore=new_stat, no_commit=True)
+        db.commit()
 
     def get_json_string(self, stats: ParticipantStats) -> str:
         dict = {}
@@ -66,7 +78,6 @@ class Challenges:
             try:
                 new_stat = getattr(stats, name)
             except (AttributeError) as error:
-                print(name)
                 return 0
         else:
             try:

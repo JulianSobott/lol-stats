@@ -1,9 +1,12 @@
 CREATE TABLE IF NOT EXISTS Summoners (
    puuid        TEXT    PRIMARY KEY     NOT NULL,
+   region_id    TEXT                            ,
    name         TEXT                    NOT NULL,
-   level        INT                     NOT NULL,
-   icon_path    TEXT                    NOT NULL,
-   last_update  INT                     NOT NULL
+   level        INT                             ,
+   icon_path    TEXT                            ,
+   tier         TEXT                            ,
+   division     TEXT                            ,
+   last_update  INT                     
 );
 
 CREATE TABLE IF NOT EXISTS SummonerSpells (
@@ -55,6 +58,7 @@ CREATE TABLE IF NOT EXISTS Games (
    champ_id     INT                     NOT NULL,
    start_time   INT                     NOT NULL,
    duration     INT                     NOT NULL,
+   team         TEXT                    NOT NULL,
    win          BOOLEAN                 NOT NULL,
    lane         TEXT                    NOT NULL,
    challenges   TEXT                    NOT NULL,

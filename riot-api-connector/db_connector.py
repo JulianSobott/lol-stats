@@ -31,21 +31,33 @@ class db:
         self.cursor.execute(open('db_init/schema.sql', 'r').read())
         self.connection.commit()
 
-    def add_summoner(self, puuid: str, name: str, level: int, icon_path: str, last_update_time: int) -> None:
-        sql = """INSERT INTO summoners(puuid, name, level, icon_path, last_update) VALUES(%s, %s, %s, %s, %s);"""
+    def add_summoner(self, puuid: str, region_id: str, name: str, level: int, icon_path: str, tier: str, division: str, last_update_time: int) -> None:
+        sql = """INSERT INTO summoners(puuid, region_id, name, level, icon_path, tier, division, last_update) VALUES(%s, %s, %s, %s, %s, %s, %s, %s);"""
         self.cursor.execute(
-            sql, (puuid, name, level, icon_path, last_update_time))
+            sql, (puuid, region_id, name, level, icon_path, tier, division, last_update_time))
         self.connection.commit()
 
-    def update_summoner_update_time(self, puuid: str, last_update_time: int) -> None:
-        sql = """UPDATE summoners SET last_update = %s WHERE puuid = %s;"""
-        self.cursor.execute(sql, (last_update_time, puuid))
+    def update_summoner(self, puuid: str, name: str, level: int, icon_path: str, tier: str, division: str, last_update_time: int) -> None:
+        sql = """UPDATE summoners SET name = %s, level = %s, icon_path = %s, tier = %s, division = %s, last_update = %s WHERE puuid = %s;"""
+        self.cursor.execute(sql, (name, level, icon_path,
+                            tier, division, last_update_time, puuid))
         self.connection.commit()
 
     def get_summoner(self, puuid: str):
         sql = """SELECT * FROM summoners WHERE puuid = %s;"""
         self.cursor.execute(sql, (puuid,))
         return self.cursor.fetchone()
+
+    def has_summoner(self, puuid: str) -> bool:
+        sql = """SELECT COUNT(1) FROM summoners WHERE puuid = %s"""
+        self.cursor.execute(sql, (puuid,))
+        x = self.cursor.fetchone()[0]
+        return x > 0
+
+    def get_all_full_summoners(self):
+        sql = """SELECT * FROM summoners WHERE NOT(level IS NULL OR icon_path IS NULL OR tier IS NULL OR division IS NULL OR last_update IS NULL)"""
+        self.cursor.execute(sql)
+        return self.cursor.fetchall()
 
     def add_summoner_icon(self, id: int, icon_path: str) -> None:
         sql = """INSERT INTO summonericons(id, icon_path) VALUES (%s, %s);"""
@@ -97,26 +109,33 @@ class db:
         self.cursor.execute(sql, (name,))
         return self.cursor.fetchone()
 
+    def get_challenge_classes(self):
+        sql = """SELECT * FROM challengeclasses"""
+        self.cursor.execute(sql)
+        return self.cursor.fetchall()
+
     def clear_challenge_classes(self) -> None:
         sql = """DELETE FROM challengeclasses;"""
         self.cursor.execute(sql)
         self.connection.commit()
 
-    def add_challenge(self, name: str, summoner_id: str, total: float, average_per_game: float, highscore: float) -> None:
+    def add_challenge(self, name: str, summoner_id: str, total: float, average_per_game: float, highscore: float, no_commit: bool = False) -> None:
         try:
             sql = """INSERT INTO challenges(name, summoner_id, total, average_per_game, highscore) VALUES (%s, %s, %s, %s, %s);"""
             self.cursor.execute(sql, (name, summoner_id, float(total),
                                 float(average_per_game), float(highscore)))
-            self.connection.commit()
+            if not no_commit:
+                self.connection.commit()
         except (TypeError) as error:
             print(f'Error adding challenge {name} to database')
 
-    def update_challenge(self, name: str, puuid: str, total: float, average_per_game: float, highscore: float) -> None:
+    def update_challenge(self, name: str, puuid: str, total: float, average_per_game: float, highscore: float, no_commit: bool = False) -> None:
         try:
             sql = """UPDATE challenges SET total = %s, average_per_game = %s, highscore = %s WHERE name = %s AND summoner_id = %s;"""
             self.cursor.execute(
                 sql, (float(total), float(average_per_game), float(highscore), name, puuid))
-            self.connection.commit()
+            if not no_commit:
+                self.connection.commit()
         except (TypeError) as error:
             print(f'Error updating challenge {name} in database')
 
@@ -125,20 +144,27 @@ class db:
         self.cursor.execute(sql, (name, puuid))
         return self.cursor.fetchone()
 
-    def add_game(self, match_id: str, summoner_id: str, champ_id: int, start_time: int, duration: int, win: bool, lane: str, challenges: str) -> None:
-        sql = """INSERT INTO games(match_id, summoner_id, champ_id, start_time, duration, win, lane, challenges) VALUES (%s, %s, %s, %s, %s, %s, %s, %s);"""
+    def get_challenge_entries(self, puuid: str):
+        sql = """SELECT * FROM challenges WHERE summoner_id = %s;"""
+        self.cursor.execute(sql, (puuid,))
+        return self.cursor.fetchall()
+
+    def add_game(self, match_id: str, summoner_id: str, champ_id: int, start_time: int, duration: int, team: str, win: bool, lane: str, challenges: str) -> None:
+        sql = """INSERT INTO games(match_id, summoner_id, champ_id, start_time, duration, team, win, lane, challenges) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s);"""
         self.cursor.execute(sql, (match_id, summoner_id, champ_id,
-                            start_time, duration, win, lane, challenges))
+                            start_time, duration, team, win, lane, challenges))
         self.connection.commit()
 
     def has_game(self, match_id: str, summoner_id: str) -> bool:
         sql = """SELECT COUNT(1) FROM games WHERE match_id = %s AND summoner_id = %s"""
-        self.cursor.execute(sql, (match_id, summoner_id))
+        self.cursor.execute(sql, (str(match_id), summoner_id))
         x = self.cursor.fetchone()[0]
-        print(x, match_id, summoner_id)
         return x > 0
 
     def get_games_played_count(self, puuid: str) -> int:
         sql = """SELECT COUNT(summoner_id) FROM games WHERE summoner_id = %s;"""
         self.cursor.execute(sql, (puuid,))
         return self.cursor.fetchone()
+
+    def commit(self):
+        self.connection.commit()
