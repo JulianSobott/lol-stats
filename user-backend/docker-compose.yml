@@ -9,7 +9,7 @@ services:
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
       - POSTGRES_DB=userBackend
       - POSTGRES_HOST=db
-      - POSTGRES_PORT=5432
+      - POSTGRES_PORT=5431
       - JWT_SECRET_KEY=${JWT_SECRET_KEY}
       - PYTHONPATH=.
       - FLASK_ENV=production
@@ -29,7 +29,7 @@ services:
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
       - POSTGRES_DB=userBackend
     ports:
-      - "5432:5432"
+      - "5431:5432"
     container_name: user-management-db
     networks:
       - user_management
