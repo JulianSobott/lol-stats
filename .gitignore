@@ -58,3 +58,4 @@ Thumbs.db
 user-backend/user_backend/test.db
 .env
 .idea
+user-backend/user_backend/alembic.ini
