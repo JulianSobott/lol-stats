@@ -3,8 +3,6 @@ services:
   user-management:
     build: user_backend/
     restart: unless-stopped
-    ports:
-      - "5000:5000"
     container_name: user-management-api
     environment:
       - POSTGRES_USER=postgres
@@ -17,6 +15,10 @@ services:
       - FLASK_ENV=production
     depends_on:
       - db
+    networks:
+      - user_management
+      - tracing
+      - services
   db:
     image: postgres:14
     restart: unless-stopped
@@ -29,5 +31,14 @@ services:
     ports:
       - "5432:5432"
     container_name: user-management-db
+    networks:
+      - user_management
+
 volumes:
   postgres_data:
+networks:
+  tracing:
+    external: true
+  services:
+    external: true
+  user_management: {}
