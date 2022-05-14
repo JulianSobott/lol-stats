@@ -136,7 +136,7 @@ def login():
         return make_response(jsonify({"status": "error", "message": "User not found"}), 404)
 
 
-@app.route('/api/token/token-id', methods=['GET'])
+@app.route('/api/token/info', methods=['GET'])
 @token_required
 def verify_token(current_user, access_token):
     if current_user is not None:
