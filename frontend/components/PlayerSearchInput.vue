@@ -73,7 +73,7 @@ export default {
         try {
           this.loading = true
           const response = await this.$axios.get(
-            `/players?player_name=${this.playername}&region=ewu`
+            `/players?player_name=${this.playername}&region=euw`
           )
           this.$emit('playerSelected', {
             playername: response.data.name,

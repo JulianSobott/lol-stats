@@ -69,8 +69,7 @@ export default {
           property: 'token',
           global: true,
           // required: true,
-          // type: 'Bearer'
-          name: 'X-Access-Tokens',
+          name: 'authorization',
         },
         user: {
           property: 'user',
@@ -82,11 +81,11 @@ export default {
             method: 'post'
           },
           logout: {
-            url: '/auth/logout',
+            url: 'https://lol-stats.de/api/auth/logout',
             method: 'post'
           },
           user: {
-            url: '/auth/me',
+            url: 'https://lol-stats.de/api/auth/me',
             method: 'get'
           }
         }
