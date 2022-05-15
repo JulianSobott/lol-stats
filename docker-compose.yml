@@ -59,26 +59,26 @@ services:
       - tracing
 
   user-management:
-    build: user_backend/
+    build: user-backend/user_backend/
     restart: unless-stopped
     container_name: user-management-api
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
       - POSTGRES_DB=userBackend
-      - POSTGRES_HOST=db
+      - POSTGRES_HOST=user-management-database
       - POSTGRES_PORT=5432
       - JWT_SECRET_KEY=${JWT_SECRET_KEY}
       - PYTHONPATH=.
       - FLASK_ENV=production
     depends_on:
-      - db
+      - user-management-database
     networks:
       - user_management
       - tracing
       - services
 
-  db:
+  user-management-database:
     image: postgres:14
     restart: unless-stopped
     volumes:
@@ -105,3 +105,5 @@ networks:
     external: true
   tracing:
     external: true
+  user_management: {}
+
