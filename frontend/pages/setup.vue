@@ -119,7 +119,7 @@ export default {
       try {
         const playerId = this.$auth.user.id
         await this.$axios.put(`/users/${playerId}`, {
-          // TODO: region: this.form.region,
+          region: this.form.region,
           player_uuid: this.form.player.player_uuid,
         })
         this.$router.push('/dashboard')
