@@ -61,7 +61,10 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/User'
+                type: object
+                properties:
+                  User:
+                    $ref: '#/components/schemas/User'
         '404':
           description: User not found
           content:
@@ -84,7 +87,7 @@ paths:
                     type: string
                   message:
                     type: string
-  /api/token/info:
+  /api/auth/token:
     get:
       description: Verify token
       tags:
@@ -154,9 +157,12 @@ paths:
         '200':
           description: Sucessfully returned mail of registered acc
           content:
-              application/json:
-                schema:
-                  $ref: '#/components/schemas/User'
+            application/json:
+              schema:
+                type: object
+                properties:
+                  User:
+                    $ref: '#/components/schemas/User'
         '400':
           description: Invalid input
           content:
@@ -193,7 +199,8 @@ paths:
               properties:
                 region:
                   type: string
-                $ref: '#/components/schemas/player_uuid'
+                player_uuid:
+                  type: string
       parameters:
         - name: token
           in: header
@@ -211,7 +218,10 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/User'
+                type: object
+                properties:
+                  User:
+                    $ref: '#/components/schemas/User'
         '404':
           description: User not found or invalid 
           content:
@@ -323,8 +333,11 @@ paths:
             description: Sucessfully returned specific competitor
             content:
               application/json:
-                schema:
-                  $ref: '#/components/schemas/Competitor'
+                schema: 
+                  type: object
+                  properties: 
+                    Competitor:
+                      $ref: '#/components/schemas/Competitor'
       delete:
         description: Delete specific competitor of user
         tags:
@@ -423,11 +436,6 @@ components:
           description: path
         rank:
           $ref: '#/components/schemas/Rank'
-    player_uuid:
-      type: object
-      properties:
-        player_uuid:
-          type: string
     login_data:
       type: object
       properties:
