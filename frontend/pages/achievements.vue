@@ -387,6 +387,7 @@
 <script>
 export default {
   name: 'AchievementsPage',
+  middleware: 'auth',
   data() {
     return {
       showImportPlayerModal: false,

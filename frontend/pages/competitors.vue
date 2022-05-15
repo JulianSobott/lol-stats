@@ -98,6 +98,7 @@
 <script>
 export default {
   name: 'CompetitorsPage',
+  middleware: 'auth',
   mounted() {
     this.getCompetitors()
   },
