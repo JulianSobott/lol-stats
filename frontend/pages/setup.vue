@@ -107,17 +107,18 @@ export default {
       this.form.player = playerData
     },
     async getPlayerData() {
-      // get current player uuid from vue store
-      // fetch current player uuid
+      const user = this.$auth.user
       const response = await this.$axios.get(
-        '/players/i6rhuj9rVlNXt0WRoGzMelbaGItog4yYs6mC8yZXQOY2rpuY68virbdeyvnoptwJ07u1cgZKW1tBPA'
+        `/players/${user.player_uuid}`
       )
       this.$refs.playerSearchInput.setPlayerData(response.data.name)
+      this.form.region = user.playerRegion
     },
     async savePlayername() {
       try {
-        await this.$axios.put('/users/1234', {
-          region: this.form.region,
+        const playerId = this.$auth.user.id
+        await this.$axios.put(`/users/${playerId}`, {
+          // TODO: region: this.form.region,
           player_uuid: this.form.player.player_uuid,
         })
         this.$router.push('/dashboard')
