@@ -250,6 +250,7 @@ import { mapActions } from 'vuex'
 
 export default {
   name: 'IndexPage',
+  middleware: 'auth',
   computed: {
     playerData() {
       return this.$store.state.dashboard.playerData

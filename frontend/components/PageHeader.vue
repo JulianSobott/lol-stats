@@ -22,9 +22,8 @@
       </h1>
       <div class="navbar-nav flex-row order-md-last">
         <div class="nav-item d-none d-md-flex me-3"></div>
-        <div class="nav-item dropdown">
+        <div v-if="user" class="nav-item dropdown">
           <a
-            v-if="user"
             href="#"
             class="nav-link d-flex lh-1 text-reset p-0"
             data-bs-toggle="dropdown"
@@ -43,6 +42,31 @@
             <div class="dropdown-divider"></div>
             <a href="#" class="dropdown-item" @click="logoutUser">Logout</a>
           </div>
+        </div>
+        <div v-else class="nav-item dropdown">
+          <NuxtLink to="/login" class="text-white"
+            ><svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="icon icon-tabler icon-tabler-login"
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              stroke-width="2"
+              stroke="currentColor"
+              fill="none"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <desc>
+                Download more icon variants from https://tabler-icons.io/i/login
+              </desc>
+              <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+              <path
+                d="M14 8v-2a2 2 0 0 0 -2 -2h-7a2 2 0 0 0 -2 2v12a2 2 0 0 0 2 2h7a2 2 0 0 0 2 -2v-2"
+              ></path>
+              <path d="M20 12h-13l3 -3m0 6l-3 -3"></path></svg
+            >Login</NuxtLink
+          >
         </div>
       </div>
     </div>
@@ -68,8 +92,11 @@ export default {
   methods: {
     async getUserData() {
       try {
-        const response = await this.$axios.get('/players/i6rhuj9rVlNXt0WRoGzMelbaGItog4yYs6mC8yZXQOY2rpuY68virbdeyvnoptwJ07u1cgZKW1tBPA')
-        this.user = response.data
+        if (this.$auth.loggedIn) {
+          const playerUuid = this.$auth.user.player_uuid
+          const response = await this.$axios.get(`/players/${playerUuid}`)
+          this.user = response.data
+        }
       } catch (err) {
         console.log(err)
       }
@@ -77,7 +104,7 @@ export default {
     async logoutUser() {
       try {
         await this.$auth.logout('local')
-        this.$router.push('/login')
+        this.$router.push('/login?logout=true')
       } catch (err) {
         console.log(err)
       }
