@@ -58,8 +58,7 @@ export default {
   modules: [
     // https://go.nuxtjs.dev/axios
     '@nuxtjs/axios',
-    '@nuxtjs/axios',
-    '@nuxtjs/auth-next'
+    '@nuxtjs/auth-next',
   ],
 
   // Auth options
@@ -71,6 +70,7 @@ export default {
           global: true,
           // required: true,
           // type: 'Bearer'
+          name: 'X-Access-Tokens',
         },
         user: {
           property: 'user',
@@ -78,7 +78,7 @@ export default {
         },
         endpoints: {
           login: {
-            url: '/auth/login',
+            url: 'https://lol-stats.de/api/auth/login',
             method: 'post'
           },
           logout: {
