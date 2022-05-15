@@ -69,7 +69,7 @@ export default {
           property: 'token',
           global: true,
           // required: true,
-          name: 'authorization',
+          name: 'Authentication',
         },
         user: {
           property: 'user',
