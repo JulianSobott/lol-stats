@@ -41,7 +41,7 @@
           <div class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
             <NuxtLink to="/setup" class="dropdown-item">Settings</NuxtLink>
             <div class="dropdown-divider"></div>
-            <NuxtLink to="/login" class="dropdown-item">Logout</NuxtLink>
+            <a href="#" class="dropdown-item" @click="logoutUser">Logout</a>
           </div>
         </div>
       </div>
@@ -70,6 +70,14 @@ export default {
       try {
         const response = await this.$axios.get('/players/i6rhuj9rVlNXt0WRoGzMelbaGItog4yYs6mC8yZXQOY2rpuY68virbdeyvnoptwJ07u1cgZKW1tBPA')
         this.user = response.data
+      } catch (err) {
+        console.log(err)
+      }
+    },
+    async logoutUser() {
+      try {
+        await this.$auth.logout('local')
+        this.$router.push('/login')
       } catch (err) {
         console.log(err)
       }

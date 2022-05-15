@@ -104,18 +104,21 @@ export default {
       }
 
       try {
-        const response = await this.$auth.loginWith('local', {
-          data: {
-            email: this.form.email,
-            password: this.form.password
-          }
-        })
-        // TODO Redirect to /setup page if no username is empty
-        if (response.data.player_uuid === null) {
-          this.$router.push('/setup?firstsetup=true')
-        } else {
-          this.$router.push('/dashboard')
-        }
+        await this.$auth
+          .loginWith('local', {
+            data: {
+              email: this.form.email,
+              password: this.form.password,
+            },
+          })
+          .then(() => {
+            const user = this.$auth.user
+            if (user.player_uuid === null) {
+              this.$router.push('/setup?firstsetup=true')
+            } else {
+              this.$router.push('/dashboard')
+            }
+          })
       } catch (err) {
         this.error = true
       }
