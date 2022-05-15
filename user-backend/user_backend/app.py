@@ -36,7 +36,7 @@ class Users(db.Model):
     player_uuid = db.Column(db.String(255))
     email = db.Column(db.String(255))
     password = db.Column(db.String(255))
-    region = db.Column(db.String(20), default="EUW")
+    region = db.Column(db.String(20), default="euw")
     competitors = db.relationship('Competitors', backref='user', lazy=True)
     access_token = db.relationship('AccessToken', backref='user', lazy=True)
 
