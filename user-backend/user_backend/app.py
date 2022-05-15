@@ -58,13 +58,20 @@ class AccessToken(db.Model):
     updated_at = db.Column(db.TIMESTAMP, nullable=False)
 
 
+def get_token(header):
+    if 'Authentication' in request.headers:
+        token = request.headers['Authentication']
+    else:
+        return None
+
+    return token.replace("Bearer ", "")
+
+
 def token_required(f):
     @wraps(f)
     def decorator(*args, **kwargs):
-        token = None
-        if 'Authentication' in request.headers:
-            token = request.headers['Authentication']
-        else:
+        token = get_token(request.headers)
+        if token is None:
             return make_response(jsonify({"status": "error", 'message': 'No Authentication in Header'}), 401)
 
         if not token:
@@ -158,17 +165,17 @@ def verify_token(current_user, access_token):
 
 @app.route('/api/auth/logout', methods=['POST'])
 def logout():
-    if 'Authentication' in request.headers:
-        token = request.headers['Authentication']
-        db_token = AccessToken.query.filter_by(token=token).first()
+        db_token = get_token(request.headers)
+        if db_token is None:
+            return make_response(jsonify({"status": "error", 'message': 'No Authentication in Header'}), 401)
+
+        db_token = AccessToken.query.filter_by(token=db_token).first()
         if db_token is not None:
             db.session.delete(db_token)
             db.session.commit()
             return make_response(jsonify({"status": "success", "message": "Successfully logged out"}), 200)
         else:
             return make_response(jsonify({"status": "error", "message": "Session already expired"}), 400)
-    else:
-        return make_response(jsonify({"status": "error", "message": "No token"}), 400)
 
 
 @app.route('/api/auth/register', methods=['POST'])
