@@ -111,7 +111,7 @@ async def get_player(player_id: PlayerId):
         name=player.name,
         level=player.level,
         rank=Rank(
-            rank=player.rank, tier=player.tier, league_points=player.league_points
+            division=Rank.division_from_str(player.division), tier=player.tier, league_points=player.league_points
         ),
         most_played=most_played,
         win_rate=win_rate,
@@ -133,7 +133,7 @@ def find_player(player_name: str, region: str = None):
         name=player.name,
         level=player.level,
         rank=Rank(
-            rank=player.rank, tier=player.tier, league_points=player.league_points
+            division=Rank.division_from_str(player.division), tier=player.tier, league_points=player.league_points
         ),
     )
 

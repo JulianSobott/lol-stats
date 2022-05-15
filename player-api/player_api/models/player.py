@@ -16,9 +16,27 @@ class TierEnum(str, Enum):
 
 
 class Rank(BaseModel):
-    rank: int = Field(ge=1, le=5)
+    division: int = Field(ge=1, le=4)
     tier: TierEnum
     league_points: int = Field(ge=0, le=100)
+
+    @property
+    def division_str(self) -> str:
+        return {
+            1: "one",
+            2: "two",
+            3: "three",
+            4: "four",
+        }[self.division]
+
+    @staticmethod
+    def division_from_str(division: str) -> int:
+        return {
+            "one": 1,
+            "two": 2,
+            "three": 3,
+            "four": 4
+        }[division]
 
 
 class MostPlayed(BaseModel):

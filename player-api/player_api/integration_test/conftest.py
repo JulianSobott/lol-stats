@@ -1,6 +1,6 @@
 from pytest import fixture
 from sqlalchemy import create_engine
-from sqlalchemy.orm import Session
+from fastapi_sqlalchemy import db
 
 from db import Base
 from integration_test.test_main import Champion
@@ -14,6 +14,6 @@ def db_session():
     Champion.cache = {}
     Base.metadata.drop_all(engine)
     Base.metadata.create_all(engine)
-    session = Session()
-    yield session
-    session.close()
+    with db():
+        db.session.commit()
+        yield

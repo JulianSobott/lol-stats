@@ -160,7 +160,7 @@ class Testplayer:
             icon_path=self.player.player_icon_path,
             last_update=datetime.now(),
             tier=self.player.rank.tier,
-            rank=self.player.rank.rank,
+            division=self.player.rank.division_str,
             league_points=self.player.rank.league_points,
         )
 
@@ -217,6 +217,7 @@ class GamesFactory:
                     champ_id=Champion(self.champion).id,
                     start_time=datetime.now() - timedelta(hours=1),
                     duration=timedelta(minutes=30).total_seconds(),
+                    team="red",
                     win=won,
                     lane="bottom",
                     stats="",
@@ -230,10 +231,11 @@ class Champion:
     cache = {}
 
     def __new__(cls, name, *args, **kwargs) -> Champions:
-        if name in Champion.cache:
-            return Champion.cache[name]
-        # DB read not possible, because we clean database before each test
         with db():
+            res = db.session.query(Champions).where(Champions.name == name).all()
+            if res:
+                return res[0]
+
             champ = Champions(
                 id=len(Champion.cache),
                 name=name,
