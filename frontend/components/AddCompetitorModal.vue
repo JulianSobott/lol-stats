@@ -62,7 +62,7 @@ export default {
   methods: {
     async addCompetitor() {
       try {
-        const playerId = 'test' // this.$auth.user.id
+        const playerId = this.$auth.user.id
         await this.$axios.post(`/users/${playerId}/competitors`, {
           player_uuid: this.form.player.player_uuid,
         })
