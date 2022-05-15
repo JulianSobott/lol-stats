@@ -112,7 +112,7 @@ export default {
         `/players/${user.player_uuid}`
       )
       this.$refs.playerSearchInput.setPlayerData(response.data.name)
-      this.form.region = user.playerRegion
+      this.form.region = user.region
     },
     async savePlayername() {
       try {
