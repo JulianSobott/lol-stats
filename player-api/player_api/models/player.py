@@ -4,15 +4,15 @@ from pydantic import BaseModel, Field
 
 
 class TierEnum(str, Enum):
-    IRON = "IRON"
-    BRONZE = "BRONZE"
-    SILVER = "SILVER"
-    GOLD = "GOLD"
-    PLATINUM = "PLATINUM"
-    DIAMOND = "DIAMOND"
-    MASTER = "MASTER"
-    GRANDMASTER = "GRANDMASTER"
-    CHALLENGER = "CHALLENGER"
+    iron = "iron"
+    bronze = "bronze"
+    silver = "silver"
+    gold = "gold"
+    platinum = "platinum"
+    diamond = "diamond"
+    master = "master"
+    grandmaster = "grandmaster"
+    challenger = "challenger"
 
 
 class Rank(BaseModel):
