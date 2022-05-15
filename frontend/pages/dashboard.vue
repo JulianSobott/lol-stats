@@ -260,6 +260,9 @@ export default {
     },
   },
   mounted() {
+    if (this.$route.query.welcome !== undefined) {
+      this.fetchUserData();
+    }
     this.getPlayerData()
   },
   data() {
@@ -274,6 +277,9 @@ export default {
     mostPlayedIconPath(champion) {
       return `background-image: url("${champion.icon_path}");`
     },
+    async fetchUserData() {
+      await this.$auth.fetchUser()
+    }
   },
 }
 </script>
