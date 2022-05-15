@@ -76,6 +76,7 @@
 <script>
 export default {
   name: 'SetupPage',
+  middleware: 'auth',
   mounted() {
     if (this.$route.query.firstsetup !== undefined) {
       this.firstSetup = this.$route.query.firstsetup === 'true'

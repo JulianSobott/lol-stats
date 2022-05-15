@@ -102,7 +102,7 @@
                     ></span>
                   </div>
                   <div class="card-title mb-1">
-                    {{ playerData.rank.tier }} {{ playerData.rank.rank }}
+                    {{ playerData.rank.tier }} {{ playerData.rank.division }}
                   </div>
                   <div class="text-muted">
                     {{ playerData.rank.league_points }}
