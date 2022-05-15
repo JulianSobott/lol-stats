@@ -71,7 +71,7 @@
                         <td>50%</td>
                         <td>5220</td>
                         <td>
-                          <a href="#" class="text-red" @click="removeCompetitor(item.id)">
+                          <a href="#" class="text-red" @click="removeCompetitor(item.player_uuid)">
                             Remove
                           </a>
                         </td>
@@ -98,30 +98,40 @@
 <script>
 export default {
   name: 'CompetitorsPage',
+  mounted() {
+    this.getCompetitors()
+  },
   data() {
     return {
-      competitors: [{
-        id: 1,
-        playername: 'Test',
-      },
-      {
-        id: 2,
-        playername: 'Test2',
-      },
-      {
-        id: 3,
-        playername: 'Test3',
-      }],
+      competitors: [],
       submitted: false,
       error: null
     }
   },
   methods: {
-    removeCompetitor(id) {
-      this.competitors = this.competitors.filter(function( obj ) {
-        return obj.id !== id;
-      });
-    }
+    async getCompetitors() {
+      try {
+        const userId = 'test' // this.$auth.user.id
+        const response = await this.$axios.get(`/users/${userId}/competitors`)
+        this.competitors = response.data.competitors
+      } catch (e) {
+        this.error = true
+      }
+    },
+    async removeCompetitor(competitorUuid) {
+      try {
+        const userId = 'test' // this.$auth.user.id
+        await this.$axios.delete(`/users/${userId}/competitors/${competitorUuid}`, {})
+        
+        /*
+        this.competitors = this.competitors.filter(function( obj ) {
+          return obj.id !== id;
+        });
+        */
+      } catch (e) {
+        this.error = true
+      }
+    },
   }
 }
 </script>
