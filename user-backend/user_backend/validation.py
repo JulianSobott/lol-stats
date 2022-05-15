@@ -11,10 +11,18 @@ class CompetitorSchema(Schema):
 
 
 class UserSetupSchema(Schema):
-    region = fields.String(required=True, load_default="euw")
+    region = fields.Field(load_default="euw")
     player_uuid = fields.String(required=True)
+
+
+class UserDumpSchema(Schema):
+    id = fields.Integer(required=True)
+    email = fields.Email(required=True, allow_none=False, error="Invalid mail")
+    region = fields.Field()
+    player_uuid = fields.String()
 
 
 user_schema = UserSchema()
 competitor_schema = CompetitorSchema()
 user_setup_schema = UserSetupSchema()
+user_dump_schema = UserDumpSchema()

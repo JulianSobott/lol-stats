@@ -11,7 +11,7 @@ from marshmallow import ValidationError
 from werkzeug import security
 
 import config
-from validation import user_schema, competitor_schema, user_setup_schema
+from validation import user_schema, competitor_schema, user_setup_schema, user_dump_schema
 
 
 def create_app():
@@ -132,9 +132,11 @@ def login():
                                        updated_at=datetime.datetime.utcnow() + datetime.timedelta(minutes=45))
                 db.session.add(db_token)
                 db.session.commit()
+
+                user = user_dump_schema.dump(user)
+
                 return make_response(
-                    jsonify({"status": "success", "user": {"id": user.id, "player_uuid": user.player_uuid,
-                                                           "email": user.email}, "token": access_token}), 200)
+                    jsonify({"status": "success", "user": user, "token": access_token}), 200)
             else:
                 return make_response(jsonify({"status": "error", "message": "Wrong password"}), 400)
         else:
@@ -186,13 +188,10 @@ def register():
         db.session.add(usr)
         db.session.commit()
         user = Users.query.filter_by(email=data["email"]).first()
+        user = user_dump_schema.dump(user)
         return make_response(
             jsonify({"status": "success",
-                     "user": {
-                         "id": user.id,
-                         "player_uuid": user.player_uuid,
-                         "email": user.email}
-                     }), 200)
+                     "user": user}), 200)
     else:
         return make_response(
             jsonify({"status": "error", "message": "Account with given mail already exists"}),
@@ -226,7 +225,7 @@ def put_player_uuid(current_user, access_token, user_id):
 
     if user is not None:
         if not data:
-            return jsonify({"status": "error", "message": "No input data provided"}, 400)
+            return make_response(jsonify({"status": "error", "message": "No input data provided"}), 400)
         try:
             data = user_setup_schema.load(data)
         except ValidationError as err:
@@ -239,14 +238,11 @@ def put_player_uuid(current_user, access_token, user_id):
 
         db.session.commit()
 
+        user = user_dump_schema.dump(user)
+
         return make_response(
             jsonify({
-                "user": {
-                    "id": user.id,
-                    "player_uuid": user.player_uuid,
-                    "email": user.email,
-                    "region": user.region
-                },
+                "user": user,
                 "token": access_token,
                 "status": "success"
             }), 200)
