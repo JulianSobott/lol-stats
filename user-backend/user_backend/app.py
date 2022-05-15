@@ -132,8 +132,9 @@ def login():
                                        updated_at=datetime.datetime.utcnow() + datetime.timedelta(minutes=45))
                 db.session.add(db_token)
                 db.session.commit()
-                return make_response(jsonify({"status": "success", "id": user.id, "player_uuid": user.player_uuid,
-                                              "email": user.email, "token": access_token}), 200)
+                return make_response(
+                    jsonify({"status": "success", "user": {"id": user.id, "player_uuid": user.player_uuid,
+                                                           "email": user.email}, "token": access_token}), 200)
             else:
                 return make_response(jsonify({"status": "error", "message": "Wrong password"}), 400)
         else:
@@ -187,9 +188,11 @@ def register():
         user = Users.query.filter_by(email=data["email"]).first()
         return make_response(
             jsonify({"status": "success",
-                     "id": user.id,
-                     "player_uuid": user.player_uuid,
-                     "email": user.email}), 200)
+                     "user": {
+                         "id": user.id,
+                         "player_uuid": user.player_uuid,
+                         "email": user.email}
+                     }), 200)
     else:
         return make_response(
             jsonify({"status": "error", "message": "Account with given mail already exists"}),
@@ -233,20 +236,20 @@ def put_player_uuid(current_user, access_token, user_id):
             user.region = data["region"]
         if "player_uuid" in data:
             user.player_uuid = data["player_uuid"]
-        
+
         db.session.commit()
-        
+
         return make_response(
             jsonify({
                 "user": {
-                        "id": user.id,
-                        "player_uuid": user.player_uuid,
-                        "email": user.email,
-                        "region": user.region
-                    },
+                    "id": user.id,
+                    "player_uuid": user.player_uuid,
+                    "email": user.email,
+                    "region": user.region
+                },
                 "token": access_token,
                 "status": "success"
-                     }), 200)
+            }), 200)
     else:
         return make_response(jsonify({"status": "error", "message": "User not found"}), 404)
 
