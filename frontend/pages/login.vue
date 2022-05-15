@@ -10,6 +10,9 @@
         <div v-if="error" class="card-status-top bg-danger"></div>
         <div class="card-body">
           <h2 class="card-title text-center mb-4">Login to your account</h2>
+          <p v-if="logoutSuccess" class="card-subtitle text-green text-center">
+            You have been logged out successfully. 
+          </p>
           <div class="mb-3">
             <label class="form-label">Email address</label>
             <input
@@ -67,6 +70,13 @@ import { required } from 'vuelidate/lib/validators'
 
 export default {
   name: 'LoginPage',
+  mounted() {
+    if (this.$route.query.logout !== undefined) {
+      this.logoutSuccess = this.$route.query.logout === 'true'
+    } else {
+      this.logoutSuccess = false
+    }
+  },
   data() {
     return {
       form: {
@@ -75,6 +85,7 @@ export default {
       },
       submitted: false,
       error: null,
+      logoutSuccess: false,
     }
   },
   head: {

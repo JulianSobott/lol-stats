@@ -77,7 +77,7 @@ export default {
     async logoutUser() {
       try {
         await this.$auth.logout('local')
-        this.$router.push('/login')
+        this.$router.push('/login?logout=true')
       } catch (err) {
         console.log(err)
       }
