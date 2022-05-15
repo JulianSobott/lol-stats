@@ -1,6 +1,7 @@
 import datetime
 import os
 from functools import wraps
+from urllib import response
 
 import jwt
 from flask_cors import CORS
@@ -10,7 +11,7 @@ from marshmallow import ValidationError
 from werkzeug import security
 
 import config
-from validation import user_schema, competitor_schema
+from validation import user_schema, competitor_schema, user_setup_schema
 
 
 def create_app():
@@ -61,13 +62,16 @@ def token_required(f):
     @wraps(f)
     def decorator(*args, **kwargs):
         token = None
-        if 'x-access-tokens' in request.headers:
-            token = request.headers['x-access-tokens']
+        if 'Authentication' in request.headers:
+            token = request.headers['Authentication']
+        else:
+            return make_response(jsonify({"status": "error", 'message': 'No Authentication in Header'}), 401)
 
         if not token:
             return make_response(jsonify({"status": "error", 'message': 'No token'}), 404)
         try:
-            data = jwt.decode(token, app.config['JWT_SECRET_KEY'], algorithms=["HS256"])
+            api_key = token.replace("Bearer ", "")
+            data = jwt.decode(api_key, app.config['JWT_SECRET_KEY'], algorithms=["HS256"])
             current_user = Users.query.filter_by(id=data['user_id']).first()
         except:
             return make_response(jsonify({"status": "error", 'message': 'Token is invalid'}), 400)
@@ -131,9 +135,9 @@ def login():
                 return make_response(jsonify({"status": "success", "id": user.id, "player_uuid": user.player_uuid,
                                               "email": user.email, "token": access_token}), 200)
             else:
-                return make_response(jsonify({"status": "error", "message": "Invalid Input"}), 400)
+                return make_response(jsonify({"status": "error", "message": "Wrong password"}), 400)
         else:
-            return make_response(jsonify({"status": "error", "message": "Invalid Input"}), 400)
+            return make_response(jsonify({"status": "error", "message": "No password"}), 400)
     else:
         return make_response(jsonify({"status": "error", "message": "User not found"}), 404)
 
@@ -151,8 +155,8 @@ def verify_token(current_user, access_token):
 
 @app.route('/api/auth/logout', methods=['POST'])
 def logout():
-    if 'x-access-tokens' in request.headers:
-        token = request.headers['x-access-tokens']
+    if 'Authentication' in request.headers:
+        token = request.headers['Authentication']
         db_token = AccessToken.query.filter_by(token=token).first()
         if db_token is not None:
             db.session.delete(db_token)
@@ -211,21 +215,38 @@ def delete_user(current_user, token):
                                   }), 200)
 
 
-@app.route('/api/users/<player_uuid>', methods=['PUT'])
+@app.route('/api/users/<user_id>', methods=['PUT'])
 @token_required
-def put_player_uuid(current_user, access_token, player_uuid):
+def put_player_uuid(current_user, access_token, user_id):
     user = Users.query.filter_by(id=current_user.id).first()
+    data = request.get_json()
 
     if user is not None:
-        user.player_uuid = player_uuid
+        if not data:
+            return jsonify({"status": "error", "message": "No input data provided"}, 400)
+        try:
+            data = user_setup_schema.load(data)
+        except ValidationError as err:
+            return make_response(jsonify({"status": "error", "message": err.messages}), 400)
+
+        if "region" in data:
+            user.region = data["region"]
+        if "player_uuid" in data:
+            user.player_uuid = data["player_uuid"]
+        
         db.session.commit()
+        
         return make_response(
-            jsonify({"status": "success",
-                     "message": "Successfully put ingame user id",
-                     "id": current_user.id,
-                     "player_uuid": current_user.player_uuid,
-                     "email": current_user.email,
-                     "token": access_token}), 200)
+            jsonify({
+                "user": {
+                        "id": user.id,
+                        "player_uuid": user.player_uuid,
+                        "email": user.email,
+                        "region": user.region
+                    },
+                "token": access_token,
+                "status": "success"
+                     }), 200)
     else:
         return make_response(jsonify({"status": "error", "message": "User not found"}), 404)
 
@@ -257,7 +278,7 @@ def get_list_of_or_add_competitor(current_user, token, user_id):
         if not data:
             return jsonify({"status": "error", "message": "No input data provided"}, 400)
         try:
-            data = competitor_schema.load({"user_id": user_id, "player_uuid": data["player_uuid"]})
+            data = competitor_schema.load({"player_uuid": data["player_uuid"]})
         except ValidationError as err:
             return make_response(jsonify({"status": "error", "message": err.messages}), 400)
 
@@ -281,7 +302,7 @@ def get_list_of_or_add_competitor(current_user, token, user_id):
                 409)
 
 
-@app.route('/api/users/>user_id>/competitors/<competitor_puuid>', methods=['GET, DELETE'])
+@app.route('/api/users/<user_id>/competitors/<competitor_puuid>', methods=['GET, DELETE'])
 @token_required
 def get_or_delete_competitor(current_user, token, user_id, competitor_puuid):
     competitor = Competitors.query.filter_by(user_id=user_id, player_uuid=competitor_puuid).first()
