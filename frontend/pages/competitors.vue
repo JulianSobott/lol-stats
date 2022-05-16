@@ -16,7 +16,7 @@
               <!-- Page title actions -->
               <div class="col-12 col-md-auto ms-auto d-print-none">
                 <div class="btn-list">
-                  <a href="#" class="btn btn-primary d-sm-inline-block" data-bs-toggle="modal" data-bs-target="#modal-add-competitor">
+                  <a href="#" class="btn btn-primary d-sm-inline-block" data-bs-toggle="modal" data-bs-target="#modal-add-competitor" @click="openAddCompetitorModal">
                     Add Competitor
                   </a>
                 </div>
@@ -54,9 +54,9 @@
                             ></span>
                             <div class="flex-fill">
                               <div class="font-weight-medium">
-                                <NuxtLink to="/profiles/1234" class="text-reset">{{item.playername}}</NuxtLink>
+                                <NuxtLink to="/profiles/1234" class="text-reset">{{item.name}}</NuxtLink>
                               </div>
-                              <div class="text-muted"><NuxtLink :to="'/achievements?playername=' + item.playername" class="text-reset">Achievements</NuxtLink></div>
+                              <div class="text-muted"><NuxtLink :to="'/achievements?playername=' + item.name" class="text-reset">Achievements</NuxtLink></div>
                             </div>
                           </div>
                         </td>
@@ -91,7 +91,7 @@
         </div>
       </div>
     </div>
-    <AddCompetitorModal />
+    <AddCompetitorModal ref="addCompetitorModal" />
   </div>
 </template>
 
@@ -110,6 +110,9 @@ export default {
     }
   },
   methods: {
+    openAddCompetitorModal() {
+      this.$refs.addCompetitorModal.clearForm()
+    },
     async getCompetitors() {
       try {
         const userId = this.$auth.user.id
@@ -122,13 +125,12 @@ export default {
     async removeCompetitor(competitorUuid) {
       try {
         const userId = this.$auth.user.id
-        await this.$axios.delete(`/users/${userId}/competitors/${competitorUuid}/`, {})
+        await this.$axios.delete(`/users/${userId}/competitors/${competitorUuid}`, {})
         
-        /*
         this.competitors = this.competitors.filter(function( obj ) {
-          return obj.id !== id;
+          return obj.player_uuid !== competitorUuid;
         });
-        */
+
       } catch (e) {
         this.error = true
       }

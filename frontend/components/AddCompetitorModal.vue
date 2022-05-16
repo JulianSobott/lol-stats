@@ -53,13 +53,17 @@ export default {
   data() {
     return {
       form: {
-        player: {}
+        player: {},
       },
       submitted: false,
       error: null,
     }
   },
   methods: {
+    clearForm() {
+      this.form.player = {}
+      this.$refs.PlayerSearchInput.clear()
+    },
     async addCompetitor() {
       try {
         const playerId = this.$auth.user.id
@@ -67,6 +71,9 @@ export default {
           player_uuid: this.form.player.player_uuid,
         })
         this.$router.push('/competitors')
+        
+        // dirty hack to reload the page
+        window.location.reload(true)
       } catch (e) {
         this.error = true
       }
