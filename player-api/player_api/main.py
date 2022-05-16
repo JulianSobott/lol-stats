@@ -1,5 +1,4 @@
 import json
-import os
 import string
 import random
 import time
@@ -7,11 +6,11 @@ from urllib.parse import urlencode
 from datetime import datetime
 from pathlib import Path
 
-from fastapi import FastAPI, HTTPException, Request
-from fastapi_sqlalchemy import DBSessionMiddleware, db
+from fastapi import FastAPI, HTTPException, Request, Depends
 from sqlalchemy import func, text, case, desc
 import logging.config
 from opentelemetry.instrumentation.fastapi import FastAPIInstrumentor
+from sqlalchemy.orm import Session
 
 from player_api.models.game import (
     Game,
@@ -22,7 +21,7 @@ from player_api.models.game import (
     GamePlayer,
     NameValue,
 )
-from player_api.db import Summoners, Games, Champions
+from player_api.db import Summoners, Games, Champions, SessionLocal
 from player_api.models.player import Player, Rank, MostPlayed, BasicPlayer
 from player_api.models.responses import ExceptionMessage
 
@@ -38,11 +37,15 @@ app = FastAPI(
     version="1.0.0",
     servers=[{"url": "https://lol-stats.de/api"}],
 )
-app.add_middleware(
-    DBSessionMiddleware,
-    db_url=f"postgresql://postgres:{os.environ.get('POSTGRES_PASSWORD', 'postgres')}@"
-    f"{os.environ.get('POSTGRES_HOST', 'localhost')}/postgres",
-)
+
+
+def get_db():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
+
 
 PlayerId = str
 PlayerName = str
@@ -72,16 +75,16 @@ async def log_requests(request: Request, call_next):
     response_model=Player,
     responses={404: {"model": ExceptionMessage, "description": "Player not found"}},
 )
-async def get_player(player_id: PlayerId):
+async def get_player(player_id: PlayerId, db: Session = Depends(get_db)):
     """Get a player by riots puuid"""
     logger.debug(f"method=get_player {player_id=}")
-    player = get_player_by_id(player_id)
+    player = get_player_by_id(db, player_id)
     if player is None:
         raise HTTPException(status_code=404, detail="player not found")
     logger.debug(f"method=get_player {player_id=} {player.name=}")
 
     most_played_db = (
-        db.session.query(
+        db.query(
             Games.champ_id,
             Champions.name,
             Champions.icon_path,
@@ -109,7 +112,7 @@ async def get_player(player_id: PlayerId):
     logging.debug(f"method=get_player {most_played=}")
 
     result = (
-        db.session.query(
+        db.query(
             func.count(Games.summoner_id).label("num_played"),
             func.count(case([(Games.win, 1)])).label("won"),
         )
@@ -136,8 +139,8 @@ async def get_player(player_id: PlayerId):
     response_model=BasicPlayer,
     responses={404: {"model": ExceptionMessage, "description": "Player not found"}},
 )
-def find_player(player_name: str, region: str = None):
-    player = get_player_by_name(player_name)
+def find_player(player_name: str, region: str = None, db: Session = Depends(get_db)):
+    player = get_player_by_name(db, player_name)
     if player is None:
         raise HTTPException(status_code=404, detail="player not found")
     return BasicPlayer(
@@ -151,12 +154,11 @@ def find_player(player_name: str, region: str = None):
     )
 
 
-def get_player_by_id(player_id: str) -> Summoners | None:
-    with db():
-        player: Summoners | None = (
-            db.session.query(Summoners).where(Summoners.puuid == player_id).first()
-        )
-        return player
+def get_player_by_id(db: Session, player_id: str) -> Summoners | None:
+    player: Summoners | None = (
+        db.query(Summoners).where(Summoners.puuid == player_id).first()
+    )
+    return player
 
 
 @app.get(
@@ -169,16 +171,17 @@ def recent_games(
     request: Request,
     start_after: datetime = None,
     limit: int = DEFAULT_GAMES_PER_PAGE,
+    db: Session = Depends(get_db)
 ):
     logger.debug(f"method=recent_games {player_name=}")
-    player = get_player_by_name(player_name)
+    player = get_player_by_name(db, player_name)
     if player is None:
         raise HTTPException(status_code=404, detail="player not found")
     logger.debug(f"method=recent_games {player_name=} {player.puuid=}")
     if start_after is None:
         start_after = datetime(1970, 1, 1)
     games: list[Games] = (
-        db.session.query(Games)
+        db.query(Games)
         .where(Summoners.puuid == player.puuid and Games.start_time > start_after)
         .order_by(desc(Games.start_time))
         .limit(limit)
@@ -216,12 +219,11 @@ def recent_games(
     return Page[Game](items=ret_games, next=str(next_link))
 
 
-def get_player_by_name(player_name: str) -> Summoners | None:
-    with db():
-        player: Summoners | None = (
-            db.session.query(Summoners).where(Summoners.name == player_name).first()
-        )
-        return player
+def get_player_by_name(db: Session, player_name: str) -> Summoners | None:
+    player: Summoners | None = (
+        db.query(Summoners).where(Summoners.name == player_name).first()
+    )
+    return player
 
 
 def calc_win_rate(games: int, won: int) -> int:

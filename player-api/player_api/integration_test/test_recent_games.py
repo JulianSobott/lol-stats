@@ -13,7 +13,7 @@ random.seed(1)
 
 
 def test_get_most_played_no_games(db_session):
-    players = PlayerFactory().player()
+    players = PlayerFactory(db_session).player()
     player = players[0]
     with players:
         pass
@@ -23,7 +23,7 @@ def test_get_most_played_no_games(db_session):
 
 
 def test_get_most_played_correct_next(db_session):
-    players = PlayerFactory().player()
+    players = PlayerFactory(db_session).player()
     player = players[0]
     with players:
         player.play_n_games(DEFAULT_GAMES_PER_PAGE).starting_at(
@@ -38,7 +38,7 @@ def test_get_most_played_correct_next(db_session):
 
 
 def test_get_most_played_correct_games(db_session):
-    players = PlayerFactory().player()
+    players = PlayerFactory(db_session).player()
     player = players[0]
     with players:
         player.play_n_games(DEFAULT_GAMES_PER_PAGE).starting_at(
@@ -56,7 +56,7 @@ def test_get_most_played_correct_games(db_session):
 
 
 def test_get_most_played_pagination(db_session):
-    players = PlayerFactory().player()
+    players = PlayerFactory(db_session).player()
     player = players[0]
     with players:
         player.play_n_games(DEFAULT_GAMES_PER_PAGE).starting_at(

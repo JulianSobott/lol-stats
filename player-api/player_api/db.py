@@ -12,9 +12,16 @@ from sqlalchemy import (
     Enum,
     CheckConstraint,
 )
-from sqlalchemy.orm import relationship
+from sqlalchemy.orm import relationship, sessionmaker
 
 from player_api.models.player import TierEnum
+
+
+engine = create_engine(
+        f"postgresql://postgres:{os.environ.get('POSTGRES_PASSWORD', 'postgres')}@"
+        f"{os.environ.get('POSTGRES_HOST', 'localhost')}/postgres",
+    )
+SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 
 Base = declarative_base()

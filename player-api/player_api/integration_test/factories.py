@@ -3,7 +3,7 @@ import random
 import string
 from datetime import datetime, timedelta
 
-from fastapi_sqlalchemy import db
+from sqlalchemy.orm import Session
 
 from models.player import Player
 from player_api.db import Champions, Summoners, Base, Games
@@ -13,29 +13,29 @@ DEFAULT_GAME_LENGTH = 30
 
 
 class PlayerFactory:
-    def __init__(self):
+    def __init__(self, db: Session):
+        self.db = db
         self.players: list["Testplayer"] = []
 
     def player(self) -> "PlayerFactory":
-        self.players.append(Testplayer())
+        self.players.append(Testplayer(self.db))
         return self
 
     def n_players(self, num_players: int) -> "PlayerFactory":
-        self.players.extend(Testplayer() for i in range(num_players))
+        self.players.extend(Testplayer(self.db) for i in range(num_players))
         return self
 
     def __enter__(self):
         pass
 
     def __exit__(self, exc_type, exc_val, exc_tb):
-        with db():
-            objects = []
-            for player in self.players:
-                objects.append(player.summoner)
-                for game in player.games:
-                    objects.append(game)
-            db.session.bulk_save_objects(objects)
-            db.session.commit()
+        objects = []
+        for player in self.players:
+            objects.append(player.summoner)
+            for game in player.games:
+                objects.append(game)
+        self.db.bulk_save_objects(objects)
+        self.db.commit()
 
     def __getitem__(self, item):
         return self.players[item]
@@ -46,12 +46,13 @@ class PlayerFactory:
 
 
 class Testplayer:
-    def __init__(self, **kwargs):
+    def __init__(self, db: Session, **kwargs):
+        self.db = db
         self.player: Player = PlayerModelFactory.build(**kwargs)
         self.games_factories: list[GamesFactory] = []
 
     def play_n_games(self, num_games: int) -> "GamesFactory":
-        factory = GamesFactory(self).with_n_games(num_games)
+        factory = GamesFactory(self.db, self).with_n_games(num_games)
         self.games_factories.append(factory)
         return factory
 
@@ -61,10 +62,10 @@ class Testplayer:
             puuid=self.player.id,
             name=self.player.name,
             level=self.player.level,
-            icon_path=self.player.icon_path,
+            icon_path=self.player.player_icon_path,
             last_update=datetime.now(),
             tier=self.player.rank.tier,
-            rank=self.player.rank.rank,
+            division=self.player.rank.division_str,
             league_points=self.player.rank.league_points,
         )
 
@@ -81,7 +82,8 @@ class Testplayer:
 
 
 class GamesFactory:
-    def __init__(self, player: Testplayer):
+    def __init__(self, db: Session, player: Testplayer):
+        self.db = db
         self.num_games = 0
         self.champion = "Aatrox"
         self.won = 0
@@ -123,11 +125,12 @@ class GamesFactory:
                 Games(
                     match_id=random_name(),
                     summoner_id=self.player.summoner.puuid,
-                    champion_id=Champion(self.champion).id,
+                    champ_id=Champion(self.db, self.champion).id,
                     start_time=self.start + timedelta(minutes=i * DEFAULT_GAME_LENGTH),
                     duration=timedelta(minutes=DEFAULT_GAME_LENGTH).total_seconds(),
                     win=won,
                     lane="bottom",
+                    team="red",
                     stats=json.dumps(
                         {
                             "-damageSelfMitigated": 7032,
@@ -291,7 +294,7 @@ class GamesFactory:
                             "controlWardsPlaced": 0,
                             "stealthWardsPlaced": 5,
                             "threeWardsOneSweeperCount": 0,
-                            "visionScoreAdvantageLaneOpponent": -0.2218838930130005,
+                            "viChampion.cache[name]sionScoreAdvantageLaneOpponent": -0.2218838930130005,
                             "visionScorePerMinute": 0.3787263810293082,
                             "wardTakedowns": 0,
                             "wardTakedownsBefore20M": 0,
@@ -317,23 +320,22 @@ class GamesFactory:
 
 
 class Champion:
-    cache = {}
 
-    def __new__(cls, name, *args, **kwargs) -> Champions:
-        if name in Champion.cache:
-            return Champion.cache[name]
-        # DB read not possible, because we clean database before each test
-        with db():
-            champ = Champions(
-                id=len(Champion.cache),
-                name=name,
-                icon_path=f"https://ddragon.leagueoflegends.com/cdn/12.8.1/img/champion/{name}.png",
-            )
-            db.session.bulk_save_objects([champ])
-            db.session.commit()
-            # champ = db.session.query(Champions).where(Champions.name == name).all()[0]
-        Champion.cache[name] = champ
-        return Champion.cache[name]
+    def __new__(cls, db: Session, name, *args, **kwargs) -> Champions:
+        res = db.query(Champions).where(Champions.name == name).all()
+        if res:
+            return res[0]
+
+        champ = Champions(
+            id=random.randint(0, 50000),
+            name=name,
+            icon_path=f"https://ddragon.leagueoflegends.com/cdn/12.8.1/img/champion/{name}.png",
+        )
+        db.add(champ)
+        db.commit()
+        db.refresh(champ)
+        # champ = db.session.query(Champions).where(Champions.name == name).all()[0]
+        return champ
 
 
 def random_name():
