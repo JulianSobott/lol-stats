@@ -127,7 +127,7 @@ export default {
             if (user.player_uuid === null) {
               this.$router.push('/setup?firstsetup=true')
             } else {
-              this.$router.push('/dashboard')
+              this.$router.push('/dashboard?welcome=true')
             }
           })
       } catch (err) {
