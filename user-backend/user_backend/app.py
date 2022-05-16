@@ -95,7 +95,8 @@ def get_own_data(current_user, access_token):
         "id": current_user.id,
         "player_uuid": current_user.player_uuid,
         "email": current_user.email,
-        "token": access_token
+        "token": access_token,
+        "region": "euw" # placeholder
     }
 
     # TODO implement call to player endpoint and retrieve player data
@@ -108,7 +109,8 @@ def get_own_data(current_user, access_token):
         data = {
             "id": competitor.id,
             "player_uuid": competitor.player_uuid,
-            "name": competitor.username
+            "name": competitor.username,
+            "region": "euw" # placeholder
         }
         competitor_output.append(data)
 
