@@ -92,7 +92,7 @@ def test_contains_team_members(db_session):
 
 
 def _recent_game_request(player: Testplayer) -> Page[Game]:
-    response = client.get(f"/players/{player.name}/recent-games")
+    response = client.get(f"/players/{player.player.id}/recent-games")
     assert response.status_code == 200
     return Page[Game](**response.json())
 

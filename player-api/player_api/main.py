@@ -173,22 +173,22 @@ def get_player_by_id(db: Session, player_id: str) -> Summoners | None:
 
 
 @app.get(
-    "/players/{player_name}/recent-games",
+    "/players/{player_id}/recent-games",
     response_model=Page[Game],
     responses={404: {"model": ExceptionMessage, "description": "Player not found"}},
 )
 def recent_games(
-    player_name: PlayerName,
+    player_id: PlayerId,
     request: Request,
     start_before: datetime = None,
     limit: int = DEFAULT_GAMES_PER_PAGE,
     db: Session = Depends(get_db)
 ):
-    logger.debug(f"method=recent_games {player_name=}")
-    player = get_player_by_name(db, player_name)
+    logger.debug(f"method=recent_games {player_id=}")
+    player = get_player_by_id(db, player_id)
     if player is None:
         raise HTTPException(status_code=404, detail="player not found")
-    logger.debug(f"method=recent_games {player_name=} {player.puuid=}")
+    logger.debug(f"method=recent_games {player_id=} {player.name=}")
     if start_before is None:
         start_before = datetime(2090, 1, 1)
     start_before = datetime_to_db(start_before)
