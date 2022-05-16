@@ -16,7 +16,7 @@ from validation import user_schema, competitor_schema, user_setup_schema, user_d
 
 def create_app():
     flask_app = Flask(__name__)
-    CORS(flask_app)
+    CORS(flask_app, origins=['*'], allow_headers=['*'], methods=['*'], supports_credentials=False)
     flask_app.config['SQLALCHEMY_DATABASE_URI'] = config.DATABASE_CONNECTION_URI
     flask_app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     flask_app.app_context().push()
