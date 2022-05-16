@@ -169,7 +169,7 @@ def get_player_by_id(db: Session, player_id: str) -> Summoners | None:
 def recent_games(
     player_name: PlayerName,
     request: Request,
-    start_after: datetime = None,
+    start_before: datetime = None,
     limit: int = DEFAULT_GAMES_PER_PAGE,
     db: Session = Depends(get_db)
 ):
@@ -178,22 +178,22 @@ def recent_games(
     if player is None:
         raise HTTPException(status_code=404, detail="player not found")
     logger.debug(f"method=recent_games {player_name=} {player.puuid=}")
-    if start_after is None:
-        start_after = datetime(1970, 1, 1)
+    if start_before is None:
+        start_before = datetime(2090, 1, 1)
     games: list[Games] = (
         db.query(Games)
-        .where(Summoners.puuid == player.puuid and Games.start_time > start_after)
+        .where(Summoners.puuid == player.puuid, Games.start_time < start_before)
         .order_by(desc(Games.start_time))
         .limit(limit)
         .all()
     )
     if len(games) == 0:
         return Page[Game](items=[], next="")
-    next_start_after = games[0].start_time.isoformat()
+    next_start_before = games[-1].start_time.isoformat()
     next_link = (
         str(request.url.path)
         + "?"
-        + urlencode({"start_after": next_start_after, "limit": limit})
+        + urlencode({"start_before": next_start_before, "limit": limit})
     )
     ret_games = []
     for game in games:

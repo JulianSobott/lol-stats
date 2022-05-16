@@ -62,18 +62,26 @@ def test_get_most_played_pagination(db_session):
         player.play_n_games(DEFAULT_GAMES_PER_PAGE).starting_at(
             datetime(2000, 1, 1)
         ).with_champion("Lux")
-        player.play_n_games(DEFAULT_GAMES_PER_PAGE).starting_at(
+        player.play_n_games(DEFAULT_GAMES_PER_PAGE - 1).starting_at(
             datetime(2000, 1, 2)
         ).with_champion("Azir")
     res = _recent_game_request(player)
     assert len(res.items) == DEFAULT_GAMES_PER_PAGE
-    res = _recent_game_request(player)
-    assert len(res.items) == DEFAULT_GAMES_PER_PAGE
-    res = _recent_game_request(player)
+    res = _next_game(res)
+    assert len(res.items) == DEFAULT_GAMES_PER_PAGE - 1
+    res = _next_game(res)
+    assert res.next == ""
+    assert len(res.items) == 0
 
 
 def _recent_game_request(player: Testplayer) -> Page[Game]:
     response = client.get(f"/players/{player.name}/recent-games")
+    assert response.status_code == 200
+    return Page[Game](**response.json())
+
+
+def _next_game(res: Page[Game]) -> Page[Game]:
+    response = client.get(res.next)
     assert response.status_code == 200
     return Page[Game](**response.json())
 
