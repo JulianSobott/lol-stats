@@ -74,7 +74,7 @@
                   <div class="d-flex mb-2">
                     <div>Winrate</div>
                   </div>
-                  <div class="progress progress-sm">
+                  <div class="progress">
                     <div
                       class="progress-bar bg-blue"
                       :style="winRateProgressStyle"
@@ -138,7 +138,7 @@
                   </thead>
                   <tbody v-if="playerData">
                     <tr
-                      v-for="champion in playerData.most_played"
+                      v-for="champion in playerData.most_played.slice(0, 3)"
                       :key="champion.champion_id"
                     >
                       <td class="p-0">
