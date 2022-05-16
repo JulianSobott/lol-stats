@@ -75,8 +75,8 @@ def test_contains_team_members(db_session):
     players = PlayerFactory(db_session).player()
     player = players[0]
     with players:
-        player.play_n_games(1).with_champion("Lux").with_team().starting_at(datetime(2000, 1, 1))
-        player.play_n_games(1).with_champion("Aatrox").with_team().starting_at(datetime(2000, 1, 2))
+        player.play_n_games(1).with_champion("Lux").starting_at(datetime(2000, 1, 1))
+        player.play_n_games(1).with_champion("Aatrox").starting_at(datetime(2000, 1, 2))
     res = _recent_game_request(player)
 
     assert len(res.items) == 2

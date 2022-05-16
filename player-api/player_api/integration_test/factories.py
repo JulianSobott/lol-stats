@@ -6,7 +6,7 @@ from datetime import datetime, timedelta
 from sqlalchemy.orm import Session
 
 from models.player import Player
-from player_api.db import Champions, Summoners, Base, Games
+from player_api.db import Champions, Summoners, Base, Games, datetime_to_db
 from player_api.models.factories import PlayerModelFactory
 
 DEFAULT_GAME_LENGTH = 30
@@ -63,7 +63,7 @@ class Testplayer:
             name=self.player.name,
             level=self.player.level,
             icon_path=self.player.player_icon_path,
-            last_update=datetime.now(),
+            last_update=datetime_to_db(datetime.now()),
             tier=self.player.rank.tier,
             division=self.player.rank.division_str,
             league_points=self.player.rank.league_points,
@@ -89,7 +89,6 @@ class GamesFactory:
         self.won = 0
         self.player = player
         self.start = datetime.now() - timedelta(days=7)
-        self.add_team_members = False
 
     def with_n_games(self, num_games: int) -> "GamesFactory":
         self.num_games = num_games
@@ -101,10 +100,6 @@ class GamesFactory:
 
     def with_champion(self, champion: str) -> "GamesFactory":
         self.champion = champion
-        return self
-
-    def with_team(self):
-        self.add_team_members = True
         return self
 
     def win(self, num_games: int):
@@ -133,7 +128,7 @@ class GamesFactory:
                     match_id=match_id,
                     summoner_id=self.player.summoner.puuid,
                     champ_id=Champion(self.db, self.champion).id,
-                    start_time=self.start + timedelta(minutes=i * DEFAULT_GAME_LENGTH),
+                    start_time=datetime_to_db(self.start + timedelta(minutes=i * DEFAULT_GAME_LENGTH)),
                     duration=timedelta(minutes=DEFAULT_GAME_LENGTH).total_seconds(),
                     win=won,
                     lane="bottom",
@@ -142,25 +137,24 @@ class GamesFactory:
                     challenges="",
                 )
             )
-            if self.add_team_members:
-                for j in range(9):
-                    summoner = Testplayer(self.db).summoner
-                    self.db.add(summoner)
-                    self.db.commit()
-                    objects.append(
-                        Games(
-                            match_id=match_id,
-                            summoner_id=summoner.puuid,
-                            champ_id=Champion(self.db, self.champion).id,
-                            start_time=self.start + timedelta(minutes=i * DEFAULT_GAME_LENGTH),
-                            duration=timedelta(minutes=DEFAULT_GAME_LENGTH).total_seconds(),
-                            win=won if j < 4 else not won,
-                            lane="bottom",
-                            team="red" if j < 4 else "blue",
-                            stats=stats,
-                            challenges="",
-                        )
+            for j in range(9):
+                summoner = Testplayer(self.db).summoner
+                self.db.add(summoner)
+                self.db.commit()
+                objects.append(
+                    Games(
+                        match_id=match_id,
+                        summoner_id=summoner.puuid,
+                        champ_id=Champion(self.db, self.champion).id,
+                        start_time=datetime_to_db(self.start + timedelta(minutes=i * DEFAULT_GAME_LENGTH)),
+                        duration=timedelta(minutes=DEFAULT_GAME_LENGTH).total_seconds(),
+                        win=won if j < 4 else not won,
+                        lane="bottom",
+                        team="red" if j < 4 else "blue",
+                        stats=stats,
+                        challenges="",
                     )
+                )
         return objects
 
 

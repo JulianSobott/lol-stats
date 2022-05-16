@@ -21,7 +21,7 @@ from player_api.models.game import (
     GamePlayer,
     NameValue,
 )
-from player_api.db import Summoners, Games, Champions, SessionLocal
+from player_api.db import Summoners, Games, Champions, SessionLocal, db_to_datetime, datetime_to_db
 from player_api.models.player import Player, Rank, MostPlayed, BasicPlayer
 from player_api.models.responses import ExceptionMessage
 
@@ -180,6 +180,7 @@ def recent_games(
     logger.debug(f"method=recent_games {player_name=} {player.puuid=}")
     if start_before is None:
         start_before = datetime(2090, 1, 1)
+    start_before = datetime_to_db(start_before)
     games: list[Games] = (
         db.query(Games)
         .where(Games.summoner_id == player.puuid, Games.start_time < start_before)
@@ -189,7 +190,7 @@ def recent_games(
     )
     if len(games) == 0:
         return Page[Game](items=[], next="")
-    next_start_before = games[-1].start_time.isoformat()
+    next_start_before = db_to_datetime(games[-1].start_time).isoformat()
     next_link = (
         str(request.url.path)
         + "?"
@@ -222,7 +223,7 @@ def recent_games(
                 ally_team=ally_team,
                 enemy_team=enemy_team,
                 duration=game.duration,
-                timestamp=game.start_time,
+                timestamp=db_to_datetime(game.start_time),
             )
         )
     return Page[Game](items=ret_games, next=str(next_link))
