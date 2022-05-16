@@ -57,7 +57,15 @@
                   </p>
                   <div class="d-flex mb-2"><i>Current Status ....</i></div>
                   <div class="progress mb-2">
-                    <div class="progress-bar bg-lime" style="width: 38%" role="progressbar" aria-valuenow="38" aria-valuemin="0" aria-valuemax="100" aria-label="38% Complete">
+                    <div
+                      class="progress-bar bg-lime"
+                      style="width: 38%"
+                      role="progressbar"
+                      aria-valuenow="38"
+                      aria-valuemin="0"
+                      aria-valuemax="100"
+                      aria-label="38% Complete"
+                    >
                       <span class="visually-hidden">38% Complete</span>
                     </div>
                   </div>
@@ -102,7 +110,8 @@
                     ></span>
                   </div>
                   <div class="card-title mb-1">
-                    {{ playerData.rank.tier.toUpperCase() }} {{ playerData.rank.division }}
+                    {{ playerData.rank.tier.toUpperCase() }}
+                    {{ playerData.rank.division }}
                   </div>
                   <div class="text-muted">
                     League Points: {{ playerData.rank.league_points }}
@@ -145,7 +154,7 @@
                         <div class="d-flex px-3 align-items-center">
                           <span
                             class="avatar avatar-xs avatar-rounded"
-                            :style="mostPlayedIconPath(champion)"
+                            :style="championIconPath(champion)"
                           ></span>
                           <div class="flex-fill">
                             <div class="font-weight-medium m-2">
@@ -178,9 +187,14 @@
                       </tr>
                     </thead>
                     <tbody>
-                      <tr v-for="index in 10" :key="index">
-                        <td class="text-muted">{{ index }}</td>
-                        <td><span class="text-green">WIN</span></td>
+                      <tr
+                        v-for="game in recentGames.items"
+                        :key="game.match_id"
+                      >
+                        <td class="text-muted">{{ game.match_id }}</td>
+                        <td>
+                          <span>{{ game.victorious_team.toUpperCase() }}</span>
+                        </td>
                         <td>
                           <span
                             class="avatar avatar-s avatar-rounded m-1"
@@ -195,28 +209,24 @@
                               <div>
                                 <div
                                   class="avatar avatar-rounded"
-                                  v-for="index in 5"
-                                  :key="index"
+                                  v-for="player in game.ally_team"
+                                  :key="player.id"
                                 >
                                   <span
                                     class="avatar avatar-xs avatar-rounded ml-1"
-                                    style="
-                                      background-image: url(https://placekitten.com/32/32);
-                                    "
+                                    :style="championIconPath(player.champion)"
                                   ></span>
                                 </div>
                               </div>
                               <div>
                                 <div
                                   class="avatar avatar-rounded"
-                                  v-for="index in 5"
-                                  :key="index"
+                                  v-for="player in game.enemy_team"
+                                  :key="player.id"
                                 >
                                   <span
                                     class="avatar avatar-xs avatar-rounded ml-1"
-                                    style="
-                                      background-image: url(https://placekitten.com/32/32);
-                                    "
+                                    :style="championIconPath(player.champion)"
                                   ></span>
                                 </div>
                               </div>
@@ -225,15 +235,26 @@
                           </div>
                         </td>
                         <td>100 / 100 / 100</td>
-                        <td>200</td>
-                        <td>05-24-2022</td>
+                        <td>{{ game.duration }}</td>
+                        <td>{{ converTimestamp(game.timestamp) }}</td>
                       </tr>
                     </tbody>
                   </table>
                 </div>
                 <div class="card-footer">
                   <div class="text-center">
-                    <a href="#" class="btn btn-primary ms-auto">Load More</a>
+                    <button
+                      class="btn btn-primary ms-auto"
+                      @click="loadMoreGames(recentGames.next)"
+                    >
+                      <span v-if="moreGamesLoading"  class="spinner-border spinner-border-sm icon icon-tabler" role="status" aria-hidden="true"></span>
+                      <svg v-else xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-refresh" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                        <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                        <path d="M20 11a8.1 8.1 0 0 0 -15.5 -2m-.5 -4v4h4"></path>
+                        <path d="M4 13a8.1 8.1 0 0 0 15.5 2m.5 4v-4h-4"></path>
+                      </svg>
+                      Load More
+                    </button>
                   </div>
                 </div>
               </div>
@@ -247,6 +268,7 @@
 
 <script>
 import { mapActions } from 'vuex'
+import moment from 'moment'
 
 export default {
   name: 'IndexPage',
@@ -261,24 +283,6594 @@ export default {
   },
   mounted() {
     if (this.$route.query.welcome !== undefined) {
-      this.fetchUserData();
+      this.fetchUserData()
     }
     this.getPlayerData()
+    this.getRecentGames()
   },
   data() {
     return {
       importPlayerData: true,
+      moreGamesLoading: false,
+      recentGames: {
+        items: [
+          {
+            match_id: 'LnKDk',
+            victorious_team: 'red',
+            ally_team: [
+              {
+                champion: {
+                  name: 'Aatrox',
+                  icon_path:
+                    'https://ddragon.leagueoflegends.com/cdn/12.8.1/img/champion/Aatrox.png',
+                },
+                player: {
+                  id: 'vyRHLQqqyODzzVHnrGqb',
+                  name: 'TMbZSpeThGEfQCpsflAC',
+                },
+                player_stats: {
+                  kda: '1.3333333333333333',
+                },
+              },
+              {
+                champion: {
+                  name: 'Aatrox',
+                  icon_path:
+                    'https://ddragon.leagueoflegends.com/cdn/12.8.1/img/champion/Aatrox.png',
+                },
+                player: {
+                  id: 'RmOyHZHwinFeHGevsowp',
+                  name: 'ffKKReHSPmxqxCpEbudH',
+                },
+                player_stats: [
+                  {
+                    name: '-damageSelfMitigated',
+                    value: 7032.0,
+                  },
+                  {
+                    name: '-largestCriticalStrike',
+                    value: 506.0,
+                  },
+                  {
+                    name: '-magicDamageDealt',
+                    value: 24260.0,
+                  },
+                  {
+                    name: '-magicDamageDealtToChampions',
+                    value: 1474.0,
+                  },
+                  {
+                    name: '-magicDamageTaken',
+                    value: 7062.0,
+                  },
+                  {
+                    name: '-physicalDamageDealt',
+                    value: 83191.0,
+                  },
+                  {
+                    name: '-physicalDamageDealtToChampions',
+                    value: 6535.0,
+                  },
+                  {
+                    name: '-physicalDamageTaken',
+                    value: 10580.0,
+                  },
+                  {
+                    name: '-totalDamageDealt',
+                    value: 116887.0,
+                  },
+                  {
+                    name: '-totalDamageDealtToChampions',
+                    value: 9531.0,
+                  },
+                  {
+                    name: '-totalDamageTaken',
+                    value: 17776.0,
+                  },
+                  {
+                    name: '-trueDamageDealt',
+                    value: 9435.0,
+                  },
+                  {
+                    name: '-trueDamageDealtToChampions',
+                    value: 1521.0,
+                  },
+                  {
+                    name: '-trueDamageTaken',
+                    value: 133.0,
+                  },
+                  {
+                    name: 'damagePerMinute',
+                    value: 327.23765452306037,
+                  },
+                  {
+                    name: 'damageTakenOnTeamPercentage',
+                    value: 0.16427365853437548,
+                  },
+                  {
+                    name: 'teamDamagePercentage',
+                    value: 0.10242491893231571,
+                  },
+                  {
+                    name: '-doubleKills',
+                    value: 0.0,
+                  },
+                  {
+                    name: '-killingSprees',
+                    value: 2.0,
+                  },
+                  {
+                    name: '-largestKillingSpree',
+                    value: 3.0,
+                  },
+                  {
+                    name: '-largestMultiKill',
+                    value: 1.0,
+                  },
+                  {
+                    name: '-pentaKills',
+                    value: 0.0,
+                  },
+                  {
+                    name: '-quadraKills',
+                    value: 0.0,
+                  },
+                  {
+                    name: '-tripleKills',
+                    value: 0.0,
+                  },
+                  {
+                    name: '12AssistStreakCount',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'acesBefore15Minutes',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'doubleAces',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'flawlessAces',
+                    value: 1.0,
+                  },
+                  {
+                    name: 'fullTeamTakedown',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'legendaryCount',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'multiKillOneSpell',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'multikills',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'multikillsAfterAggressiveFlash',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'elderDragonMultikills',
+                    value: 0.0,
+                  },
+                  {
+                    name: '-spell2Casts',
+                    value: 20.0,
+                  },
+                  {
+                    name: '-spell1Casts',
+                    value: 22.0,
+                  },
+                  {
+                    name: '-spell3Casts',
+                    value: 20.0,
+                  },
+                  {
+                    name: '-spell4Casts',
+                    value: 5.0,
+                  },
+                  {
+                    name: '-summoner1Casts',
+                    value: 3.0,
+                  },
+                  {
+                    name: '-summoner2Casts',
+                    value: 2.0,
+                  },
+                  {
+                    name: 'abilityUses',
+                    value: 67.0,
+                  },
+                  {
+                    name: 'dodgeSkillShotsSmallWindow',
+                    value: 13.0,
+                  },
+                  {
+                    name: 'landSkillShotsEarlyGame',
+                    value: 5.0,
+                  },
+                  {
+                    name: 'quickCleanse',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'skillshotsDodged',
+                    value: 7.0,
+                  },
+                  {
+                    name: 'skillshotsHit',
+                    value: 19.0,
+                  },
+                  {
+                    name: 'snowballsHit',
+                    value: 0.0,
+                  },
+                  {
+                    name: '-timeCCingOthers',
+                    value: 3.0,
+                  },
+                  {
+                    name: '-totalDamageShieldedOnTeammates',
+                    value: 0.0,
+                  },
+                  {
+                    name: '-totalHeal',
+                    value: 2043.0,
+                  },
+                  {
+                    name: '-totalHealsOnTeammates',
+                    value: 0.0,
+                  },
+                  {
+                    name: '-totalTimeCCDealt',
+                    value: 16.0,
+                  },
+                  {
+                    name: '-totalUnitsHealed',
+                    value: 1.0,
+                  },
+                  {
+                    name: 'effectiveHealAndShielding',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'enemyChampionImmobilizations',
+                    value: 5.0,
+                  },
+                  {
+                    name: 'immobilizeAndKillWithAlly',
+                    value: 1.0,
+                  },
+                  {
+                    name: 'knockEnemyIntoTeamAndKill',
+                    value: 1.0,
+                  },
+                  {
+                    name: 'saveAllyFromDeath',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'getTakedownsInAllLanesEarlyJungleAsLaner',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'junglerTakedownsNearDamagedEpicMonster',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'killAfterHiddenWithAlly',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'killedChampTookFullTeamDamageSurvived',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'killsNearEnemyTurret',
+                    value: 2.0,
+                  },
+                  {
+                    name: 'killsOnLanersEarlyJungleAsJungler',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'killsOnOtherLanesEarlyJungleAsLaner',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'killsOnRecentlyHealedByAramPack',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'killsUnderOwnTurret',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'killsWithHelpFromEpicMonster',
+                    value: 0.0,
+                  },
+                  {
+                    name: '-nexusKills',
+                    value: 0.0,
+                  },
+                  {
+                    name: '-nexusTakedowns',
+                    value: 1.0,
+                  },
+                  {
+                    name: 'outnumberedKills',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'outnumberedNexusKill',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'pickKillWithAlly',
+                    value: 6.0,
+                  },
+                  {
+                    name: 'quickSoloKills',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'soloKills',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'takedowns',
+                    value: 8.0,
+                  },
+                  {
+                    name: 'takedownsAfterGainingLevelAdvantage',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'takedownsBeforeJungleMinionSpawn',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'takedownsFirst25Minutes',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'takedownsInAlcove',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'takedownsInEnemyFountain',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'junglerKillsEarlyJungle',
+                    value: 0.0,
+                  },
+                  {
+                    name: '-assists',
+                    value: 1.0,
+                  },
+                  {
+                    name: '-deaths',
+                    value: 6.0,
+                  },
+                  {
+                    name: '-firstBloodAssist',
+                    value: 0.0,
+                  },
+                  {
+                    name: '-firstBloodKill',
+                    value: 0.0,
+                  },
+                  {
+                    name: '-kills',
+                    value: 7.0,
+                  },
+                  {
+                    name: 'bountyGold',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'deathsByEnemyChamps',
+                    value: 6.0,
+                  },
+                  {
+                    name: 'kda',
+                    value: 1.3333333333333333,
+                  },
+                  {
+                    name: 'killParticipation',
+                    value: 0.25,
+                  },
+                  {
+                    name: 'maxKillDeficit',
+                    value: 6.0,
+                  },
+                  {
+                    name: 'maxLevelLeadLaneOpponent',
+                    value: 1.0,
+                  },
+                  {
+                    name: 'outerTurretExecutesBefore10Minutes',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'survivedSingleDigitHpCount',
+                    value: 1.0,
+                  },
+                  {
+                    name: 'survivedThreeImmobilizesInFight',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'tookLargeDamageSurvived',
+                    value: 0.0,
+                  },
+                  {
+                    name: '-damageDealtToBuildings',
+                    value: 8232.0,
+                  },
+                  {
+                    name: '-damageDealtToObjectives',
+                    value: 12524.0,
+                  },
+                  {
+                    name: '-damageDealtToTurrets',
+                    value: 8232.0,
+                  },
+                  {
+                    name: '-firstTowerAssist',
+                    value: 0.0,
+                  },
+                  {
+                    name: '-firstTowerKill',
+                    value: 0.0,
+                  },
+                  {
+                    name: '-inhibitorKills',
+                    value: 0.0,
+                  },
+                  {
+                    name: '-inhibitorTakedowns',
+                    value: 1.0,
+                  },
+                  {
+                    name: '-inhibitorsLost',
+                    value: 0.0,
+                  },
+                  {
+                    name: '-objectivesStolen',
+                    value: 0.0,
+                  },
+                  {
+                    name: '-objectivesStolenAssists',
+                    value: 0.0,
+                  },
+                  {
+                    name: '-turretKills',
+                    value: 2.0,
+                  },
+                  {
+                    name: '-turretTakedowns',
+                    value: 5.0,
+                  },
+                  {
+                    name: '-turretsLost',
+                    value: 3.0,
+                  },
+                  {
+                    name: 'baronTakedowns',
+                    value: 1.0,
+                  },
+                  {
+                    name: 'dragonTakedowns',
+                    value: 1.0,
+                  },
+                  {
+                    name: 'elderDragonKillsWithOpposingSoul',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'epicMonsterKillsNearEnemyJungler',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'epicMonsterKillsWithin30SecondsOfSpawn',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'epicMonsterSteals',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'epicMonsterStolenWithoutSmite',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'kTurretsDestroyedBeforePlatesFall',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'multiTurretRiftHeraldCount',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'perfectDragonSoulsTaken',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'quickFirstTurret',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'riftHeraldTakedowns',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'soloBaronKills',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'soloTurretsLategame',
+                    value: 1.0,
+                  },
+                  {
+                    name: 'takedownOnFirstTurret',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'teamBaronKills',
+                    value: 1.0,
+                  },
+                  {
+                    name: 'teamElderDragonKills',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'teamRiftHeraldKills',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'turretPlatesTaken',
+                    value: 2.0,
+                  },
+                  {
+                    name: 'turretTakedowns',
+                    value: 5.0,
+                  },
+                  {
+                    name: 'turretsTakenWithRiftHerald',
+                    value: 0.0,
+                  },
+                  {
+                    name: '-champLevel',
+                    value: 15.0,
+                  },
+                  {
+                    name: '-gameEndedInEarlySurrender',
+                    value: 0.0,
+                  },
+                  {
+                    name: '-gameEndedInSurrender',
+                    value: 0.0,
+                  },
+                  {
+                    name: '-longestTimeSpentLiving',
+                    value: 456.0,
+                  },
+                  {
+                    name: '-teamEarlySurrendered',
+                    value: 0.0,
+                  },
+                  {
+                    name: '-totalTimeSpentDead',
+                    value: 180.0,
+                  },
+                  {
+                    name: 'gameLength',
+                    value: 1747.688579886358,
+                  },
+                  {
+                    name: 'perfectGame',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'blastConeOppositeOpponentCount',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'completeSupportQuestInTime',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'dancedWithRiftHerald',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'hadAfkTeammate',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'hadOpenNexus',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'moreEnemyJungleThanOpponent',
+                    value: -123.50000008940697,
+                  },
+                  {
+                    name: 'poroExplosions',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'unseenRecalls',
+                    value: 0.0,
+                  },
+                  {
+                    name: '-consumablesPurchased',
+                    value: 6.0,
+                  },
+                  {
+                    name: '-goldEarned',
+                    value: 11587.0,
+                  },
+                  {
+                    name: '-goldSpent',
+                    value: 9550.0,
+                  },
+                  {
+                    name: '-itemsPurchased',
+                    value: 25.0,
+                  },
+                  {
+                    name: 'earlyLaningPhaseGoldExpAdvantage',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'goldPerMinute',
+                    value: 397.8182554240922,
+                  },
+                  {
+                    name: 'laningPhaseGoldExpAdvantage',
+                    value: 0.0,
+                  },
+                  {
+                    name: '-visionScore',
+                    value: 11.0,
+                  },
+                  {
+                    name: '-visionWardsBought',
+                    value: 1.0,
+                  },
+                  {
+                    name: '-wardsKilled',
+                    value: 0.0,
+                  },
+                  {
+                    name: '-wardsPlaced',
+                    value: 6.0,
+                  },
+                  {
+                    name: 'controlWardsPlaced',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'stealthWardsPlaced',
+                    value: 5.0,
+                  },
+                  {
+                    name: 'threeWardsOneSweeperCount',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'viChampion.cache[name]sionScoreAdvantageLaneOpponent',
+                    value: -0.2218838930130005,
+                  },
+                  {
+                    name: 'visionScorePerMinute',
+                    value: 0.3787263810293082,
+                  },
+                  {
+                    name: 'wardTakedowns',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'wardTakedownsBefore20M',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'wardsGuarded',
+                    value: 0.0,
+                  },
+                  {
+                    name: '-neutralMinionsKilled',
+                    value: 12.0,
+                  },
+                  {
+                    name: '-totalMinionsKilled',
+                    value: 163.0,
+                  },
+                  {
+                    name: 'alliedJungleMonsterKills',
+                    value: 8.000000029802322,
+                  },
+                  {
+                    name: 'buffsStolen',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'enemyJungleMonsterKills',
+                    value: 4.000000029802322,
+                  },
+                  {
+                    name: 'initialBuffCount',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'initialCrabCount',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'jungleCsBefore10Minutes',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'laneMinionsFirst10Minutes',
+                    value: 53.0,
+                  },
+                  {
+                    name: 'maxCsAdvantageOnLaneOpponent',
+                    value: 11.000000059604645,
+                  },
+                  {
+                    name: 'scuttleCrabKills',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'twentyMinionsIn3SecondsCount',
+                    value: 0.0,
+                  },
+                ],
+              },
+              {
+                champion: {
+                  name: 'Aatrox',
+                  icon_path:
+                    'https://ddragon.leagueoflegends.com/cdn/12.8.1/img/champion/Aatrox.png',
+                },
+                player: {
+                  id: 'nZpwJnlMwkMguHPXjeYR',
+                  name: 'imfvpiYSuiaqfHPGxvFU',
+                },
+                player_stats: [
+                  {
+                    name: '-damageSelfMitigated',
+                    value: 7032.0,
+                  },
+                  {
+                    name: '-largestCriticalStrike',
+                    value: 506.0,
+                  },
+                  {
+                    name: '-magicDamageDealt',
+                    value: 24260.0,
+                  },
+                  {
+                    name: '-magicDamageDealtToChampions',
+                    value: 1474.0,
+                  },
+                  {
+                    name: '-magicDamageTaken',
+                    value: 7062.0,
+                  },
+                  {
+                    name: '-physicalDamageDealt',
+                    value: 83191.0,
+                  },
+                  {
+                    name: '-physicalDamageDealtToChampions',
+                    value: 6535.0,
+                  },
+                  {
+                    name: '-physicalDamageTaken',
+                    value: 10580.0,
+                  },
+                  {
+                    name: '-totalDamageDealt',
+                    value: 116887.0,
+                  },
+                  {
+                    name: '-totalDamageDealtToChampions',
+                    value: 9531.0,
+                  },
+                  {
+                    name: '-totalDamageTaken',
+                    value: 17776.0,
+                  },
+                  {
+                    name: '-trueDamageDealt',
+                    value: 9435.0,
+                  },
+                  {
+                    name: '-trueDamageDealtToChampions',
+                    value: 1521.0,
+                  },
+                  {
+                    name: '-trueDamageTaken',
+                    value: 133.0,
+                  },
+                  {
+                    name: 'damagePerMinute',
+                    value: 327.23765452306037,
+                  },
+                  {
+                    name: 'damageTakenOnTeamPercentage',
+                    value: 0.16427365853437548,
+                  },
+                  {
+                    name: 'teamDamagePercentage',
+                    value: 0.10242491893231571,
+                  },
+                  {
+                    name: '-doubleKills',
+                    value: 0.0,
+                  },
+                  {
+                    name: '-killingSprees',
+                    value: 2.0,
+                  },
+                  {
+                    name: '-largestKillingSpree',
+                    value: 3.0,
+                  },
+                  {
+                    name: '-largestMultiKill',
+                    value: 1.0,
+                  },
+                  {
+                    name: '-pentaKills',
+                    value: 0.0,
+                  },
+                  {
+                    name: '-quadraKills',
+                    value: 0.0,
+                  },
+                  {
+                    name: '-tripleKills',
+                    value: 0.0,
+                  },
+                  {
+                    name: '12AssistStreakCount',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'acesBefore15Minutes',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'doubleAces',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'flawlessAces',
+                    value: 1.0,
+                  },
+                  {
+                    name: 'fullTeamTakedown',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'legendaryCount',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'multiKillOneSpell',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'multikills',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'multikillsAfterAggressiveFlash',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'elderDragonMultikills',
+                    value: 0.0,
+                  },
+                  {
+                    name: '-spell2Casts',
+                    value: 20.0,
+                  },
+                  {
+                    name: '-spell1Casts',
+                    value: 22.0,
+                  },
+                  {
+                    name: '-spell3Casts',
+                    value: 20.0,
+                  },
+                  {
+                    name: '-spell4Casts',
+                    value: 5.0,
+                  },
+                  {
+                    name: '-summoner1Casts',
+                    value: 3.0,
+                  },
+                  {
+                    name: '-summoner2Casts',
+                    value: 2.0,
+                  },
+                  {
+                    name: 'abilityUses',
+                    value: 67.0,
+                  },
+                  {
+                    name: 'dodgeSkillShotsSmallWindow',
+                    value: 13.0,
+                  },
+                  {
+                    name: 'landSkillShotsEarlyGame',
+                    value: 5.0,
+                  },
+                  {
+                    name: 'quickCleanse',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'skillshotsDodged',
+                    value: 7.0,
+                  },
+                  {
+                    name: 'skillshotsHit',
+                    value: 19.0,
+                  },
+                  {
+                    name: 'snowballsHit',
+                    value: 0.0,
+                  },
+                  {
+                    name: '-timeCCingOthers',
+                    value: 3.0,
+                  },
+                  {
+                    name: '-totalDamageShieldedOnTeammates',
+                    value: 0.0,
+                  },
+                  {
+                    name: '-totalHeal',
+                    value: 2043.0,
+                  },
+                  {
+                    name: '-totalHealsOnTeammates',
+                    value: 0.0,
+                  },
+                  {
+                    name: '-totalTimeCCDealt',
+                    value: 16.0,
+                  },
+                  {
+                    name: '-totalUnitsHealed',
+                    value: 1.0,
+                  },
+                  {
+                    name: 'effectiveHealAndShielding',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'enemyChampionImmobilizations',
+                    value: 5.0,
+                  },
+                  {
+                    name: 'immobilizeAndKillWithAlly',
+                    value: 1.0,
+                  },
+                  {
+                    name: 'knockEnemyIntoTeamAndKill',
+                    value: 1.0,
+                  },
+                  {
+                    name: 'saveAllyFromDeath',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'getTakedownsInAllLanesEarlyJungleAsLaner',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'junglerTakedownsNearDamagedEpicMonster',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'killAfterHiddenWithAlly',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'killedChampTookFullTeamDamageSurvived',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'killsNearEnemyTurret',
+                    value: 2.0,
+                  },
+                  {
+                    name: 'killsOnLanersEarlyJungleAsJungler',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'killsOnOtherLanesEarlyJungleAsLaner',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'killsOnRecentlyHealedByAramPack',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'killsUnderOwnTurret',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'killsWithHelpFromEpicMonster',
+                    value: 0.0,
+                  },
+                  {
+                    name: '-nexusKills',
+                    value: 0.0,
+                  },
+                  {
+                    name: '-nexusTakedowns',
+                    value: 1.0,
+                  },
+                  {
+                    name: 'outnumberedKills',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'outnumberedNexusKill',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'pickKillWithAlly',
+                    value: 6.0,
+                  },
+                  {
+                    name: 'quickSoloKills',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'soloKills',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'takedowns',
+                    value: 8.0,
+                  },
+                  {
+                    name: 'takedownsAfterGainingLevelAdvantage',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'takedownsBeforeJungleMinionSpawn',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'takedownsFirst25Minutes',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'takedownsInAlcove',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'takedownsInEnemyFountain',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'junglerKillsEarlyJungle',
+                    value: 0.0,
+                  },
+                  {
+                    name: '-assists',
+                    value: 1.0,
+                  },
+                  {
+                    name: '-deaths',
+                    value: 6.0,
+                  },
+                  {
+                    name: '-firstBloodAssist',
+                    value: 0.0,
+                  },
+                  {
+                    name: '-firstBloodKill',
+                    value: 0.0,
+                  },
+                  {
+                    name: '-kills',
+                    value: 7.0,
+                  },
+                  {
+                    name: 'bountyGold',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'deathsByEnemyChamps',
+                    value: 6.0,
+                  },
+                  {
+                    name: 'kda',
+                    value: 1.3333333333333333,
+                  },
+                  {
+                    name: 'killParticipation',
+                    value: 0.25,
+                  },
+                  {
+                    name: 'maxKillDeficit',
+                    value: 6.0,
+                  },
+                  {
+                    name: 'maxLevelLeadLaneOpponent',
+                    value: 1.0,
+                  },
+                  {
+                    name: 'outerTurretExecutesBefore10Minutes',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'survivedSingleDigitHpCount',
+                    value: 1.0,
+                  },
+                  {
+                    name: 'survivedThreeImmobilizesInFight',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'tookLargeDamageSurvived',
+                    value: 0.0,
+                  },
+                  {
+                    name: '-damageDealtToBuildings',
+                    value: 8232.0,
+                  },
+                  {
+                    name: '-damageDealtToObjectives',
+                    value: 12524.0,
+                  },
+                  {
+                    name: '-damageDealtToTurrets',
+                    value: 8232.0,
+                  },
+                  {
+                    name: '-firstTowerAssist',
+                    value: 0.0,
+                  },
+                  {
+                    name: '-firstTowerKill',
+                    value: 0.0,
+                  },
+                  {
+                    name: '-inhibitorKills',
+                    value: 0.0,
+                  },
+                  {
+                    name: '-inhibitorTakedowns',
+                    value: 1.0,
+                  },
+                  {
+                    name: '-inhibitorsLost',
+                    value: 0.0,
+                  },
+                  {
+                    name: '-objectivesStolen',
+                    value: 0.0,
+                  },
+                  {
+                    name: '-objectivesStolenAssists',
+                    value: 0.0,
+                  },
+                  {
+                    name: '-turretKills',
+                    value: 2.0,
+                  },
+                  {
+                    name: '-turretTakedowns',
+                    value: 5.0,
+                  },
+                  {
+                    name: '-turretsLost',
+                    value: 3.0,
+                  },
+                  {
+                    name: 'baronTakedowns',
+                    value: 1.0,
+                  },
+                  {
+                    name: 'dragonTakedowns',
+                    value: 1.0,
+                  },
+                  {
+                    name: 'elderDragonKillsWithOpposingSoul',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'epicMonsterKillsNearEnemyJungler',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'epicMonsterKillsWithin30SecondsOfSpawn',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'epicMonsterSteals',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'epicMonsterStolenWithoutSmite',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'kTurretsDestroyedBeforePlatesFall',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'multiTurretRiftHeraldCount',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'perfectDragonSoulsTaken',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'quickFirstTurret',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'riftHeraldTakedowns',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'soloBaronKills',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'soloTurretsLategame',
+                    value: 1.0,
+                  },
+                  {
+                    name: 'takedownOnFirstTurret',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'teamBaronKills',
+                    value: 1.0,
+                  },
+                  {
+                    name: 'teamElderDragonKills',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'teamRiftHeraldKills',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'turretPlatesTaken',
+                    value: 2.0,
+                  },
+                  {
+                    name: 'turretTakedowns',
+                    value: 5.0,
+                  },
+                  {
+                    name: 'turretsTakenWithRiftHerald',
+                    value: 0.0,
+                  },
+                  {
+                    name: '-champLevel',
+                    value: 15.0,
+                  },
+                  {
+                    name: '-gameEndedInEarlySurrender',
+                    value: 0.0,
+                  },
+                  {
+                    name: '-gameEndedInSurrender',
+                    value: 0.0,
+                  },
+                  {
+                    name: '-longestTimeSpentLiving',
+                    value: 456.0,
+                  },
+                  {
+                    name: '-teamEarlySurrendered',
+                    value: 0.0,
+                  },
+                  {
+                    name: '-totalTimeSpentDead',
+                    value: 180.0,
+                  },
+                  {
+                    name: 'gameLength',
+                    value: 1747.688579886358,
+                  },
+                  {
+                    name: 'perfectGame',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'blastConeOppositeOpponentCount',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'completeSupportQuestInTime',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'dancedWithRiftHerald',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'hadAfkTeammate',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'hadOpenNexus',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'moreEnemyJungleThanOpponent',
+                    value: -123.50000008940697,
+                  },
+                  {
+                    name: 'poroExplosions',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'unseenRecalls',
+                    value: 0.0,
+                  },
+                  {
+                    name: '-consumablesPurchased',
+                    value: 6.0,
+                  },
+                  {
+                    name: '-goldEarned',
+                    value: 11587.0,
+                  },
+                  {
+                    name: '-goldSpent',
+                    value: 9550.0,
+                  },
+                  {
+                    name: '-itemsPurchased',
+                    value: 25.0,
+                  },
+                  {
+                    name: 'earlyLaningPhaseGoldExpAdvantage',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'goldPerMinute',
+                    value: 397.8182554240922,
+                  },
+                  {
+                    name: 'laningPhaseGoldExpAdvantage',
+                    value: 0.0,
+                  },
+                  {
+                    name: '-visionScore',
+                    value: 11.0,
+                  },
+                  {
+                    name: '-visionWardsBought',
+                    value: 1.0,
+                  },
+                  {
+                    name: '-wardsKilled',
+                    value: 0.0,
+                  },
+                  {
+                    name: '-wardsPlaced',
+                    value: 6.0,
+                  },
+                  {
+                    name: 'controlWardsPlaced',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'stealthWardsPlaced',
+                    value: 5.0,
+                  },
+                  {
+                    name: 'threeWardsOneSweeperCount',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'viChampion.cache[name]sionScoreAdvantageLaneOpponent',
+                    value: -0.2218838930130005,
+                  },
+                  {
+                    name: 'visionScorePerMinute',
+                    value: 0.3787263810293082,
+                  },
+                  {
+                    name: 'wardTakedowns',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'wardTakedownsBefore20M',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'wardsGuarded',
+                    value: 0.0,
+                  },
+                  {
+                    name: '-neutralMinionsKilled',
+                    value: 12.0,
+                  },
+                  {
+                    name: '-totalMinionsKilled',
+                    value: 163.0,
+                  },
+                  {
+                    name: 'alliedJungleMonsterKills',
+                    value: 8.000000029802322,
+                  },
+                  {
+                    name: 'buffsStolen',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'enemyJungleMonsterKills',
+                    value: 4.000000029802322,
+                  },
+                  {
+                    name: 'initialBuffCount',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'initialCrabCount',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'jungleCsBefore10Minutes',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'laneMinionsFirst10Minutes',
+                    value: 53.0,
+                  },
+                  {
+                    name: 'maxCsAdvantageOnLaneOpponent',
+                    value: 11.000000059604645,
+                  },
+                  {
+                    name: 'scuttleCrabKills',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'twentyMinionsIn3SecondsCount',
+                    value: 0.0,
+                  },
+                ],
+              },
+              {
+                champion: {
+                  name: 'Aatrox',
+                  icon_path:
+                    'https://ddragon.leagueoflegends.com/cdn/12.8.1/img/champion/Aatrox.png',
+                },
+                player: {
+                  id: 'HfwQDkRrDZBEMVZnKVRo',
+                  name: 'vbHHdLSdbHkLhHAaYgFk',
+                },
+                player_stats: [
+                  {
+                    name: '-damageSelfMitigated',
+                    value: 7032.0,
+                  },
+                  {
+                    name: '-largestCriticalStrike',
+                    value: 506.0,
+                  },
+                  {
+                    name: '-magicDamageDealt',
+                    value: 24260.0,
+                  },
+                  {
+                    name: '-magicDamageDealtToChampions',
+                    value: 1474.0,
+                  },
+                  {
+                    name: '-magicDamageTaken',
+                    value: 7062.0,
+                  },
+                  {
+                    name: '-physicalDamageDealt',
+                    value: 83191.0,
+                  },
+                  {
+                    name: '-physicalDamageDealtToChampions',
+                    value: 6535.0,
+                  },
+                  {
+                    name: '-physicalDamageTaken',
+                    value: 10580.0,
+                  },
+                  {
+                    name: '-totalDamageDealt',
+                    value: 116887.0,
+                  },
+                  {
+                    name: '-totalDamageDealtToChampions',
+                    value: 9531.0,
+                  },
+                  {
+                    name: '-totalDamageTaken',
+                    value: 17776.0,
+                  },
+                  {
+                    name: '-trueDamageDealt',
+                    value: 9435.0,
+                  },
+                  {
+                    name: '-trueDamageDealtToChampions',
+                    value: 1521.0,
+                  },
+                  {
+                    name: '-trueDamageTaken',
+                    value: 133.0,
+                  },
+                  {
+                    name: 'damagePerMinute',
+                    value: 327.23765452306037,
+                  },
+                  {
+                    name: 'damageTakenOnTeamPercentage',
+                    value: 0.16427365853437548,
+                  },
+                  {
+                    name: 'teamDamagePercentage',
+                    value: 0.10242491893231571,
+                  },
+                  {
+                    name: '-doubleKills',
+                    value: 0.0,
+                  },
+                  {
+                    name: '-killingSprees',
+                    value: 2.0,
+                  },
+                  {
+                    name: '-largestKillingSpree',
+                    value: 3.0,
+                  },
+                  {
+                    name: '-largestMultiKill',
+                    value: 1.0,
+                  },
+                  {
+                    name: '-pentaKills',
+                    value: 0.0,
+                  },
+                  {
+                    name: '-quadraKills',
+                    value: 0.0,
+                  },
+                  {
+                    name: '-tripleKills',
+                    value: 0.0,
+                  },
+                  {
+                    name: '12AssistStreakCount',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'acesBefore15Minutes',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'doubleAces',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'flawlessAces',
+                    value: 1.0,
+                  },
+                  {
+                    name: 'fullTeamTakedown',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'legendaryCount',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'multiKillOneSpell',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'multikills',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'multikillsAfterAggressiveFlash',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'elderDragonMultikills',
+                    value: 0.0,
+                  },
+                  {
+                    name: '-spell2Casts',
+                    value: 20.0,
+                  },
+                  {
+                    name: '-spell1Casts',
+                    value: 22.0,
+                  },
+                  {
+                    name: '-spell3Casts',
+                    value: 20.0,
+                  },
+                  {
+                    name: '-spell4Casts',
+                    value: 5.0,
+                  },
+                  {
+                    name: '-summoner1Casts',
+                    value: 3.0,
+                  },
+                  {
+                    name: '-summoner2Casts',
+                    value: 2.0,
+                  },
+                  {
+                    name: 'abilityUses',
+                    value: 67.0,
+                  },
+                  {
+                    name: 'dodgeSkillShotsSmallWindow',
+                    value: 13.0,
+                  },
+                  {
+                    name: 'landSkillShotsEarlyGame',
+                    value: 5.0,
+                  },
+                  {
+                    name: 'quickCleanse',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'skillshotsDodged',
+                    value: 7.0,
+                  },
+                  {
+                    name: 'skillshotsHit',
+                    value: 19.0,
+                  },
+                  {
+                    name: 'snowballsHit',
+                    value: 0.0,
+                  },
+                  {
+                    name: '-timeCCingOthers',
+                    value: 3.0,
+                  },
+                  {
+                    name: '-totalDamageShieldedOnTeammates',
+                    value: 0.0,
+                  },
+                  {
+                    name: '-totalHeal',
+                    value: 2043.0,
+                  },
+                  {
+                    name: '-totalHealsOnTeammates',
+                    value: 0.0,
+                  },
+                  {
+                    name: '-totalTimeCCDealt',
+                    value: 16.0,
+                  },
+                  {
+                    name: '-totalUnitsHealed',
+                    value: 1.0,
+                  },
+                  {
+                    name: 'effectiveHealAndShielding',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'enemyChampionImmobilizations',
+                    value: 5.0,
+                  },
+                  {
+                    name: 'immobilizeAndKillWithAlly',
+                    value: 1.0,
+                  },
+                  {
+                    name: 'knockEnemyIntoTeamAndKill',
+                    value: 1.0,
+                  },
+                  {
+                    name: 'saveAllyFromDeath',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'getTakedownsInAllLanesEarlyJungleAsLaner',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'junglerTakedownsNearDamagedEpicMonster',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'killAfterHiddenWithAlly',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'killedChampTookFullTeamDamageSurvived',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'killsNearEnemyTurret',
+                    value: 2.0,
+                  },
+                  {
+                    name: 'killsOnLanersEarlyJungleAsJungler',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'killsOnOtherLanesEarlyJungleAsLaner',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'killsOnRecentlyHealedByAramPack',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'killsUnderOwnTurret',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'killsWithHelpFromEpicMonster',
+                    value: 0.0,
+                  },
+                  {
+                    name: '-nexusKills',
+                    value: 0.0,
+                  },
+                  {
+                    name: '-nexusTakedowns',
+                    value: 1.0,
+                  },
+                  {
+                    name: 'outnumberedKills',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'outnumberedNexusKill',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'pickKillWithAlly',
+                    value: 6.0,
+                  },
+                  {
+                    name: 'quickSoloKills',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'soloKills',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'takedowns',
+                    value: 8.0,
+                  },
+                  {
+                    name: 'takedownsAfterGainingLevelAdvantage',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'takedownsBeforeJungleMinionSpawn',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'takedownsFirst25Minutes',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'takedownsInAlcove',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'takedownsInEnemyFountain',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'junglerKillsEarlyJungle',
+                    value: 0.0,
+                  },
+                  {
+                    name: '-assists',
+                    value: 1.0,
+                  },
+                  {
+                    name: '-deaths',
+                    value: 6.0,
+                  },
+                  {
+                    name: '-firstBloodAssist',
+                    value: 0.0,
+                  },
+                  {
+                    name: '-firstBloodKill',
+                    value: 0.0,
+                  },
+                  {
+                    name: '-kills',
+                    value: 7.0,
+                  },
+                  {
+                    name: 'bountyGold',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'deathsByEnemyChamps',
+                    value: 6.0,
+                  },
+                  {
+                    name: 'kda',
+                    value: 1.3333333333333333,
+                  },
+                  {
+                    name: 'killParticipation',
+                    value: 0.25,
+                  },
+                  {
+                    name: 'maxKillDeficit',
+                    value: 6.0,
+                  },
+                  {
+                    name: 'maxLevelLeadLaneOpponent',
+                    value: 1.0,
+                  },
+                  {
+                    name: 'outerTurretExecutesBefore10Minutes',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'survivedSingleDigitHpCount',
+                    value: 1.0,
+                  },
+                  {
+                    name: 'survivedThreeImmobilizesInFight',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'tookLargeDamageSurvived',
+                    value: 0.0,
+                  },
+                  {
+                    name: '-damageDealtToBuildings',
+                    value: 8232.0,
+                  },
+                  {
+                    name: '-damageDealtToObjectives',
+                    value: 12524.0,
+                  },
+                  {
+                    name: '-damageDealtToTurrets',
+                    value: 8232.0,
+                  },
+                  {
+                    name: '-firstTowerAssist',
+                    value: 0.0,
+                  },
+                  {
+                    name: '-firstTowerKill',
+                    value: 0.0,
+                  },
+                  {
+                    name: '-inhibitorKills',
+                    value: 0.0,
+                  },
+                  {
+                    name: '-inhibitorTakedowns',
+                    value: 1.0,
+                  },
+                  {
+                    name: '-inhibitorsLost',
+                    value: 0.0,
+                  },
+                  {
+                    name: '-objectivesStolen',
+                    value: 0.0,
+                  },
+                  {
+                    name: '-objectivesStolenAssists',
+                    value: 0.0,
+                  },
+                  {
+                    name: '-turretKills',
+                    value: 2.0,
+                  },
+                  {
+                    name: '-turretTakedowns',
+                    value: 5.0,
+                  },
+                  {
+                    name: '-turretsLost',
+                    value: 3.0,
+                  },
+                  {
+                    name: 'baronTakedowns',
+                    value: 1.0,
+                  },
+                  {
+                    name: 'dragonTakedowns',
+                    value: 1.0,
+                  },
+                  {
+                    name: 'elderDragonKillsWithOpposingSoul',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'epicMonsterKillsNearEnemyJungler',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'epicMonsterKillsWithin30SecondsOfSpawn',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'epicMonsterSteals',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'epicMonsterStolenWithoutSmite',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'kTurretsDestroyedBeforePlatesFall',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'multiTurretRiftHeraldCount',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'perfectDragonSoulsTaken',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'quickFirstTurret',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'riftHeraldTakedowns',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'soloBaronKills',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'soloTurretsLategame',
+                    value: 1.0,
+                  },
+                  {
+                    name: 'takedownOnFirstTurret',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'teamBaronKills',
+                    value: 1.0,
+                  },
+                  {
+                    name: 'teamElderDragonKills',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'teamRiftHeraldKills',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'turretPlatesTaken',
+                    value: 2.0,
+                  },
+                  {
+                    name: 'turretTakedowns',
+                    value: 5.0,
+                  },
+                  {
+                    name: 'turretsTakenWithRiftHerald',
+                    value: 0.0,
+                  },
+                  {
+                    name: '-champLevel',
+                    value: 15.0,
+                  },
+                  {
+                    name: '-gameEndedInEarlySurrender',
+                    value: 0.0,
+                  },
+                  {
+                    name: '-gameEndedInSurrender',
+                    value: 0.0,
+                  },
+                  {
+                    name: '-longestTimeSpentLiving',
+                    value: 456.0,
+                  },
+                  {
+                    name: '-teamEarlySurrendered',
+                    value: 0.0,
+                  },
+                  {
+                    name: '-totalTimeSpentDead',
+                    value: 180.0,
+                  },
+                  {
+                    name: 'gameLength',
+                    value: 1747.688579886358,
+                  },
+                  {
+                    name: 'perfectGame',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'blastConeOppositeOpponentCount',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'completeSupportQuestInTime',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'dancedWithRiftHerald',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'hadAfkTeammate',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'hadOpenNexus',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'moreEnemyJungleThanOpponent',
+                    value: -123.50000008940697,
+                  },
+                  {
+                    name: 'poroExplosions',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'unseenRecalls',
+                    value: 0.0,
+                  },
+                  {
+                    name: '-consumablesPurchased',
+                    value: 6.0,
+                  },
+                  {
+                    name: '-goldEarned',
+                    value: 11587.0,
+                  },
+                  {
+                    name: '-goldSpent',
+                    value: 9550.0,
+                  },
+                  {
+                    name: '-itemsPurchased',
+                    value: 25.0,
+                  },
+                  {
+                    name: 'earlyLaningPhaseGoldExpAdvantage',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'goldPerMinute',
+                    value: 397.8182554240922,
+                  },
+                  {
+                    name: 'laningPhaseGoldExpAdvantage',
+                    value: 0.0,
+                  },
+                  {
+                    name: '-visionScore',
+                    value: 11.0,
+                  },
+                  {
+                    name: '-visionWardsBought',
+                    value: 1.0,
+                  },
+                  {
+                    name: '-wardsKilled',
+                    value: 0.0,
+                  },
+                  {
+                    name: '-wardsPlaced',
+                    value: 6.0,
+                  },
+                  {
+                    name: 'controlWardsPlaced',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'stealthWardsPlaced',
+                    value: 5.0,
+                  },
+                  {
+                    name: 'threeWardsOneSweeperCount',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'viChampion.cache[name]sionScoreAdvantageLaneOpponent',
+                    value: -0.2218838930130005,
+                  },
+                  {
+                    name: 'visionScorePerMinute',
+                    value: 0.3787263810293082,
+                  },
+                  {
+                    name: 'wardTakedowns',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'wardTakedownsBefore20M',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'wardsGuarded',
+                    value: 0.0,
+                  },
+                  {
+                    name: '-neutralMinionsKilled',
+                    value: 12.0,
+                  },
+                  {
+                    name: '-totalMinionsKilled',
+                    value: 163.0,
+                  },
+                  {
+                    name: 'alliedJungleMonsterKills',
+                    value: 8.000000029802322,
+                  },
+                  {
+                    name: 'buffsStolen',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'enemyJungleMonsterKills',
+                    value: 4.000000029802322,
+                  },
+                  {
+                    name: 'initialBuffCount',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'initialCrabCount',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'jungleCsBefore10Minutes',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'laneMinionsFirst10Minutes',
+                    value: 53.0,
+                  },
+                  {
+                    name: 'maxCsAdvantageOnLaneOpponent',
+                    value: 11.000000059604645,
+                  },
+                  {
+                    name: 'scuttleCrabKills',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'twentyMinionsIn3SecondsCount',
+                    value: 0.0,
+                  },
+                ],
+              },
+              {
+                champion: {
+                  name: 'Aatrox',
+                  icon_path:
+                    'https://ddragon.leagueoflegends.com/cdn/12.8.1/img/champion/Aatrox.png',
+                },
+                player: {
+                  id: 'vfOdMKmUuBZgSheEgdKf',
+                  name: 'SZrbVkwbwJwOXWlAFhWg',
+                },
+                player_stats: [
+                  {
+                    name: '-damageSelfMitigated',
+                    value: 7032.0,
+                  },
+                  {
+                    name: '-largestCriticalStrike',
+                    value: 506.0,
+                  },
+                  {
+                    name: '-magicDamageDealt',
+                    value: 24260.0,
+                  },
+                  {
+                    name: '-magicDamageDealtToChampions',
+                    value: 1474.0,
+                  },
+                  {
+                    name: '-magicDamageTaken',
+                    value: 7062.0,
+                  },
+                  {
+                    name: '-physicalDamageDealt',
+                    value: 83191.0,
+                  },
+                  {
+                    name: '-physicalDamageDealtToChampions',
+                    value: 6535.0,
+                  },
+                  {
+                    name: '-physicalDamageTaken',
+                    value: 10580.0,
+                  },
+                  {
+                    name: '-totalDamageDealt',
+                    value: 116887.0,
+                  },
+                  {
+                    name: '-totalDamageDealtToChampions',
+                    value: 9531.0,
+                  },
+                  {
+                    name: '-totalDamageTaken',
+                    value: 17776.0,
+                  },
+                  {
+                    name: '-trueDamageDealt',
+                    value: 9435.0,
+                  },
+                  {
+                    name: '-trueDamageDealtToChampions',
+                    value: 1521.0,
+                  },
+                  {
+                    name: '-trueDamageTaken',
+                    value: 133.0,
+                  },
+                  {
+                    name: 'damagePerMinute',
+                    value: 327.23765452306037,
+                  },
+                  {
+                    name: 'damageTakenOnTeamPercentage',
+                    value: 0.16427365853437548,
+                  },
+                  {
+                    name: 'teamDamagePercentage',
+                    value: 0.10242491893231571,
+                  },
+                  {
+                    name: '-doubleKills',
+                    value: 0.0,
+                  },
+                  {
+                    name: '-killingSprees',
+                    value: 2.0,
+                  },
+                  {
+                    name: '-largestKillingSpree',
+                    value: 3.0,
+                  },
+                  {
+                    name: '-largestMultiKill',
+                    value: 1.0,
+                  },
+                  {
+                    name: '-pentaKills',
+                    value: 0.0,
+                  },
+                  {
+                    name: '-quadraKills',
+                    value: 0.0,
+                  },
+                  {
+                    name: '-tripleKills',
+                    value: 0.0,
+                  },
+                  {
+                    name: '12AssistStreakCount',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'acesBefore15Minutes',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'doubleAces',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'flawlessAces',
+                    value: 1.0,
+                  },
+                  {
+                    name: 'fullTeamTakedown',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'legendaryCount',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'multiKillOneSpell',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'multikills',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'multikillsAfterAggressiveFlash',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'elderDragonMultikills',
+                    value: 0.0,
+                  },
+                  {
+                    name: '-spell2Casts',
+                    value: 20.0,
+                  },
+                  {
+                    name: '-spell1Casts',
+                    value: 22.0,
+                  },
+                  {
+                    name: '-spell3Casts',
+                    value: 20.0,
+                  },
+                  {
+                    name: '-spell4Casts',
+                    value: 5.0,
+                  },
+                  {
+                    name: '-summoner1Casts',
+                    value: 3.0,
+                  },
+                  {
+                    name: '-summoner2Casts',
+                    value: 2.0,
+                  },
+                  {
+                    name: 'abilityUses',
+                    value: 67.0,
+                  },
+                  {
+                    name: 'dodgeSkillShotsSmallWindow',
+                    value: 13.0,
+                  },
+                  {
+                    name: 'landSkillShotsEarlyGame',
+                    value: 5.0,
+                  },
+                  {
+                    name: 'quickCleanse',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'skillshotsDodged',
+                    value: 7.0,
+                  },
+                  {
+                    name: 'skillshotsHit',
+                    value: 19.0,
+                  },
+                  {
+                    name: 'snowballsHit',
+                    value: 0.0,
+                  },
+                  {
+                    name: '-timeCCingOthers',
+                    value: 3.0,
+                  },
+                  {
+                    name: '-totalDamageShieldedOnTeammates',
+                    value: 0.0,
+                  },
+                  {
+                    name: '-totalHeal',
+                    value: 2043.0,
+                  },
+                  {
+                    name: '-totalHealsOnTeammates',
+                    value: 0.0,
+                  },
+                  {
+                    name: '-totalTimeCCDealt',
+                    value: 16.0,
+                  },
+                  {
+                    name: '-totalUnitsHealed',
+                    value: 1.0,
+                  },
+                  {
+                    name: 'effectiveHealAndShielding',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'enemyChampionImmobilizations',
+                    value: 5.0,
+                  },
+                  {
+                    name: 'immobilizeAndKillWithAlly',
+                    value: 1.0,
+                  },
+                  {
+                    name: 'knockEnemyIntoTeamAndKill',
+                    value: 1.0,
+                  },
+                  {
+                    name: 'saveAllyFromDeath',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'getTakedownsInAllLanesEarlyJungleAsLaner',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'junglerTakedownsNearDamagedEpicMonster',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'killAfterHiddenWithAlly',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'killedChampTookFullTeamDamageSurvived',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'killsNearEnemyTurret',
+                    value: 2.0,
+                  },
+                  {
+                    name: 'killsOnLanersEarlyJungleAsJungler',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'killsOnOtherLanesEarlyJungleAsLaner',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'killsOnRecentlyHealedByAramPack',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'killsUnderOwnTurret',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'killsWithHelpFromEpicMonster',
+                    value: 0.0,
+                  },
+                  {
+                    name: '-nexusKills',
+                    value: 0.0,
+                  },
+                  {
+                    name: '-nexusTakedowns',
+                    value: 1.0,
+                  },
+                  {
+                    name: 'outnumberedKills',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'outnumberedNexusKill',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'pickKillWithAlly',
+                    value: 6.0,
+                  },
+                  {
+                    name: 'quickSoloKills',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'soloKills',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'takedowns',
+                    value: 8.0,
+                  },
+                  {
+                    name: 'takedownsAfterGainingLevelAdvantage',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'takedownsBeforeJungleMinionSpawn',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'takedownsFirst25Minutes',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'takedownsInAlcove',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'takedownsInEnemyFountain',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'junglerKillsEarlyJungle',
+                    value: 0.0,
+                  },
+                  {
+                    name: '-assists',
+                    value: 1.0,
+                  },
+                  {
+                    name: '-deaths',
+                    value: 6.0,
+                  },
+                  {
+                    name: '-firstBloodAssist',
+                    value: 0.0,
+                  },
+                  {
+                    name: '-firstBloodKill',
+                    value: 0.0,
+                  },
+                  {
+                    name: '-kills',
+                    value: 7.0,
+                  },
+                  {
+                    name: 'bountyGold',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'deathsByEnemyChamps',
+                    value: 6.0,
+                  },
+                  {
+                    name: 'kda',
+                    value: 1.3333333333333333,
+                  },
+                  {
+                    name: 'killParticipation',
+                    value: 0.25,
+                  },
+                  {
+                    name: 'maxKillDeficit',
+                    value: 6.0,
+                  },
+                  {
+                    name: 'maxLevelLeadLaneOpponent',
+                    value: 1.0,
+                  },
+                  {
+                    name: 'outerTurretExecutesBefore10Minutes',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'survivedSingleDigitHpCount',
+                    value: 1.0,
+                  },
+                  {
+                    name: 'survivedThreeImmobilizesInFight',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'tookLargeDamageSurvived',
+                    value: 0.0,
+                  },
+                  {
+                    name: '-damageDealtToBuildings',
+                    value: 8232.0,
+                  },
+                  {
+                    name: '-damageDealtToObjectives',
+                    value: 12524.0,
+                  },
+                  {
+                    name: '-damageDealtToTurrets',
+                    value: 8232.0,
+                  },
+                  {
+                    name: '-firstTowerAssist',
+                    value: 0.0,
+                  },
+                  {
+                    name: '-firstTowerKill',
+                    value: 0.0,
+                  },
+                  {
+                    name: '-inhibitorKills',
+                    value: 0.0,
+                  },
+                  {
+                    name: '-inhibitorTakedowns',
+                    value: 1.0,
+                  },
+                  {
+                    name: '-inhibitorsLost',
+                    value: 0.0,
+                  },
+                  {
+                    name: '-objectivesStolen',
+                    value: 0.0,
+                  },
+                  {
+                    name: '-objectivesStolenAssists',
+                    value: 0.0,
+                  },
+                  {
+                    name: '-turretKills',
+                    value: 2.0,
+                  },
+                  {
+                    name: '-turretTakedowns',
+                    value: 5.0,
+                  },
+                  {
+                    name: '-turretsLost',
+                    value: 3.0,
+                  },
+                  {
+                    name: 'baronTakedowns',
+                    value: 1.0,
+                  },
+                  {
+                    name: 'dragonTakedowns',
+                    value: 1.0,
+                  },
+                  {
+                    name: 'elderDragonKillsWithOpposingSoul',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'epicMonsterKillsNearEnemyJungler',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'epicMonsterKillsWithin30SecondsOfSpawn',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'epicMonsterSteals',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'epicMonsterStolenWithoutSmite',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'kTurretsDestroyedBeforePlatesFall',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'multiTurretRiftHeraldCount',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'perfectDragonSoulsTaken',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'quickFirstTurret',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'riftHeraldTakedowns',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'soloBaronKills',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'soloTurretsLategame',
+                    value: 1.0,
+                  },
+                  {
+                    name: 'takedownOnFirstTurret',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'teamBaronKills',
+                    value: 1.0,
+                  },
+                  {
+                    name: 'teamElderDragonKills',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'teamRiftHeraldKills',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'turretPlatesTaken',
+                    value: 2.0,
+                  },
+                  {
+                    name: 'turretTakedowns',
+                    value: 5.0,
+                  },
+                  {
+                    name: 'turretsTakenWithRiftHerald',
+                    value: 0.0,
+                  },
+                  {
+                    name: '-champLevel',
+                    value: 15.0,
+                  },
+                  {
+                    name: '-gameEndedInEarlySurrender',
+                    value: 0.0,
+                  },
+                  {
+                    name: '-gameEndedInSurrender',
+                    value: 0.0,
+                  },
+                  {
+                    name: '-longestTimeSpentLiving',
+                    value: 456.0,
+                  },
+                  {
+                    name: '-teamEarlySurrendered',
+                    value: 0.0,
+                  },
+                  {
+                    name: '-totalTimeSpentDead',
+                    value: 180.0,
+                  },
+                  {
+                    name: 'gameLength',
+                    value: 1747.688579886358,
+                  },
+                  {
+                    name: 'perfectGame',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'blastConeOppositeOpponentCount',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'completeSupportQuestInTime',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'dancedWithRiftHerald',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'hadAfkTeammate',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'hadOpenNexus',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'moreEnemyJungleThanOpponent',
+                    value: -123.50000008940697,
+                  },
+                  {
+                    name: 'poroExplosions',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'unseenRecalls',
+                    value: 0.0,
+                  },
+                  {
+                    name: '-consumablesPurchased',
+                    value: 6.0,
+                  },
+                  {
+                    name: '-goldEarned',
+                    value: 11587.0,
+                  },
+                  {
+                    name: '-goldSpent',
+                    value: 9550.0,
+                  },
+                  {
+                    name: '-itemsPurchased',
+                    value: 25.0,
+                  },
+                  {
+                    name: 'earlyLaningPhaseGoldExpAdvantage',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'goldPerMinute',
+                    value: 397.8182554240922,
+                  },
+                  {
+                    name: 'laningPhaseGoldExpAdvantage',
+                    value: 0.0,
+                  },
+                  {
+                    name: '-visionScore',
+                    value: 11.0,
+                  },
+                  {
+                    name: '-visionWardsBought',
+                    value: 1.0,
+                  },
+                  {
+                    name: '-wardsKilled',
+                    value: 0.0,
+                  },
+                  {
+                    name: '-wardsPlaced',
+                    value: 6.0,
+                  },
+                  {
+                    name: 'controlWardsPlaced',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'stealthWardsPlaced',
+                    value: 5.0,
+                  },
+                  {
+                    name: 'threeWardsOneSweeperCount',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'viChampion.cache[name]sionScoreAdvantageLaneOpponent',
+                    value: -0.2218838930130005,
+                  },
+                  {
+                    name: 'visionScorePerMinute',
+                    value: 0.3787263810293082,
+                  },
+                  {
+                    name: 'wardTakedowns',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'wardTakedownsBefore20M',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'wardsGuarded',
+                    value: 0.0,
+                  },
+                  {
+                    name: '-neutralMinionsKilled',
+                    value: 12.0,
+                  },
+                  {
+                    name: '-totalMinionsKilled',
+                    value: 163.0,
+                  },
+                  {
+                    name: 'alliedJungleMonsterKills',
+                    value: 8.000000029802322,
+                  },
+                  {
+                    name: 'buffsStolen',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'enemyJungleMonsterKills',
+                    value: 4.000000029802322,
+                  },
+                  {
+                    name: 'initialBuffCount',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'initialCrabCount',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'jungleCsBefore10Minutes',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'laneMinionsFirst10Minutes',
+                    value: 53.0,
+                  },
+                  {
+                    name: 'maxCsAdvantageOnLaneOpponent',
+                    value: 11.000000059604645,
+                  },
+                  {
+                    name: 'scuttleCrabKills',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'twentyMinionsIn3SecondsCount',
+                    value: 0.0,
+                  },
+                ],
+              },
+            ],
+            enemy_team: [
+              {
+                champion: {
+                  name: 'Aatrox',
+                  icon_path:
+                    'https://ddragon.leagueoflegends.com/cdn/12.8.1/img/champion/Aatrox.png',
+                },
+                player: {
+                  id: 'YrRCpxDRcDkyGHPMsWBL',
+                  name: 'yUsuPangHPrLNymNJQsn',
+                },
+                player_stats: [
+                  {
+                    name: '-damageSelfMitigated',
+                    value: 7032.0,
+                  },
+                  {
+                    name: '-largestCriticalStrike',
+                    value: 506.0,
+                  },
+                  {
+                    name: '-magicDamageDealt',
+                    value: 24260.0,
+                  },
+                  {
+                    name: '-magicDamageDealtToChampions',
+                    value: 1474.0,
+                  },
+                  {
+                    name: '-magicDamageTaken',
+                    value: 7062.0,
+                  },
+                  {
+                    name: '-physicalDamageDealt',
+                    value: 83191.0,
+                  },
+                  {
+                    name: '-physicalDamageDealtToChampions',
+                    value: 6535.0,
+                  },
+                  {
+                    name: '-physicalDamageTaken',
+                    value: 10580.0,
+                  },
+                  {
+                    name: '-totalDamageDealt',
+                    value: 116887.0,
+                  },
+                  {
+                    name: '-totalDamageDealtToChampions',
+                    value: 9531.0,
+                  },
+                  {
+                    name: '-totalDamageTaken',
+                    value: 17776.0,
+                  },
+                  {
+                    name: '-trueDamageDealt',
+                    value: 9435.0,
+                  },
+                  {
+                    name: '-trueDamageDealtToChampions',
+                    value: 1521.0,
+                  },
+                  {
+                    name: '-trueDamageTaken',
+                    value: 133.0,
+                  },
+                  {
+                    name: 'damagePerMinute',
+                    value: 327.23765452306037,
+                  },
+                  {
+                    name: 'damageTakenOnTeamPercentage',
+                    value: 0.16427365853437548,
+                  },
+                  {
+                    name: 'teamDamagePercentage',
+                    value: 0.10242491893231571,
+                  },
+                  {
+                    name: '-doubleKills',
+                    value: 0.0,
+                  },
+                  {
+                    name: '-killingSprees',
+                    value: 2.0,
+                  },
+                  {
+                    name: '-largestKillingSpree',
+                    value: 3.0,
+                  },
+                  {
+                    name: '-largestMultiKill',
+                    value: 1.0,
+                  },
+                  {
+                    name: '-pentaKills',
+                    value: 0.0,
+                  },
+                  {
+                    name: '-quadraKills',
+                    value: 0.0,
+                  },
+                  {
+                    name: '-tripleKills',
+                    value: 0.0,
+                  },
+                  {
+                    name: '12AssistStreakCount',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'acesBefore15Minutes',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'doubleAces',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'flawlessAces',
+                    value: 1.0,
+                  },
+                  {
+                    name: 'fullTeamTakedown',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'legendaryCount',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'multiKillOneSpell',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'multikills',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'multikillsAfterAggressiveFlash',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'elderDragonMultikills',
+                    value: 0.0,
+                  },
+                  {
+                    name: '-spell2Casts',
+                    value: 20.0,
+                  },
+                  {
+                    name: '-spell1Casts',
+                    value: 22.0,
+                  },
+                  {
+                    name: '-spell3Casts',
+                    value: 20.0,
+                  },
+                  {
+                    name: '-spell4Casts',
+                    value: 5.0,
+                  },
+                  {
+                    name: '-summoner1Casts',
+                    value: 3.0,
+                  },
+                  {
+                    name: '-summoner2Casts',
+                    value: 2.0,
+                  },
+                  {
+                    name: 'abilityUses',
+                    value: 67.0,
+                  },
+                  {
+                    name: 'dodgeSkillShotsSmallWindow',
+                    value: 13.0,
+                  },
+                  {
+                    name: 'landSkillShotsEarlyGame',
+                    value: 5.0,
+                  },
+                  {
+                    name: 'quickCleanse',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'skillshotsDodged',
+                    value: 7.0,
+                  },
+                  {
+                    name: 'skillshotsHit',
+                    value: 19.0,
+                  },
+                  {
+                    name: 'snowballsHit',
+                    value: 0.0,
+                  },
+                  {
+                    name: '-timeCCingOthers',
+                    value: 3.0,
+                  },
+                  {
+                    name: '-totalDamageShieldedOnTeammates',
+                    value: 0.0,
+                  },
+                  {
+                    name: '-totalHeal',
+                    value: 2043.0,
+                  },
+                  {
+                    name: '-totalHealsOnTeammates',
+                    value: 0.0,
+                  },
+                  {
+                    name: '-totalTimeCCDealt',
+                    value: 16.0,
+                  },
+                  {
+                    name: '-totalUnitsHealed',
+                    value: 1.0,
+                  },
+                  {
+                    name: 'effectiveHealAndShielding',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'enemyChampionImmobilizations',
+                    value: 5.0,
+                  },
+                  {
+                    name: 'immobilizeAndKillWithAlly',
+                    value: 1.0,
+                  },
+                  {
+                    name: 'knockEnemyIntoTeamAndKill',
+                    value: 1.0,
+                  },
+                  {
+                    name: 'saveAllyFromDeath',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'getTakedownsInAllLanesEarlyJungleAsLaner',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'junglerTakedownsNearDamagedEpicMonster',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'killAfterHiddenWithAlly',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'killedChampTookFullTeamDamageSurvived',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'killsNearEnemyTurret',
+                    value: 2.0,
+                  },
+                  {
+                    name: 'killsOnLanersEarlyJungleAsJungler',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'killsOnOtherLanesEarlyJungleAsLaner',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'killsOnRecentlyHealedByAramPack',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'killsUnderOwnTurret',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'killsWithHelpFromEpicMonster',
+                    value: 0.0,
+                  },
+                  {
+                    name: '-nexusKills',
+                    value: 0.0,
+                  },
+                  {
+                    name: '-nexusTakedowns',
+                    value: 1.0,
+                  },
+                  {
+                    name: 'outnumberedKills',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'outnumberedNexusKill',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'pickKillWithAlly',
+                    value: 6.0,
+                  },
+                  {
+                    name: 'quickSoloKills',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'soloKills',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'takedowns',
+                    value: 8.0,
+                  },
+                  {
+                    name: 'takedownsAfterGainingLevelAdvantage',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'takedownsBeforeJungleMinionSpawn',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'takedownsFirst25Minutes',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'takedownsInAlcove',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'takedownsInEnemyFountain',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'junglerKillsEarlyJungle',
+                    value: 0.0,
+                  },
+                  {
+                    name: '-assists',
+                    value: 1.0,
+                  },
+                  {
+                    name: '-deaths',
+                    value: 6.0,
+                  },
+                  {
+                    name: '-firstBloodAssist',
+                    value: 0.0,
+                  },
+                  {
+                    name: '-firstBloodKill',
+                    value: 0.0,
+                  },
+                  {
+                    name: '-kills',
+                    value: 7.0,
+                  },
+                  {
+                    name: 'bountyGold',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'deathsByEnemyChamps',
+                    value: 6.0,
+                  },
+                  {
+                    name: 'kda',
+                    value: 1.3333333333333333,
+                  },
+                  {
+                    name: 'killParticipation',
+                    value: 0.25,
+                  },
+                  {
+                    name: 'maxKillDeficit',
+                    value: 6.0,
+                  },
+                  {
+                    name: 'maxLevelLeadLaneOpponent',
+                    value: 1.0,
+                  },
+                  {
+                    name: 'outerTurretExecutesBefore10Minutes',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'survivedSingleDigitHpCount',
+                    value: 1.0,
+                  },
+                  {
+                    name: 'survivedThreeImmobilizesInFight',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'tookLargeDamageSurvived',
+                    value: 0.0,
+                  },
+                  {
+                    name: '-damageDealtToBuildings',
+                    value: 8232.0,
+                  },
+                  {
+                    name: '-damageDealtToObjectives',
+                    value: 12524.0,
+                  },
+                  {
+                    name: '-damageDealtToTurrets',
+                    value: 8232.0,
+                  },
+                  {
+                    name: '-firstTowerAssist',
+                    value: 0.0,
+                  },
+                  {
+                    name: '-firstTowerKill',
+                    value: 0.0,
+                  },
+                  {
+                    name: '-inhibitorKills',
+                    value: 0.0,
+                  },
+                  {
+                    name: '-inhibitorTakedowns',
+                    value: 1.0,
+                  },
+                  {
+                    name: '-inhibitorsLost',
+                    value: 0.0,
+                  },
+                  {
+                    name: '-objectivesStolen',
+                    value: 0.0,
+                  },
+                  {
+                    name: '-objectivesStolenAssists',
+                    value: 0.0,
+                  },
+                  {
+                    name: '-turretKills',
+                    value: 2.0,
+                  },
+                  {
+                    name: '-turretTakedowns',
+                    value: 5.0,
+                  },
+                  {
+                    name: '-turretsLost',
+                    value: 3.0,
+                  },
+                  {
+                    name: 'baronTakedowns',
+                    value: 1.0,
+                  },
+                  {
+                    name: 'dragonTakedowns',
+                    value: 1.0,
+                  },
+                  {
+                    name: 'elderDragonKillsWithOpposingSoul',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'epicMonsterKillsNearEnemyJungler',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'epicMonsterKillsWithin30SecondsOfSpawn',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'epicMonsterSteals',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'epicMonsterStolenWithoutSmite',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'kTurretsDestroyedBeforePlatesFall',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'multiTurretRiftHeraldCount',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'perfectDragonSoulsTaken',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'quickFirstTurret',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'riftHeraldTakedowns',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'soloBaronKills',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'soloTurretsLategame',
+                    value: 1.0,
+                  },
+                  {
+                    name: 'takedownOnFirstTurret',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'teamBaronKills',
+                    value: 1.0,
+                  },
+                  {
+                    name: 'teamElderDragonKills',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'teamRiftHeraldKills',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'turretPlatesTaken',
+                    value: 2.0,
+                  },
+                  {
+                    name: 'turretTakedowns',
+                    value: 5.0,
+                  },
+                  {
+                    name: 'turretsTakenWithRiftHerald',
+                    value: 0.0,
+                  },
+                  {
+                    name: '-champLevel',
+                    value: 15.0,
+                  },
+                  {
+                    name: '-gameEndedInEarlySurrender',
+                    value: 0.0,
+                  },
+                  {
+                    name: '-gameEndedInSurrender',
+                    value: 0.0,
+                  },
+                  {
+                    name: '-longestTimeSpentLiving',
+                    value: 456.0,
+                  },
+                  {
+                    name: '-teamEarlySurrendered',
+                    value: 0.0,
+                  },
+                  {
+                    name: '-totalTimeSpentDead',
+                    value: 180.0,
+                  },
+                  {
+                    name: 'gameLength',
+                    value: 1747.688579886358,
+                  },
+                  {
+                    name: 'perfectGame',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'blastConeOppositeOpponentCount',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'completeSupportQuestInTime',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'dancedWithRiftHerald',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'hadAfkTeammate',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'hadOpenNexus',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'moreEnemyJungleThanOpponent',
+                    value: -123.50000008940697,
+                  },
+                  {
+                    name: 'poroExplosions',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'unseenRecalls',
+                    value: 0.0,
+                  },
+                  {
+                    name: '-consumablesPurchased',
+                    value: 6.0,
+                  },
+                  {
+                    name: '-goldEarned',
+                    value: 11587.0,
+                  },
+                  {
+                    name: '-goldSpent',
+                    value: 9550.0,
+                  },
+                  {
+                    name: '-itemsPurchased',
+                    value: 25.0,
+                  },
+                  {
+                    name: 'earlyLaningPhaseGoldExpAdvantage',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'goldPerMinute',
+                    value: 397.8182554240922,
+                  },
+                  {
+                    name: 'laningPhaseGoldExpAdvantage',
+                    value: 0.0,
+                  },
+                  {
+                    name: '-visionScore',
+                    value: 11.0,
+                  },
+                  {
+                    name: '-visionWardsBought',
+                    value: 1.0,
+                  },
+                  {
+                    name: '-wardsKilled',
+                    value: 0.0,
+                  },
+                  {
+                    name: '-wardsPlaced',
+                    value: 6.0,
+                  },
+                  {
+                    name: 'controlWardsPlaced',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'stealthWardsPlaced',
+                    value: 5.0,
+                  },
+                  {
+                    name: 'threeWardsOneSweeperCount',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'viChampion.cache[name]sionScoreAdvantageLaneOpponent',
+                    value: -0.2218838930130005,
+                  },
+                  {
+                    name: 'visionScorePerMinute',
+                    value: 0.3787263810293082,
+                  },
+                  {
+                    name: 'wardTakedowns',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'wardTakedownsBefore20M',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'wardsGuarded',
+                    value: 0.0,
+                  },
+                  {
+                    name: '-neutralMinionsKilled',
+                    value: 12.0,
+                  },
+                  {
+                    name: '-totalMinionsKilled',
+                    value: 163.0,
+                  },
+                  {
+                    name: 'alliedJungleMonsterKills',
+                    value: 8.000000029802322,
+                  },
+                  {
+                    name: 'buffsStolen',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'enemyJungleMonsterKills',
+                    value: 4.000000029802322,
+                  },
+                  {
+                    name: 'initialBuffCount',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'initialCrabCount',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'jungleCsBefore10Minutes',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'laneMinionsFirst10Minutes',
+                    value: 53.0,
+                  },
+                  {
+                    name: 'maxCsAdvantageOnLaneOpponent',
+                    value: 11.000000059604645,
+                  },
+                  {
+                    name: 'scuttleCrabKills',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'twentyMinionsIn3SecondsCount',
+                    value: 0.0,
+                  },
+                ],
+              },
+              {
+                champion: {
+                  name: 'Aatrox',
+                  icon_path:
+                    'https://ddragon.leagueoflegends.com/cdn/12.8.1/img/champion/Aatrox.png',
+                },
+                player: {
+                  id: 'RzKOthaRJpWZHFFgwFGZ',
+                  name: 'rrOrxQcOHqcSURavoOcU',
+                },
+                player_stats: [
+                  {
+                    name: '-damageSelfMitigated',
+                    value: 7032.0,
+                  },
+                  {
+                    name: '-largestCriticalStrike',
+                    value: 506.0,
+                  },
+                  {
+                    name: '-magicDamageDealt',
+                    value: 24260.0,
+                  },
+                  {
+                    name: '-magicDamageDealtToChampions',
+                    value: 1474.0,
+                  },
+                  {
+                    name: '-magicDamageTaken',
+                    value: 7062.0,
+                  },
+                  {
+                    name: '-physicalDamageDealt',
+                    value: 83191.0,
+                  },
+                  {
+                    name: '-physicalDamageDealtToChampions',
+                    value: 6535.0,
+                  },
+                  {
+                    name: '-physicalDamageTaken',
+                    value: 10580.0,
+                  },
+                  {
+                    name: '-totalDamageDealt',
+                    value: 116887.0,
+                  },
+                  {
+                    name: '-totalDamageDealtToChampions',
+                    value: 9531.0,
+                  },
+                  {
+                    name: '-totalDamageTaken',
+                    value: 17776.0,
+                  },
+                  {
+                    name: '-trueDamageDealt',
+                    value: 9435.0,
+                  },
+                  {
+                    name: '-trueDamageDealtToChampions',
+                    value: 1521.0,
+                  },
+                  {
+                    name: '-trueDamageTaken',
+                    value: 133.0,
+                  },
+                  {
+                    name: 'damagePerMinute',
+                    value: 327.23765452306037,
+                  },
+                  {
+                    name: 'damageTakenOnTeamPercentage',
+                    value: 0.16427365853437548,
+                  },
+                  {
+                    name: 'teamDamagePercentage',
+                    value: 0.10242491893231571,
+                  },
+                  {
+                    name: '-doubleKills',
+                    value: 0.0,
+                  },
+                  {
+                    name: '-killingSprees',
+                    value: 2.0,
+                  },
+                  {
+                    name: '-largestKillingSpree',
+                    value: 3.0,
+                  },
+                  {
+                    name: '-largestMultiKill',
+                    value: 1.0,
+                  },
+                  {
+                    name: '-pentaKills',
+                    value: 0.0,
+                  },
+                  {
+                    name: '-quadraKills',
+                    value: 0.0,
+                  },
+                  {
+                    name: '-tripleKills',
+                    value: 0.0,
+                  },
+                  {
+                    name: '12AssistStreakCount',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'acesBefore15Minutes',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'doubleAces',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'flawlessAces',
+                    value: 1.0,
+                  },
+                  {
+                    name: 'fullTeamTakedown',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'legendaryCount',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'multiKillOneSpell',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'multikills',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'multikillsAfterAggressiveFlash',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'elderDragonMultikills',
+                    value: 0.0,
+                  },
+                  {
+                    name: '-spell2Casts',
+                    value: 20.0,
+                  },
+                  {
+                    name: '-spell1Casts',
+                    value: 22.0,
+                  },
+                  {
+                    name: '-spell3Casts',
+                    value: 20.0,
+                  },
+                  {
+                    name: '-spell4Casts',
+                    value: 5.0,
+                  },
+                  {
+                    name: '-summoner1Casts',
+                    value: 3.0,
+                  },
+                  {
+                    name: '-summoner2Casts',
+                    value: 2.0,
+                  },
+                  {
+                    name: 'abilityUses',
+                    value: 67.0,
+                  },
+                  {
+                    name: 'dodgeSkillShotsSmallWindow',
+                    value: 13.0,
+                  },
+                  {
+                    name: 'landSkillShotsEarlyGame',
+                    value: 5.0,
+                  },
+                  {
+                    name: 'quickCleanse',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'skillshotsDodged',
+                    value: 7.0,
+                  },
+                  {
+                    name: 'skillshotsHit',
+                    value: 19.0,
+                  },
+                  {
+                    name: 'snowballsHit',
+                    value: 0.0,
+                  },
+                  {
+                    name: '-timeCCingOthers',
+                    value: 3.0,
+                  },
+                  {
+                    name: '-totalDamageShieldedOnTeammates',
+                    value: 0.0,
+                  },
+                  {
+                    name: '-totalHeal',
+                    value: 2043.0,
+                  },
+                  {
+                    name: '-totalHealsOnTeammates',
+                    value: 0.0,
+                  },
+                  {
+                    name: '-totalTimeCCDealt',
+                    value: 16.0,
+                  },
+                  {
+                    name: '-totalUnitsHealed',
+                    value: 1.0,
+                  },
+                  {
+                    name: 'effectiveHealAndShielding',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'enemyChampionImmobilizations',
+                    value: 5.0,
+                  },
+                  {
+                    name: 'immobilizeAndKillWithAlly',
+                    value: 1.0,
+                  },
+                  {
+                    name: 'knockEnemyIntoTeamAndKill',
+                    value: 1.0,
+                  },
+                  {
+                    name: 'saveAllyFromDeath',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'getTakedownsInAllLanesEarlyJungleAsLaner',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'junglerTakedownsNearDamagedEpicMonster',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'killAfterHiddenWithAlly',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'killedChampTookFullTeamDamageSurvived',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'killsNearEnemyTurret',
+                    value: 2.0,
+                  },
+                  {
+                    name: 'killsOnLanersEarlyJungleAsJungler',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'killsOnOtherLanesEarlyJungleAsLaner',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'killsOnRecentlyHealedByAramPack',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'killsUnderOwnTurret',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'killsWithHelpFromEpicMonster',
+                    value: 0.0,
+                  },
+                  {
+                    name: '-nexusKills',
+                    value: 0.0,
+                  },
+                  {
+                    name: '-nexusTakedowns',
+                    value: 1.0,
+                  },
+                  {
+                    name: 'outnumberedKills',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'outnumberedNexusKill',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'pickKillWithAlly',
+                    value: 6.0,
+                  },
+                  {
+                    name: 'quickSoloKills',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'soloKills',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'takedowns',
+                    value: 8.0,
+                  },
+                  {
+                    name: 'takedownsAfterGainingLevelAdvantage',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'takedownsBeforeJungleMinionSpawn',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'takedownsFirst25Minutes',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'takedownsInAlcove',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'takedownsInEnemyFountain',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'junglerKillsEarlyJungle',
+                    value: 0.0,
+                  },
+                  {
+                    name: '-assists',
+                    value: 1.0,
+                  },
+                  {
+                    name: '-deaths',
+                    value: 6.0,
+                  },
+                  {
+                    name: '-firstBloodAssist',
+                    value: 0.0,
+                  },
+                  {
+                    name: '-firstBloodKill',
+                    value: 0.0,
+                  },
+                  {
+                    name: '-kills',
+                    value: 7.0,
+                  },
+                  {
+                    name: 'bountyGold',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'deathsByEnemyChamps',
+                    value: 6.0,
+                  },
+                  {
+                    name: 'kda',
+                    value: 1.3333333333333333,
+                  },
+                  {
+                    name: 'killParticipation',
+                    value: 0.25,
+                  },
+                  {
+                    name: 'maxKillDeficit',
+                    value: 6.0,
+                  },
+                  {
+                    name: 'maxLevelLeadLaneOpponent',
+                    value: 1.0,
+                  },
+                  {
+                    name: 'outerTurretExecutesBefore10Minutes',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'survivedSingleDigitHpCount',
+                    value: 1.0,
+                  },
+                  {
+                    name: 'survivedThreeImmobilizesInFight',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'tookLargeDamageSurvived',
+                    value: 0.0,
+                  },
+                  {
+                    name: '-damageDealtToBuildings',
+                    value: 8232.0,
+                  },
+                  {
+                    name: '-damageDealtToObjectives',
+                    value: 12524.0,
+                  },
+                  {
+                    name: '-damageDealtToTurrets',
+                    value: 8232.0,
+                  },
+                  {
+                    name: '-firstTowerAssist',
+                    value: 0.0,
+                  },
+                  {
+                    name: '-firstTowerKill',
+                    value: 0.0,
+                  },
+                  {
+                    name: '-inhibitorKills',
+                    value: 0.0,
+                  },
+                  {
+                    name: '-inhibitorTakedowns',
+                    value: 1.0,
+                  },
+                  {
+                    name: '-inhibitorsLost',
+                    value: 0.0,
+                  },
+                  {
+                    name: '-objectivesStolen',
+                    value: 0.0,
+                  },
+                  {
+                    name: '-objectivesStolenAssists',
+                    value: 0.0,
+                  },
+                  {
+                    name: '-turretKills',
+                    value: 2.0,
+                  },
+                  {
+                    name: '-turretTakedowns',
+                    value: 5.0,
+                  },
+                  {
+                    name: '-turretsLost',
+                    value: 3.0,
+                  },
+                  {
+                    name: 'baronTakedowns',
+                    value: 1.0,
+                  },
+                  {
+                    name: 'dragonTakedowns',
+                    value: 1.0,
+                  },
+                  {
+                    name: 'elderDragonKillsWithOpposingSoul',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'epicMonsterKillsNearEnemyJungler',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'epicMonsterKillsWithin30SecondsOfSpawn',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'epicMonsterSteals',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'epicMonsterStolenWithoutSmite',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'kTurretsDestroyedBeforePlatesFall',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'multiTurretRiftHeraldCount',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'perfectDragonSoulsTaken',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'quickFirstTurret',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'riftHeraldTakedowns',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'soloBaronKills',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'soloTurretsLategame',
+                    value: 1.0,
+                  },
+                  {
+                    name: 'takedownOnFirstTurret',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'teamBaronKills',
+                    value: 1.0,
+                  },
+                  {
+                    name: 'teamElderDragonKills',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'teamRiftHeraldKills',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'turretPlatesTaken',
+                    value: 2.0,
+                  },
+                  {
+                    name: 'turretTakedowns',
+                    value: 5.0,
+                  },
+                  {
+                    name: 'turretsTakenWithRiftHerald',
+                    value: 0.0,
+                  },
+                  {
+                    name: '-champLevel',
+                    value: 15.0,
+                  },
+                  {
+                    name: '-gameEndedInEarlySurrender',
+                    value: 0.0,
+                  },
+                  {
+                    name: '-gameEndedInSurrender',
+                    value: 0.0,
+                  },
+                  {
+                    name: '-longestTimeSpentLiving',
+                    value: 456.0,
+                  },
+                  {
+                    name: '-teamEarlySurrendered',
+                    value: 0.0,
+                  },
+                  {
+                    name: '-totalTimeSpentDead',
+                    value: 180.0,
+                  },
+                  {
+                    name: 'gameLength',
+                    value: 1747.688579886358,
+                  },
+                  {
+                    name: 'perfectGame',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'blastConeOppositeOpponentCount',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'completeSupportQuestInTime',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'dancedWithRiftHerald',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'hadAfkTeammate',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'hadOpenNexus',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'moreEnemyJungleThanOpponent',
+                    value: -123.50000008940697,
+                  },
+                  {
+                    name: 'poroExplosions',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'unseenRecalls',
+                    value: 0.0,
+                  },
+                  {
+                    name: '-consumablesPurchased',
+                    value: 6.0,
+                  },
+                  {
+                    name: '-goldEarned',
+                    value: 11587.0,
+                  },
+                  {
+                    name: '-goldSpent',
+                    value: 9550.0,
+                  },
+                  {
+                    name: '-itemsPurchased',
+                    value: 25.0,
+                  },
+                  {
+                    name: 'earlyLaningPhaseGoldExpAdvantage',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'goldPerMinute',
+                    value: 397.8182554240922,
+                  },
+                  {
+                    name: 'laningPhaseGoldExpAdvantage',
+                    value: 0.0,
+                  },
+                  {
+                    name: '-visionScore',
+                    value: 11.0,
+                  },
+                  {
+                    name: '-visionWardsBought',
+                    value: 1.0,
+                  },
+                  {
+                    name: '-wardsKilled',
+                    value: 0.0,
+                  },
+                  {
+                    name: '-wardsPlaced',
+                    value: 6.0,
+                  },
+                  {
+                    name: 'controlWardsPlaced',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'stealthWardsPlaced',
+                    value: 5.0,
+                  },
+                  {
+                    name: 'threeWardsOneSweeperCount',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'viChampion.cache[name]sionScoreAdvantageLaneOpponent',
+                    value: -0.2218838930130005,
+                  },
+                  {
+                    name: 'visionScorePerMinute',
+                    value: 0.3787263810293082,
+                  },
+                  {
+                    name: 'wardTakedowns',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'wardTakedownsBefore20M',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'wardsGuarded',
+                    value: 0.0,
+                  },
+                  {
+                    name: '-neutralMinionsKilled',
+                    value: 12.0,
+                  },
+                  {
+                    name: '-totalMinionsKilled',
+                    value: 163.0,
+                  },
+                  {
+                    name: 'alliedJungleMonsterKills',
+                    value: 8.000000029802322,
+                  },
+                  {
+                    name: 'buffsStolen',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'enemyJungleMonsterKills',
+                    value: 4.000000029802322,
+                  },
+                  {
+                    name: 'initialBuffCount',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'initialCrabCount',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'jungleCsBefore10Minutes',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'laneMinionsFirst10Minutes',
+                    value: 53.0,
+                  },
+                  {
+                    name: 'maxCsAdvantageOnLaneOpponent',
+                    value: 11.000000059604645,
+                  },
+                  {
+                    name: 'scuttleCrabKills',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'twentyMinionsIn3SecondsCount',
+                    value: 0.0,
+                  },
+                ],
+              },
+              {
+                champion: {
+                  name: 'Aatrox',
+                  icon_path:
+                    'https://ddragon.leagueoflegends.com/cdn/12.8.1/img/champion/Aatrox.png',
+                },
+                player: {
+                  id: 'ABbiDIjQJUBYWnEltJqG',
+                  name: 'SfopcBDpErBHOnKPVIKT',
+                },
+                player_stats: [
+                  {
+                    name: '-damageSelfMitigated',
+                    value: 7032.0,
+                  },
+                  {
+                    name: '-largestCriticalStrike',
+                    value: 506.0,
+                  },
+                  {
+                    name: '-magicDamageDealt',
+                    value: 24260.0,
+                  },
+                  {
+                    name: '-magicDamageDealtToChampions',
+                    value: 1474.0,
+                  },
+                  {
+                    name: '-magicDamageTaken',
+                    value: 7062.0,
+                  },
+                  {
+                    name: '-physicalDamageDealt',
+                    value: 83191.0,
+                  },
+                  {
+                    name: '-physicalDamageDealtToChampions',
+                    value: 6535.0,
+                  },
+                  {
+                    name: '-physicalDamageTaken',
+                    value: 10580.0,
+                  },
+                  {
+                    name: '-totalDamageDealt',
+                    value: 116887.0,
+                  },
+                  {
+                    name: '-totalDamageDealtToChampions',
+                    value: 9531.0,
+                  },
+                  {
+                    name: '-totalDamageTaken',
+                    value: 17776.0,
+                  },
+                  {
+                    name: '-trueDamageDealt',
+                    value: 9435.0,
+                  },
+                  {
+                    name: '-trueDamageDealtToChampions',
+                    value: 1521.0,
+                  },
+                  {
+                    name: '-trueDamageTaken',
+                    value: 133.0,
+                  },
+                  {
+                    name: 'damagePerMinute',
+                    value: 327.23765452306037,
+                  },
+                  {
+                    name: 'damageTakenOnTeamPercentage',
+                    value: 0.16427365853437548,
+                  },
+                  {
+                    name: 'teamDamagePercentage',
+                    value: 0.10242491893231571,
+                  },
+                  {
+                    name: '-doubleKills',
+                    value: 0.0,
+                  },
+                  {
+                    name: '-killingSprees',
+                    value: 2.0,
+                  },
+                  {
+                    name: '-largestKillingSpree',
+                    value: 3.0,
+                  },
+                  {
+                    name: '-largestMultiKill',
+                    value: 1.0,
+                  },
+                  {
+                    name: '-pentaKills',
+                    value: 0.0,
+                  },
+                  {
+                    name: '-quadraKills',
+                    value: 0.0,
+                  },
+                  {
+                    name: '-tripleKills',
+                    value: 0.0,
+                  },
+                  {
+                    name: '12AssistStreakCount',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'acesBefore15Minutes',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'doubleAces',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'flawlessAces',
+                    value: 1.0,
+                  },
+                  {
+                    name: 'fullTeamTakedown',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'legendaryCount',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'multiKillOneSpell',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'multikills',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'multikillsAfterAggressiveFlash',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'elderDragonMultikills',
+                    value: 0.0,
+                  },
+                  {
+                    name: '-spell2Casts',
+                    value: 20.0,
+                  },
+                  {
+                    name: '-spell1Casts',
+                    value: 22.0,
+                  },
+                  {
+                    name: '-spell3Casts',
+                    value: 20.0,
+                  },
+                  {
+                    name: '-spell4Casts',
+                    value: 5.0,
+                  },
+                  {
+                    name: '-summoner1Casts',
+                    value: 3.0,
+                  },
+                  {
+                    name: '-summoner2Casts',
+                    value: 2.0,
+                  },
+                  {
+                    name: 'abilityUses',
+                    value: 67.0,
+                  },
+                  {
+                    name: 'dodgeSkillShotsSmallWindow',
+                    value: 13.0,
+                  },
+                  {
+                    name: 'landSkillShotsEarlyGame',
+                    value: 5.0,
+                  },
+                  {
+                    name: 'quickCleanse',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'skillshotsDodged',
+                    value: 7.0,
+                  },
+                  {
+                    name: 'skillshotsHit',
+                    value: 19.0,
+                  },
+                  {
+                    name: 'snowballsHit',
+                    value: 0.0,
+                  },
+                  {
+                    name: '-timeCCingOthers',
+                    value: 3.0,
+                  },
+                  {
+                    name: '-totalDamageShieldedOnTeammates',
+                    value: 0.0,
+                  },
+                  {
+                    name: '-totalHeal',
+                    value: 2043.0,
+                  },
+                  {
+                    name: '-totalHealsOnTeammates',
+                    value: 0.0,
+                  },
+                  {
+                    name: '-totalTimeCCDealt',
+                    value: 16.0,
+                  },
+                  {
+                    name: '-totalUnitsHealed',
+                    value: 1.0,
+                  },
+                  {
+                    name: 'effectiveHealAndShielding',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'enemyChampionImmobilizations',
+                    value: 5.0,
+                  },
+                  {
+                    name: 'immobilizeAndKillWithAlly',
+                    value: 1.0,
+                  },
+                  {
+                    name: 'knockEnemyIntoTeamAndKill',
+                    value: 1.0,
+                  },
+                  {
+                    name: 'saveAllyFromDeath',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'getTakedownsInAllLanesEarlyJungleAsLaner',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'junglerTakedownsNearDamagedEpicMonster',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'killAfterHiddenWithAlly',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'killedChampTookFullTeamDamageSurvived',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'killsNearEnemyTurret',
+                    value: 2.0,
+                  },
+                  {
+                    name: 'killsOnLanersEarlyJungleAsJungler',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'killsOnOtherLanesEarlyJungleAsLaner',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'killsOnRecentlyHealedByAramPack',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'killsUnderOwnTurret',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'killsWithHelpFromEpicMonster',
+                    value: 0.0,
+                  },
+                  {
+                    name: '-nexusKills',
+                    value: 0.0,
+                  },
+                  {
+                    name: '-nexusTakedowns',
+                    value: 1.0,
+                  },
+                  {
+                    name: 'outnumberedKills',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'outnumberedNexusKill',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'pickKillWithAlly',
+                    value: 6.0,
+                  },
+                  {
+                    name: 'quickSoloKills',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'soloKills',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'takedowns',
+                    value: 8.0,
+                  },
+                  {
+                    name: 'takedownsAfterGainingLevelAdvantage',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'takedownsBeforeJungleMinionSpawn',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'takedownsFirst25Minutes',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'takedownsInAlcove',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'takedownsInEnemyFountain',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'junglerKillsEarlyJungle',
+                    value: 0.0,
+                  },
+                  {
+                    name: '-assists',
+                    value: 1.0,
+                  },
+                  {
+                    name: '-deaths',
+                    value: 6.0,
+                  },
+                  {
+                    name: '-firstBloodAssist',
+                    value: 0.0,
+                  },
+                  {
+                    name: '-firstBloodKill',
+                    value: 0.0,
+                  },
+                  {
+                    name: '-kills',
+                    value: 7.0,
+                  },
+                  {
+                    name: 'bountyGold',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'deathsByEnemyChamps',
+                    value: 6.0,
+                  },
+                  {
+                    name: 'kda',
+                    value: 1.3333333333333333,
+                  },
+                  {
+                    name: 'killParticipation',
+                    value: 0.25,
+                  },
+                  {
+                    name: 'maxKillDeficit',
+                    value: 6.0,
+                  },
+                  {
+                    name: 'maxLevelLeadLaneOpponent',
+                    value: 1.0,
+                  },
+                  {
+                    name: 'outerTurretExecutesBefore10Minutes',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'survivedSingleDigitHpCount',
+                    value: 1.0,
+                  },
+                  {
+                    name: 'survivedThreeImmobilizesInFight',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'tookLargeDamageSurvived',
+                    value: 0.0,
+                  },
+                  {
+                    name: '-damageDealtToBuildings',
+                    value: 8232.0,
+                  },
+                  {
+                    name: '-damageDealtToObjectives',
+                    value: 12524.0,
+                  },
+                  {
+                    name: '-damageDealtToTurrets',
+                    value: 8232.0,
+                  },
+                  {
+                    name: '-firstTowerAssist',
+                    value: 0.0,
+                  },
+                  {
+                    name: '-firstTowerKill',
+                    value: 0.0,
+                  },
+                  {
+                    name: '-inhibitorKills',
+                    value: 0.0,
+                  },
+                  {
+                    name: '-inhibitorTakedowns',
+                    value: 1.0,
+                  },
+                  {
+                    name: '-inhibitorsLost',
+                    value: 0.0,
+                  },
+                  {
+                    name: '-objectivesStolen',
+                    value: 0.0,
+                  },
+                  {
+                    name: '-objectivesStolenAssists',
+                    value: 0.0,
+                  },
+                  {
+                    name: '-turretKills',
+                    value: 2.0,
+                  },
+                  {
+                    name: '-turretTakedowns',
+                    value: 5.0,
+                  },
+                  {
+                    name: '-turretsLost',
+                    value: 3.0,
+                  },
+                  {
+                    name: 'baronTakedowns',
+                    value: 1.0,
+                  },
+                  {
+                    name: 'dragonTakedowns',
+                    value: 1.0,
+                  },
+                  {
+                    name: 'elderDragonKillsWithOpposingSoul',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'epicMonsterKillsNearEnemyJungler',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'epicMonsterKillsWithin30SecondsOfSpawn',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'epicMonsterSteals',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'epicMonsterStolenWithoutSmite',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'kTurretsDestroyedBeforePlatesFall',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'multiTurretRiftHeraldCount',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'perfectDragonSoulsTaken',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'quickFirstTurret',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'riftHeraldTakedowns',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'soloBaronKills',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'soloTurretsLategame',
+                    value: 1.0,
+                  },
+                  {
+                    name: 'takedownOnFirstTurret',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'teamBaronKills',
+                    value: 1.0,
+                  },
+                  {
+                    name: 'teamElderDragonKills',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'teamRiftHeraldKills',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'turretPlatesTaken',
+                    value: 2.0,
+                  },
+                  {
+                    name: 'turretTakedowns',
+                    value: 5.0,
+                  },
+                  {
+                    name: 'turretsTakenWithRiftHerald',
+                    value: 0.0,
+                  },
+                  {
+                    name: '-champLevel',
+                    value: 15.0,
+                  },
+                  {
+                    name: '-gameEndedInEarlySurrender',
+                    value: 0.0,
+                  },
+                  {
+                    name: '-gameEndedInSurrender',
+                    value: 0.0,
+                  },
+                  {
+                    name: '-longestTimeSpentLiving',
+                    value: 456.0,
+                  },
+                  {
+                    name: '-teamEarlySurrendered',
+                    value: 0.0,
+                  },
+                  {
+                    name: '-totalTimeSpentDead',
+                    value: 180.0,
+                  },
+                  {
+                    name: 'gameLength',
+                    value: 1747.688579886358,
+                  },
+                  {
+                    name: 'perfectGame',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'blastConeOppositeOpponentCount',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'completeSupportQuestInTime',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'dancedWithRiftHerald',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'hadAfkTeammate',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'hadOpenNexus',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'moreEnemyJungleThanOpponent',
+                    value: -123.50000008940697,
+                  },
+                  {
+                    name: 'poroExplosions',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'unseenRecalls',
+                    value: 0.0,
+                  },
+                  {
+                    name: '-consumablesPurchased',
+                    value: 6.0,
+                  },
+                  {
+                    name: '-goldEarned',
+                    value: 11587.0,
+                  },
+                  {
+                    name: '-goldSpent',
+                    value: 9550.0,
+                  },
+                  {
+                    name: '-itemsPurchased',
+                    value: 25.0,
+                  },
+                  {
+                    name: 'earlyLaningPhaseGoldExpAdvantage',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'goldPerMinute',
+                    value: 397.8182554240922,
+                  },
+                  {
+                    name: 'laningPhaseGoldExpAdvantage',
+                    value: 0.0,
+                  },
+                  {
+                    name: '-visionScore',
+                    value: 11.0,
+                  },
+                  {
+                    name: '-visionWardsBought',
+                    value: 1.0,
+                  },
+                  {
+                    name: '-wardsKilled',
+                    value: 0.0,
+                  },
+                  {
+                    name: '-wardsPlaced',
+                    value: 6.0,
+                  },
+                  {
+                    name: 'controlWardsPlaced',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'stealthWardsPlaced',
+                    value: 5.0,
+                  },
+                  {
+                    name: 'threeWardsOneSweeperCount',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'viChampion.cache[name]sionScoreAdvantageLaneOpponent',
+                    value: -0.2218838930130005,
+                  },
+                  {
+                    name: 'visionScorePerMinute',
+                    value: 0.3787263810293082,
+                  },
+                  {
+                    name: 'wardTakedowns',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'wardTakedownsBefore20M',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'wardsGuarded',
+                    value: 0.0,
+                  },
+                  {
+                    name: '-neutralMinionsKilled',
+                    value: 12.0,
+                  },
+                  {
+                    name: '-totalMinionsKilled',
+                    value: 163.0,
+                  },
+                  {
+                    name: 'alliedJungleMonsterKills',
+                    value: 8.000000029802322,
+                  },
+                  {
+                    name: 'buffsStolen',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'enemyJungleMonsterKills',
+                    value: 4.000000029802322,
+                  },
+                  {
+                    name: 'initialBuffCount',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'initialCrabCount',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'jungleCsBefore10Minutes',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'laneMinionsFirst10Minutes',
+                    value: 53.0,
+                  },
+                  {
+                    name: 'maxCsAdvantageOnLaneOpponent',
+                    value: 11.000000059604645,
+                  },
+                  {
+                    name: 'scuttleCrabKills',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'twentyMinionsIn3SecondsCount',
+                    value: 0.0,
+                  },
+                ],
+              },
+              {
+                champion: {
+                  name: 'Aatrox',
+                  icon_path:
+                    'https://ddragon.leagueoflegends.com/cdn/12.8.1/img/champion/Aatrox.png',
+                },
+                player: {
+                  id: 'NZphUySleelcfQYfyYEQ',
+                  name: 'LYzGKgkYpXbNFBgpXBlS',
+                },
+                player_stats: [
+                  {
+                    name: '-damageSelfMitigated',
+                    value: 7032.0,
+                  },
+                  {
+                    name: '-largestCriticalStrike',
+                    value: 506.0,
+                  },
+                  {
+                    name: '-magicDamageDealt',
+                    value: 24260.0,
+                  },
+                  {
+                    name: '-magicDamageDealtToChampions',
+                    value: 1474.0,
+                  },
+                  {
+                    name: '-magicDamageTaken',
+                    value: 7062.0,
+                  },
+                  {
+                    name: '-physicalDamageDealt',
+                    value: 83191.0,
+                  },
+                  {
+                    name: '-physicalDamageDealtToChampions',
+                    value: 6535.0,
+                  },
+                  {
+                    name: '-physicalDamageTaken',
+                    value: 10580.0,
+                  },
+                  {
+                    name: '-totalDamageDealt',
+                    value: 116887.0,
+                  },
+                  {
+                    name: '-totalDamageDealtToChampions',
+                    value: 9531.0,
+                  },
+                  {
+                    name: '-totalDamageTaken',
+                    value: 17776.0,
+                  },
+                  {
+                    name: '-trueDamageDealt',
+                    value: 9435.0,
+                  },
+                  {
+                    name: '-trueDamageDealtToChampions',
+                    value: 1521.0,
+                  },
+                  {
+                    name: '-trueDamageTaken',
+                    value: 133.0,
+                  },
+                  {
+                    name: 'damagePerMinute',
+                    value: 327.23765452306037,
+                  },
+                  {
+                    name: 'damageTakenOnTeamPercentage',
+                    value: 0.16427365853437548,
+                  },
+                  {
+                    name: 'teamDamagePercentage',
+                    value: 0.10242491893231571,
+                  },
+                  {
+                    name: '-doubleKills',
+                    value: 0.0,
+                  },
+                  {
+                    name: '-killingSprees',
+                    value: 2.0,
+                  },
+                  {
+                    name: '-largestKillingSpree',
+                    value: 3.0,
+                  },
+                  {
+                    name: '-largestMultiKill',
+                    value: 1.0,
+                  },
+                  {
+                    name: '-pentaKills',
+                    value: 0.0,
+                  },
+                  {
+                    name: '-quadraKills',
+                    value: 0.0,
+                  },
+                  {
+                    name: '-tripleKills',
+                    value: 0.0,
+                  },
+                  {
+                    name: '12AssistStreakCount',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'acesBefore15Minutes',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'doubleAces',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'flawlessAces',
+                    value: 1.0,
+                  },
+                  {
+                    name: 'fullTeamTakedown',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'legendaryCount',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'multiKillOneSpell',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'multikills',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'multikillsAfterAggressiveFlash',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'elderDragonMultikills',
+                    value: 0.0,
+                  },
+                  {
+                    name: '-spell2Casts',
+                    value: 20.0,
+                  },
+                  {
+                    name: '-spell1Casts',
+                    value: 22.0,
+                  },
+                  {
+                    name: '-spell3Casts',
+                    value: 20.0,
+                  },
+                  {
+                    name: '-spell4Casts',
+                    value: 5.0,
+                  },
+                  {
+                    name: '-summoner1Casts',
+                    value: 3.0,
+                  },
+                  {
+                    name: '-summoner2Casts',
+                    value: 2.0,
+                  },
+                  {
+                    name: 'abilityUses',
+                    value: 67.0,
+                  },
+                  {
+                    name: 'dodgeSkillShotsSmallWindow',
+                    value: 13.0,
+                  },
+                  {
+                    name: 'landSkillShotsEarlyGame',
+                    value: 5.0,
+                  },
+                  {
+                    name: 'quickCleanse',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'skillshotsDodged',
+                    value: 7.0,
+                  },
+                  {
+                    name: 'skillshotsHit',
+                    value: 19.0,
+                  },
+                  {
+                    name: 'snowballsHit',
+                    value: 0.0,
+                  },
+                  {
+                    name: '-timeCCingOthers',
+                    value: 3.0,
+                  },
+                  {
+                    name: '-totalDamageShieldedOnTeammates',
+                    value: 0.0,
+                  },
+                  {
+                    name: '-totalHeal',
+                    value: 2043.0,
+                  },
+                  {
+                    name: '-totalHealsOnTeammates',
+                    value: 0.0,
+                  },
+                  {
+                    name: '-totalTimeCCDealt',
+                    value: 16.0,
+                  },
+                  {
+                    name: '-totalUnitsHealed',
+                    value: 1.0,
+                  },
+                  {
+                    name: 'effectiveHealAndShielding',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'enemyChampionImmobilizations',
+                    value: 5.0,
+                  },
+                  {
+                    name: 'immobilizeAndKillWithAlly',
+                    value: 1.0,
+                  },
+                  {
+                    name: 'knockEnemyIntoTeamAndKill',
+                    value: 1.0,
+                  },
+                  {
+                    name: 'saveAllyFromDeath',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'getTakedownsInAllLanesEarlyJungleAsLaner',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'junglerTakedownsNearDamagedEpicMonster',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'killAfterHiddenWithAlly',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'killedChampTookFullTeamDamageSurvived',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'killsNearEnemyTurret',
+                    value: 2.0,
+                  },
+                  {
+                    name: 'killsOnLanersEarlyJungleAsJungler',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'killsOnOtherLanesEarlyJungleAsLaner',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'killsOnRecentlyHealedByAramPack',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'killsUnderOwnTurret',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'killsWithHelpFromEpicMonster',
+                    value: 0.0,
+                  },
+                  {
+                    name: '-nexusKills',
+                    value: 0.0,
+                  },
+                  {
+                    name: '-nexusTakedowns',
+                    value: 1.0,
+                  },
+                  {
+                    name: 'outnumberedKills',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'outnumberedNexusKill',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'pickKillWithAlly',
+                    value: 6.0,
+                  },
+                  {
+                    name: 'quickSoloKills',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'soloKills',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'takedowns',
+                    value: 8.0,
+                  },
+                  {
+                    name: 'takedownsAfterGainingLevelAdvantage',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'takedownsBeforeJungleMinionSpawn',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'takedownsFirst25Minutes',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'takedownsInAlcove',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'takedownsInEnemyFountain',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'junglerKillsEarlyJungle',
+                    value: 0.0,
+                  },
+                  {
+                    name: '-assists',
+                    value: 1.0,
+                  },
+                  {
+                    name: '-deaths',
+                    value: 6.0,
+                  },
+                  {
+                    name: '-firstBloodAssist',
+                    value: 0.0,
+                  },
+                  {
+                    name: '-firstBloodKill',
+                    value: 0.0,
+                  },
+                  {
+                    name: '-kills',
+                    value: 7.0,
+                  },
+                  {
+                    name: 'bountyGold',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'deathsByEnemyChamps',
+                    value: 6.0,
+                  },
+                  {
+                    name: 'kda',
+                    value: 1.3333333333333333,
+                  },
+                  {
+                    name: 'killParticipation',
+                    value: 0.25,
+                  },
+                  {
+                    name: 'maxKillDeficit',
+                    value: 6.0,
+                  },
+                  {
+                    name: 'maxLevelLeadLaneOpponent',
+                    value: 1.0,
+                  },
+                  {
+                    name: 'outerTurretExecutesBefore10Minutes',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'survivedSingleDigitHpCount',
+                    value: 1.0,
+                  },
+                  {
+                    name: 'survivedThreeImmobilizesInFight',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'tookLargeDamageSurvived',
+                    value: 0.0,
+                  },
+                  {
+                    name: '-damageDealtToBuildings',
+                    value: 8232.0,
+                  },
+                  {
+                    name: '-damageDealtToObjectives',
+                    value: 12524.0,
+                  },
+                  {
+                    name: '-damageDealtToTurrets',
+                    value: 8232.0,
+                  },
+                  {
+                    name: '-firstTowerAssist',
+                    value: 0.0,
+                  },
+                  {
+                    name: '-firstTowerKill',
+                    value: 0.0,
+                  },
+                  {
+                    name: '-inhibitorKills',
+                    value: 0.0,
+                  },
+                  {
+                    name: '-inhibitorTakedowns',
+                    value: 1.0,
+                  },
+                  {
+                    name: '-inhibitorsLost',
+                    value: 0.0,
+                  },
+                  {
+                    name: '-objectivesStolen',
+                    value: 0.0,
+                  },
+                  {
+                    name: '-objectivesStolenAssists',
+                    value: 0.0,
+                  },
+                  {
+                    name: '-turretKills',
+                    value: 2.0,
+                  },
+                  {
+                    name: '-turretTakedowns',
+                    value: 5.0,
+                  },
+                  {
+                    name: '-turretsLost',
+                    value: 3.0,
+                  },
+                  {
+                    name: 'baronTakedowns',
+                    value: 1.0,
+                  },
+                  {
+                    name: 'dragonTakedowns',
+                    value: 1.0,
+                  },
+                  {
+                    name: 'elderDragonKillsWithOpposingSoul',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'epicMonsterKillsNearEnemyJungler',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'epicMonsterKillsWithin30SecondsOfSpawn',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'epicMonsterSteals',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'epicMonsterStolenWithoutSmite',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'kTurretsDestroyedBeforePlatesFall',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'multiTurretRiftHeraldCount',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'perfectDragonSoulsTaken',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'quickFirstTurret',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'riftHeraldTakedowns',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'soloBaronKills',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'soloTurretsLategame',
+                    value: 1.0,
+                  },
+                  {
+                    name: 'takedownOnFirstTurret',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'teamBaronKills',
+                    value: 1.0,
+                  },
+                  {
+                    name: 'teamElderDragonKills',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'teamRiftHeraldKills',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'turretPlatesTaken',
+                    value: 2.0,
+                  },
+                  {
+                    name: 'turretTakedowns',
+                    value: 5.0,
+                  },
+                  {
+                    name: 'turretsTakenWithRiftHerald',
+                    value: 0.0,
+                  },
+                  {
+                    name: '-champLevel',
+                    value: 15.0,
+                  },
+                  {
+                    name: '-gameEndedInEarlySurrender',
+                    value: 0.0,
+                  },
+                  {
+                    name: '-gameEndedInSurrender',
+                    value: 0.0,
+                  },
+                  {
+                    name: '-longestTimeSpentLiving',
+                    value: 456.0,
+                  },
+                  {
+                    name: '-teamEarlySurrendered',
+                    value: 0.0,
+                  },
+                  {
+                    name: '-totalTimeSpentDead',
+                    value: 180.0,
+                  },
+                  {
+                    name: 'gameLength',
+                    value: 1747.688579886358,
+                  },
+                  {
+                    name: 'perfectGame',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'blastConeOppositeOpponentCount',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'completeSupportQuestInTime',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'dancedWithRiftHerald',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'hadAfkTeammate',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'hadOpenNexus',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'moreEnemyJungleThanOpponent',
+                    value: -123.50000008940697,
+                  },
+                  {
+                    name: 'poroExplosions',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'unseenRecalls',
+                    value: 0.0,
+                  },
+                  {
+                    name: '-consumablesPurchased',
+                    value: 6.0,
+                  },
+                  {
+                    name: '-goldEarned',
+                    value: 11587.0,
+                  },
+                  {
+                    name: '-goldSpent',
+                    value: 9550.0,
+                  },
+                  {
+                    name: '-itemsPurchased',
+                    value: 25.0,
+                  },
+                  {
+                    name: 'earlyLaningPhaseGoldExpAdvantage',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'goldPerMinute',
+                    value: 397.8182554240922,
+                  },
+                  {
+                    name: 'laningPhaseGoldExpAdvantage',
+                    value: 0.0,
+                  },
+                  {
+                    name: '-visionScore',
+                    value: 11.0,
+                  },
+                  {
+                    name: '-visionWardsBought',
+                    value: 1.0,
+                  },
+                  {
+                    name: '-wardsKilled',
+                    value: 0.0,
+                  },
+                  {
+                    name: '-wardsPlaced',
+                    value: 6.0,
+                  },
+                  {
+                    name: 'controlWardsPlaced',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'stealthWardsPlaced',
+                    value: 5.0,
+                  },
+                  {
+                    name: 'threeWardsOneSweeperCount',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'viChampion.cache[name]sionScoreAdvantageLaneOpponent',
+                    value: -0.2218838930130005,
+                  },
+                  {
+                    name: 'visionScorePerMinute',
+                    value: 0.3787263810293082,
+                  },
+                  {
+                    name: 'wardTakedowns',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'wardTakedownsBefore20M',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'wardsGuarded',
+                    value: 0.0,
+                  },
+                  {
+                    name: '-neutralMinionsKilled',
+                    value: 12.0,
+                  },
+                  {
+                    name: '-totalMinionsKilled',
+                    value: 163.0,
+                  },
+                  {
+                    name: 'alliedJungleMonsterKills',
+                    value: 8.000000029802322,
+                  },
+                  {
+                    name: 'buffsStolen',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'enemyJungleMonsterKills',
+                    value: 4.000000029802322,
+                  },
+                  {
+                    name: 'initialBuffCount',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'initialCrabCount',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'jungleCsBefore10Minutes',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'laneMinionsFirst10Minutes',
+                    value: 53.0,
+                  },
+                  {
+                    name: 'maxCsAdvantageOnLaneOpponent',
+                    value: 11.000000059604645,
+                  },
+                  {
+                    name: 'scuttleCrabKills',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'twentyMinionsIn3SecondsCount',
+                    value: 0.0,
+                  },
+                ],
+              },
+              {
+                champion: {
+                  name: 'Aatrox',
+                  icon_path:
+                    'https://ddragon.leagueoflegends.com/cdn/12.8.1/img/champion/Aatrox.png',
+                },
+                player: {
+                  id: 'BTdFwXbapzpXwNYNVZUF',
+                  name: 'OhHRYKdVuDpryEGIeeTh',
+                },
+                player_stats: [
+                  {
+                    name: '-damageSelfMitigated',
+                    value: 7032.0,
+                  },
+                  {
+                    name: '-largestCriticalStrike',
+                    value: 506.0,
+                  },
+                  {
+                    name: '-magicDamageDealt',
+                    value: 24260.0,
+                  },
+                  {
+                    name: '-magicDamageDealtToChampions',
+                    value: 1474.0,
+                  },
+                  {
+                    name: '-magicDamageTaken',
+                    value: 7062.0,
+                  },
+                  {
+                    name: '-physicalDamageDealt',
+                    value: 83191.0,
+                  },
+                  {
+                    name: '-physicalDamageDealtToChampions',
+                    value: 6535.0,
+                  },
+                  {
+                    name: '-physicalDamageTaken',
+                    value: 10580.0,
+                  },
+                  {
+                    name: '-totalDamageDealt',
+                    value: 116887.0,
+                  },
+                  {
+                    name: '-totalDamageDealtToChampions',
+                    value: 9531.0,
+                  },
+                  {
+                    name: '-totalDamageTaken',
+                    value: 17776.0,
+                  },
+                  {
+                    name: '-trueDamageDealt',
+                    value: 9435.0,
+                  },
+                  {
+                    name: '-trueDamageDealtToChampions',
+                    value: 1521.0,
+                  },
+                  {
+                    name: '-trueDamageTaken',
+                    value: 133.0,
+                  },
+                  {
+                    name: 'damagePerMinute',
+                    value: 327.23765452306037,
+                  },
+                  {
+                    name: 'damageTakenOnTeamPercentage',
+                    value: 0.16427365853437548,
+                  },
+                  {
+                    name: 'teamDamagePercentage',
+                    value: 0.10242491893231571,
+                  },
+                  {
+                    name: '-doubleKills',
+                    value: 0.0,
+                  },
+                  {
+                    name: '-killingSprees',
+                    value: 2.0,
+                  },
+                  {
+                    name: '-largestKillingSpree',
+                    value: 3.0,
+                  },
+                  {
+                    name: '-largestMultiKill',
+                    value: 1.0,
+                  },
+                  {
+                    name: '-pentaKills',
+                    value: 0.0,
+                  },
+                  {
+                    name: '-quadraKills',
+                    value: 0.0,
+                  },
+                  {
+                    name: '-tripleKills',
+                    value: 0.0,
+                  },
+                  {
+                    name: '12AssistStreakCount',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'acesBefore15Minutes',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'doubleAces',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'flawlessAces',
+                    value: 1.0,
+                  },
+                  {
+                    name: 'fullTeamTakedown',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'legendaryCount',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'multiKillOneSpell',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'multikills',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'multikillsAfterAggressiveFlash',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'elderDragonMultikills',
+                    value: 0.0,
+                  },
+                  {
+                    name: '-spell2Casts',
+                    value: 20.0,
+                  },
+                  {
+                    name: '-spell1Casts',
+                    value: 22.0,
+                  },
+                  {
+                    name: '-spell3Casts',
+                    value: 20.0,
+                  },
+                  {
+                    name: '-spell4Casts',
+                    value: 5.0,
+                  },
+                  {
+                    name: '-summoner1Casts',
+                    value: 3.0,
+                  },
+                  {
+                    name: '-summoner2Casts',
+                    value: 2.0,
+                  },
+                  {
+                    name: 'abilityUses',
+                    value: 67.0,
+                  },
+                  {
+                    name: 'dodgeSkillShotsSmallWindow',
+                    value: 13.0,
+                  },
+                  {
+                    name: 'landSkillShotsEarlyGame',
+                    value: 5.0,
+                  },
+                  {
+                    name: 'quickCleanse',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'skillshotsDodged',
+                    value: 7.0,
+                  },
+                  {
+                    name: 'skillshotsHit',
+                    value: 19.0,
+                  },
+                  {
+                    name: 'snowballsHit',
+                    value: 0.0,
+                  },
+                  {
+                    name: '-timeCCingOthers',
+                    value: 3.0,
+                  },
+                  {
+                    name: '-totalDamageShieldedOnTeammates',
+                    value: 0.0,
+                  },
+                  {
+                    name: '-totalHeal',
+                    value: 2043.0,
+                  },
+                  {
+                    name: '-totalHealsOnTeammates',
+                    value: 0.0,
+                  },
+                  {
+                    name: '-totalTimeCCDealt',
+                    value: 16.0,
+                  },
+                  {
+                    name: '-totalUnitsHealed',
+                    value: 1.0,
+                  },
+                  {
+                    name: 'effectiveHealAndShielding',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'enemyChampionImmobilizations',
+                    value: 5.0,
+                  },
+                  {
+                    name: 'immobilizeAndKillWithAlly',
+                    value: 1.0,
+                  },
+                  {
+                    name: 'knockEnemyIntoTeamAndKill',
+                    value: 1.0,
+                  },
+                  {
+                    name: 'saveAllyFromDeath',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'getTakedownsInAllLanesEarlyJungleAsLaner',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'junglerTakedownsNearDamagedEpicMonster',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'killAfterHiddenWithAlly',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'killedChampTookFullTeamDamageSurvived',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'killsNearEnemyTurret',
+                    value: 2.0,
+                  },
+                  {
+                    name: 'killsOnLanersEarlyJungleAsJungler',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'killsOnOtherLanesEarlyJungleAsLaner',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'killsOnRecentlyHealedByAramPack',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'killsUnderOwnTurret',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'killsWithHelpFromEpicMonster',
+                    value: 0.0,
+                  },
+                  {
+                    name: '-nexusKills',
+                    value: 0.0,
+                  },
+                  {
+                    name: '-nexusTakedowns',
+                    value: 1.0,
+                  },
+                  {
+                    name: 'outnumberedKills',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'outnumberedNexusKill',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'pickKillWithAlly',
+                    value: 6.0,
+                  },
+                  {
+                    name: 'quickSoloKills',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'soloKills',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'takedowns',
+                    value: 8.0,
+                  },
+                  {
+                    name: 'takedownsAfterGainingLevelAdvantage',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'takedownsBeforeJungleMinionSpawn',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'takedownsFirst25Minutes',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'takedownsInAlcove',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'takedownsInEnemyFountain',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'junglerKillsEarlyJungle',
+                    value: 0.0,
+                  },
+                  {
+                    name: '-assists',
+                    value: 1.0,
+                  },
+                  {
+                    name: '-deaths',
+                    value: 6.0,
+                  },
+                  {
+                    name: '-firstBloodAssist',
+                    value: 0.0,
+                  },
+                  {
+                    name: '-firstBloodKill',
+                    value: 0.0,
+                  },
+                  {
+                    name: '-kills',
+                    value: 7.0,
+                  },
+                  {
+                    name: 'bountyGold',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'deathsByEnemyChamps',
+                    value: 6.0,
+                  },
+                  {
+                    name: 'kda',
+                    value: 1.3333333333333333,
+                  },
+                  {
+                    name: 'killParticipation',
+                    value: 0.25,
+                  },
+                  {
+                    name: 'maxKillDeficit',
+                    value: 6.0,
+                  },
+                  {
+                    name: 'maxLevelLeadLaneOpponent',
+                    value: 1.0,
+                  },
+                  {
+                    name: 'outerTurretExecutesBefore10Minutes',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'survivedSingleDigitHpCount',
+                    value: 1.0,
+                  },
+                  {
+                    name: 'survivedThreeImmobilizesInFight',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'tookLargeDamageSurvived',
+                    value: 0.0,
+                  },
+                  {
+                    name: '-damageDealtToBuildings',
+                    value: 8232.0,
+                  },
+                  {
+                    name: '-damageDealtToObjectives',
+                    value: 12524.0,
+                  },
+                  {
+                    name: '-damageDealtToTurrets',
+                    value: 8232.0,
+                  },
+                  {
+                    name: '-firstTowerAssist',
+                    value: 0.0,
+                  },
+                  {
+                    name: '-firstTowerKill',
+                    value: 0.0,
+                  },
+                  {
+                    name: '-inhibitorKills',
+                    value: 0.0,
+                  },
+                  {
+                    name: '-inhibitorTakedowns',
+                    value: 1.0,
+                  },
+                  {
+                    name: '-inhibitorsLost',
+                    value: 0.0,
+                  },
+                  {
+                    name: '-objectivesStolen',
+                    value: 0.0,
+                  },
+                  {
+                    name: '-objectivesStolenAssists',
+                    value: 0.0,
+                  },
+                  {
+                    name: '-turretKills',
+                    value: 2.0,
+                  },
+                  {
+                    name: '-turretTakedowns',
+                    value: 5.0,
+                  },
+                  {
+                    name: '-turretsLost',
+                    value: 3.0,
+                  },
+                  {
+                    name: 'baronTakedowns',
+                    value: 1.0,
+                  },
+                  {
+                    name: 'dragonTakedowns',
+                    value: 1.0,
+                  },
+                  {
+                    name: 'elderDragonKillsWithOpposingSoul',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'epicMonsterKillsNearEnemyJungler',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'epicMonsterKillsWithin30SecondsOfSpawn',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'epicMonsterSteals',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'epicMonsterStolenWithoutSmite',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'kTurretsDestroyedBeforePlatesFall',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'multiTurretRiftHeraldCount',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'perfectDragonSoulsTaken',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'quickFirstTurret',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'riftHeraldTakedowns',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'soloBaronKills',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'soloTurretsLategame',
+                    value: 1.0,
+                  },
+                  {
+                    name: 'takedownOnFirstTurret',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'teamBaronKills',
+                    value: 1.0,
+                  },
+                  {
+                    name: 'teamElderDragonKills',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'teamRiftHeraldKills',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'turretPlatesTaken',
+                    value: 2.0,
+                  },
+                  {
+                    name: 'turretTakedowns',
+                    value: 5.0,
+                  },
+                  {
+                    name: 'turretsTakenWithRiftHerald',
+                    value: 0.0,
+                  },
+                  {
+                    name: '-champLevel',
+                    value: 15.0,
+                  },
+                  {
+                    name: '-gameEndedInEarlySurrender',
+                    value: 0.0,
+                  },
+                  {
+                    name: '-gameEndedInSurrender',
+                    value: 0.0,
+                  },
+                  {
+                    name: '-longestTimeSpentLiving',
+                    value: 456.0,
+                  },
+                  {
+                    name: '-teamEarlySurrendered',
+                    value: 0.0,
+                  },
+                  {
+                    name: '-totalTimeSpentDead',
+                    value: 180.0,
+                  },
+                  {
+                    name: 'gameLength',
+                    value: 1747.688579886358,
+                  },
+                  {
+                    name: 'perfectGame',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'blastConeOppositeOpponentCount',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'completeSupportQuestInTime',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'dancedWithRiftHerald',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'hadAfkTeammate',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'hadOpenNexus',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'moreEnemyJungleThanOpponent',
+                    value: -123.50000008940697,
+                  },
+                  {
+                    name: 'poroExplosions',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'unseenRecalls',
+                    value: 0.0,
+                  },
+                  {
+                    name: '-consumablesPurchased',
+                    value: 6.0,
+                  },
+                  {
+                    name: '-goldEarned',
+                    value: 11587.0,
+                  },
+                  {
+                    name: '-goldSpent',
+                    value: 9550.0,
+                  },
+                  {
+                    name: '-itemsPurchased',
+                    value: 25.0,
+                  },
+                  {
+                    name: 'earlyLaningPhaseGoldExpAdvantage',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'goldPerMinute',
+                    value: 397.8182554240922,
+                  },
+                  {
+                    name: 'laningPhaseGoldExpAdvantage',
+                    value: 0.0,
+                  },
+                  {
+                    name: '-visionScore',
+                    value: 11.0,
+                  },
+                  {
+                    name: '-visionWardsBought',
+                    value: 1.0,
+                  },
+                  {
+                    name: '-wardsKilled',
+                    value: 0.0,
+                  },
+                  {
+                    name: '-wardsPlaced',
+                    value: 6.0,
+                  },
+                  {
+                    name: 'controlWardsPlaced',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'stealthWardsPlaced',
+                    value: 5.0,
+                  },
+                  {
+                    name: 'threeWardsOneSweeperCount',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'viChampion.cache[name]sionScoreAdvantageLaneOpponent',
+                    value: -0.2218838930130005,
+                  },
+                  {
+                    name: 'visionScorePerMinute',
+                    value: 0.3787263810293082,
+                  },
+                  {
+                    name: 'wardTakedowns',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'wardTakedownsBefore20M',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'wardsGuarded',
+                    value: 0.0,
+                  },
+                  {
+                    name: '-neutralMinionsKilled',
+                    value: 12.0,
+                  },
+                  {
+                    name: '-totalMinionsKilled',
+                    value: 163.0,
+                  },
+                  {
+                    name: 'alliedJungleMonsterKills',
+                    value: 8.000000029802322,
+                  },
+                  {
+                    name: 'buffsStolen',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'enemyJungleMonsterKills',
+                    value: 4.000000029802322,
+                  },
+                  {
+                    name: 'initialBuffCount',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'initialCrabCount',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'jungleCsBefore10Minutes',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'laneMinionsFirst10Minutes',
+                    value: 53.0,
+                  },
+                  {
+                    name: 'maxCsAdvantageOnLaneOpponent',
+                    value: 11.000000059604645,
+                  },
+                  {
+                    name: 'scuttleCrabKills',
+                    value: 0.0,
+                  },
+                  {
+                    name: 'twentyMinionsIn3SecondsCount',
+                    value: 0.0,
+                  },
+                ],
+              },
+            ],
+            duration: 1800,
+            timestamp: '2000-01-02T00:00:00',
+          },
+        ],
+        "next": "/players/TMbZSpeThGEfQCpsflAC/recent-games?start_before=2000-01-01T00%3A00%3A00&limit=5"
+      },
     }
   },
   methods: {
     ...mapActions({
       getPlayerData: 'dashboard/getPlayerData',
+      getRecentGames: 'dashboard/getRecentGames',
     }),
-    mostPlayedIconPath(champion) {
+    championIconPath(champion) {
       return `background-image: url("${champion.icon_path}");`
     },
     async fetchUserData() {
       await this.$auth.fetchUser()
+    },
+    converTimestamp(value) {
+      return moment(String(value)).format('MM-DD-YYYY')
+    },
+    async loadMoreGames(link) {
+      console.log(link)
+      try {
+        this.moreGamesLoading = true
+        await this.$axios.get(link);
+        this.moreGamesLoading = false
+      } catch (e) {
+        console.log(e)
+      }
     }
   },
 }
