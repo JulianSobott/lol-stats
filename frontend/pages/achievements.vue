@@ -388,6 +388,13 @@
 export default {
   name: 'AchievementsPage',
   middleware: 'auth',
+  mounted() {
+    if (this.$route.query.import !== undefined) {
+      this.showImportPlayerModal = this.$route.query.import === 'true'
+    } else {
+      this.showImportPlayerModal = false
+    }
+  },
   data() {
     return {
       showImportPlayerModal: false,
