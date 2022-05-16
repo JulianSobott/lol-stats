@@ -112,8 +112,8 @@ export default {
   methods: {
     async getCompetitors() {
       try {
-        const userId = 'test' // this.$auth.user.id
-        const response = await this.$axios.get(`/users/${userId}/competitors`)
+        const userId = this.$auth.user.id
+        const response = await this.$axios.get(`/users/${userId}/competitors/`)
         this.competitors = response.data.competitors
       } catch (e) {
         this.error = true
@@ -121,8 +121,8 @@ export default {
     },
     async removeCompetitor(competitorUuid) {
       try {
-        const userId = 'test' // this.$auth.user.id
-        await this.$axios.delete(`/users/${userId}/competitors/${competitorUuid}`, {})
+        const userId = this.$auth.user.id
+        await this.$axios.delete(`/users/${userId}/competitors/${competitorUuid}/`, {})
         
         /*
         this.competitors = this.competitors.filter(function( obj ) {
