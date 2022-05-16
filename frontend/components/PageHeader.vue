@@ -33,7 +33,7 @@
             <div class="d-none d-xl-block ps-2">
               <div>{{ user.name }}</div>
               <div class="mt-1 small text-muted">
-                {{ user.rank.tier }} {{ user.rank.division }}
+                {{ user.rank.tier.toUpperCase() }} {{ user.rank.division }}
               </div>
             </div>
           </a>

@@ -7,6 +7,7 @@ from datetime import datetime
 from pathlib import Path
 
 from fastapi import FastAPI, HTTPException, Request, Depends
+from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy import func, text, case, desc
 import logging.config
 from opentelemetry.instrumentation.fastapi import FastAPIInstrumentor
@@ -46,6 +47,16 @@ def get_db():
     finally:
         db.close()
 
+
+origins = ["*"]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=False,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 PlayerId = str
 PlayerName = str

@@ -16,7 +16,7 @@ from validation import user_schema, competitor_schema, user_setup_schema, user_d
 
 def create_app():
     flask_app = Flask(__name__)
-    CORS(flask_app)
+    CORS(flask_app, origins=['*', 'http://localhost:3000'], allow_headers=['*'], supports_credentials=False)
     flask_app.config['SQLALCHEMY_DATABASE_URI'] = config.DATABASE_CONNECTION_URI
     flask_app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     flask_app.app_context().push()
@@ -95,7 +95,8 @@ def get_own_data(current_user, access_token):
         "id": current_user.id,
         "player_uuid": current_user.player_uuid,
         "email": current_user.email,
-        "token": access_token
+        "token": access_token,
+        "region": "euw" # placeholder
     }
 
     # TODO implement call to player endpoint and retrieve player data
@@ -108,7 +109,8 @@ def get_own_data(current_user, access_token):
         data = {
             "id": competitor.id,
             "player_uuid": competitor.player_uuid,
-            "username": competitor.username
+            "name": competitor.username,
+            "region": "euw" # placeholder
         }
         competitor_output.append(data)
 
@@ -271,7 +273,7 @@ def get_list_of_or_add_competitor(current_user, token, user_id):
             data = {
                 "id": competitor.id,
                 "player_uuid": competitor.player_uuid,
-                "username": competitor.username,
+                "name": competitor.username,
                 "player_stats": {}
             }
             competitor_output.append(data)
@@ -308,7 +310,7 @@ def get_list_of_or_add_competitor(current_user, token, user_id):
                 409)
 
 
-@app.route('/api/users/<user_id>/competitors/<competitor_puuid>', methods=['GET, DELETE'])
+@app.route('/api/users/<user_id>/competitors/<competitor_puuid>', methods=['GET', 'DELETE'])
 @token_required
 def get_or_delete_competitor(current_user, token, user_id, competitor_puuid):
     competitor = Competitors.query.filter_by(user_id=user_id, player_uuid=competitor_puuid).first()
@@ -323,7 +325,7 @@ def get_or_delete_competitor(current_user, token, user_id, competitor_puuid):
         competitor_data = {
             "id": competitor.id,
             "player_uuid": competitor.player_uuid,
-            "username": competitor.username,
+            "name": competitor.username,
             "player_stats": {}
         }
 

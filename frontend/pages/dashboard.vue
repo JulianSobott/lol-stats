@@ -74,7 +74,7 @@
                   <div class="d-flex mb-2">
                     <div>Winrate</div>
                   </div>
-                  <div class="progress progress-sm">
+                  <div class="progress">
                     <div
                       class="progress-bar bg-blue"
                       :style="winRateProgressStyle"
@@ -102,10 +102,10 @@
                     ></span>
                   </div>
                   <div class="card-title mb-1">
-                    {{ playerData.rank.tier }} {{ playerData.rank.division }}
+                    {{ playerData.rank.tier.toUpperCase() }} {{ playerData.rank.division }}
                   </div>
                   <div class="text-muted">
-                    {{ playerData.rank.league_points }}
+                    League Points: {{ playerData.rank.league_points }}
                   </div>
                 </div>
               </div>
