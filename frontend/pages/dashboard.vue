@@ -138,7 +138,7 @@
                   </thead>
                   <tbody v-if="playerData">
                     <tr
-                      v-for="champion in playerData.most_played.slice(0, 3)"
+                      v-for="champion in playerData.most_played"
                       :key="champion.champion_id"
                     >
                       <td class="p-0">
