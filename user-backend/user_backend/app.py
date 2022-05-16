@@ -308,7 +308,7 @@ def get_list_of_or_add_competitor(current_user, token, user_id):
                 409)
 
 
-@app.route('/api/users/<user_id>/competitors/<competitor_puuid>', methods=['GET, DELETE'])
+@app.route('/api/users/<user_id>/competitors/<competitor_puuid>', methods=['GET', 'DELETE'])
 @token_required
 def get_or_delete_competitor(current_user, token, user_id, competitor_puuid):
     competitor = Competitors.query.filter_by(user_id=user_id, player_uuid=competitor_puuid).first()
