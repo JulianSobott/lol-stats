@@ -30,11 +30,8 @@ def test_get_most_played_correct_next(db_session):
             datetime(2000, 1, 1)
         ).with_champion("Lux")
     res = _recent_game_request(player)
-    start_after = (
-        datetime(2000, 1, 1)
-        + timedelta(minutes=(DEFAULT_GAMES_PER_PAGE - 1) * DEFAULT_GAME_LENGTH)
-    ).isoformat()
-    assert f"start_after=" + start_after in urllib.parse.unquote(res.next)
+    start_before = datetime(2000, 1, 1).isoformat()
+    assert f"start_before=" + start_before in urllib.parse.unquote(res.next)
 
 
 def test_get_most_played_correct_games(db_session):
@@ -72,6 +69,26 @@ def test_get_most_played_pagination(db_session):
     res = _next_game(res)
     assert res.next == ""
     assert len(res.items) == 0
+
+
+def test_contains_team_members(db_session):
+    players = PlayerFactory(db_session).player()
+    player = players[0]
+    with players:
+        player.play_n_games(1).with_champion("Lux").with_team().starting_at(datetime(2000, 1, 1))
+        player.play_n_games(1).with_champion("Aatrox").with_team().starting_at(datetime(2000, 1, 2))
+    res = _recent_game_request(player)
+
+    assert len(res.items) == 2
+    game1 = res.items[0]
+    assert len(game1.ally_team) == 5
+    assert len(game1.enemy_team) == 5
+    assert all(map(lambda p: p.champion.name == "Aatrox", game1.ally_team + game1.enemy_team))
+
+    game2 = res.items[1]
+    assert len(game2.ally_team) == 5
+    assert len(game2.enemy_team) == 5
+    assert all(map(lambda p: p.champion.name == "Lux", game2.ally_team + game2.enemy_team))
 
 
 def _recent_game_request(player: Testplayer) -> Page[Game]:

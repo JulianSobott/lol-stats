@@ -182,7 +182,7 @@ def recent_games(
         start_before = datetime(2090, 1, 1)
     games: list[Games] = (
         db.query(Games)
-        .where(Summoners.puuid == player.puuid, Games.start_time < start_before)
+        .where(Games.summoner_id == player.puuid, Games.start_time < start_before)
         .order_by(desc(Games.start_time))
         .limit(limit)
         .all()
@@ -197,21 +197,30 @@ def recent_games(
     )
     ret_games = []
     for game in games:
-        stats = [NameValue(name=k, value=v) for k, v in json.loads(game.stats).items()]
+        games_of_team: list[Games] = db.query(Games).where(Games.match_id == game.match_id).all()
+        assert len(games_of_team) == 10, f"Game has not imported stats for all players. match_id={game.match_id}"
+        ally_team = []
+        enemy_team = []
+        for player_game in games_of_team:
+            stats = [NameValue(name=k, value=v) for k, v in json.loads(player_game.stats).items()]
+            team_member = TeamMember(
+                        champion=Champion(
+                            name=player_game.champion.name, icon_path=player_game.champion.icon_path
+                        ),
+                        player=GamePlayer(id=player_game.summoner.puuid, name=player_game.summoner.name),
+                        player_stats=stats,
+                    )
+            if player_game.team == game.team:
+                ally_team.append(team_member)
+            else:
+                enemy_team.append(team_member)
+
         ret_games.append(
             Game(
                 match_id=game.match_id,
                 victorious_team=TeamSide.red,
-                ally_team=[
-                    TeamMember(
-                        champion=Champion(
-                            name=game.champion.name, icon_path=game.champion.icon_path
-                        ),
-                        player=GamePlayer(id=player.puuid, name=player.name),
-                        player_stats=stats,
-                    )
-                ],
-                enemy_team=[],
+                ally_team=ally_team,
+                enemy_team=enemy_team,
                 duration=game.duration,
                 timestamp=game.start_time,
             )
