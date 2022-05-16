@@ -6,6 +6,7 @@ from pathlib import Path
 
 from fastapi import FastAPI, HTTPException, Request
 from fastapi_sqlalchemy import DBSessionMiddleware, db
+from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy import func, text, case
 import logging.config
 from opentelemetry.instrumentation.fastapi import FastAPIInstrumentor
@@ -31,6 +32,16 @@ app.add_middleware(
     DBSessionMiddleware,
     db_url=f"postgresql://postgres:{os.environ.get('POSTGRES_PASSWORD', 'postgres')}@"
     f"{os.environ.get('POSTGRES_HOST', 'localhost')}/postgres",
+)
+
+origins = ["*"]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=False,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 PlayerId = str
