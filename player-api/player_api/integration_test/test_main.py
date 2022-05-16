@@ -4,7 +4,7 @@ import pytest
 from fastapi.testclient import TestClient
 
 from integration_test.factories import PlayerFactory, Testplayer, Champion
-from player_api.main import app, calc_win_rate
+from player_api.main import app, calc_win_rate, DEFAULT_NUM_MOST_PLAYED_CHAMPS
 from player_api.models.player import Player
 
 client = TestClient(app)
@@ -18,7 +18,6 @@ def test_get_most_played(db_session):
         player.play_n_games(10).with_champion("Lux").win(4)
         player.play_n_games(5).with_champion("Azir").win(5)
         player.play_n_games(4).with_champion("Annie").win(0)
-        player.play_n_games(3).with_champion("Thresh").win(0)
     res = _player_reqeust(player)
     assert res.most_played[0].champion_id == Champion(db_session, "Lux").id
     assert res.most_played[0].games == 10
@@ -29,9 +28,6 @@ def test_get_most_played(db_session):
     assert res.most_played[2].champion_id == Champion(db_session, "Annie").id
     assert res.most_played[2].games == 4
     assert res.most_played[2].win_rate == calc_win_rate(4, 0)
-    assert res.most_played[3].champion_id == Champion(db_session, "Thresh").id
-    assert res.most_played[3].games == 3
-    assert res.most_played[3].win_rate == calc_win_rate(3, 0)
 
 
 def test_no_games_played(db_session):
@@ -65,12 +61,11 @@ def test_get_most_played_many_champs(db_session):
         player.play_n_games(8).with_champion("Quinn").win(1)
         player.play_n_games(7).with_champion("Braum").win(1)
     res = _player_reqeust(player)
-    assert len(res.most_played) == 5
+    assert len(res.most_played) == DEFAULT_NUM_MOST_PLAYED_CHAMPS
     assert res.most_played[0].champion_id == Champion(db_session, "Lux").id
     assert res.most_played[1].champion_id == Champion(db_session, "Azir").id
     assert res.most_played[2].champion_id == Champion(db_session, "Annie").id
-    assert res.most_played[3].champion_id == Champion(db_session, "Thresh").id
-    assert res.most_played[4].champion_id == Champion(db_session, "Aatrox").id
+
 
 
 @pytest.mark.skip

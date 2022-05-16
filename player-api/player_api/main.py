@@ -62,6 +62,7 @@ PlayerId = str
 PlayerName = str
 
 DEFAULT_GAMES_PER_PAGE = 5
+DEFAULT_NUM_MOST_PLAYED_CHAMPS = 3
 
 
 @app.middleware("http")
@@ -106,7 +107,7 @@ async def get_player(player_id: PlayerId, db: Session = Depends(get_db)):
         .where(Games.summoner_id == player.puuid)
         .group_by(Games.champ_id, Champions.name, Champions.icon_path)
         .order_by(text("num_played DESC"))
-        .limit(5)
+        .limit(DEFAULT_NUM_MOST_PLAYED_CHAMPS)
         .all()
     )
     most_played = []
