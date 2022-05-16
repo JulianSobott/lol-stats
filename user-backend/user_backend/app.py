@@ -108,7 +108,7 @@ def get_own_data(current_user, access_token):
         data = {
             "id": competitor.id,
             "player_uuid": competitor.player_uuid,
-            "username": competitor.username
+            "name": competitor.username
         }
         competitor_output.append(data)
 
@@ -271,7 +271,7 @@ def get_list_of_or_add_competitor(current_user, token, user_id):
             data = {
                 "id": competitor.id,
                 "player_uuid": competitor.player_uuid,
-                "username": competitor.username,
+                "name": competitor.username,
                 "player_stats": {}
             }
             competitor_output.append(data)
@@ -323,7 +323,7 @@ def get_or_delete_competitor(current_user, token, user_id, competitor_puuid):
         competitor_data = {
             "id": competitor.id,
             "player_uuid": competitor.player_uuid,
-            "username": competitor.username,
+            "name": competitor.username,
             "player_stats": {}
         }
 
