@@ -1,0 +1,14 @@
+syntax = "proto3";
+
+service Importer {
+  rpc import_player (ImportRequest) returns (stream ImportReply) {}
+}
+
+message ImportRequest {
+  string puuid = 1;
+}
+
+message ImportReply {
+  int32 games_imported = 1;
+  int32 total_games = 2;
+}

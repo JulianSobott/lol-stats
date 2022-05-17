@@ -27,6 +27,7 @@ def get_match_history(summoner: Summoner) -> MatchHistory:
 def add_missing_games_to_db(db: db, match_history: MatchHistory, puuid: str):
     mh_start_time = time.time()
     c = challenges.Challenges()
+    i = 0
     for match in match_history:
         if match.game_type != GameType.matched:
             continue
@@ -38,6 +39,8 @@ def add_missing_games_to_db(db: db, match_history: MatchHistory, puuid: str):
         except Exception as e:
             print(e, e.args)
             print(traceback.format_exc())
+        yield i, len(match_history)
+        i += 1
         print(f'[INFO] Imported game in {time.time() - start_time}s')
     print(f'[INFO] Imported match history in {time.time() - mh_start_time}s')
 
