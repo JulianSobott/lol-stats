@@ -177,7 +177,7 @@
                         </div>
                         <div class="mb-2">
                           <p class="empty-title">
-                            No player stats not imported
+                            Player stats not imported :(
                           </p>
                           <p class="empty-subtitle text-muted">
                             There is no player data in our system yet. To be
