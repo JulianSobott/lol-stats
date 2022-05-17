@@ -40,7 +40,10 @@
           </div>
           <div class="mb-3">
             <label class="form-label">Select your Player Name</label>
-            <PlayerSearchInput ref="playerSearchInput" @playerSelected="playerSelected" />
+            <PlayerSearchInput
+              ref="playerSearchInput"
+              @playerSelected="playerSelected"
+            />
             <div class="form-hint">
               In order for you to view player information and statistics, we
               still need your gamer tag. Please enter your gamer tag in this
@@ -109,9 +112,7 @@ export default {
     },
     async getPlayerData() {
       const user = this.$auth.user
-      const response = await this.$axios.get(
-        `/players/${user.player_uuid}`
-      )
+      const response = await this.$axios.get(`/players/${user.player_uuid}`)
       this.$refs.playerSearchInput.setPlayerData(response.data.name)
       this.form.region = user.region
     },
@@ -122,10 +123,18 @@ export default {
           region: this.form.region,
           player_uuid: this.form.player.player_uuid,
         })
-        this.$router.push('/dashboard')
       } catch (e) {
         this.error = true
       }
+
+      try {
+        await this.$axios.post(
+          `/players/${this.this.form.player.player_uuid}/import`
+        )
+      } catch (e) {
+        this.error = true
+      }
+      this.$router.push('/dashboard')
     },
   },
 }

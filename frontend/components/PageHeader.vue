@@ -38,7 +38,7 @@
             </div>
           </a>
           <div class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
-            <NuxtLink to="/setup" class="dropdown-item">Settings</NuxtLink>
+            <NuxtLink to="/settings" class="dropdown-item">Settings</NuxtLink>
             <div class="dropdown-divider"></div>
             <a href="#" class="dropdown-item" @click="logoutUser">Logout</a>
           </div>
