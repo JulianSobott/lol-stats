@@ -35,11 +35,10 @@
         </label>
       </div>
     </div>
-    <div class="form-group mb-3">
+    <div class="form-group mb-3" :class="{'d-none': !displayPlayerSearch}">
       <label class="form-label subheader mb-2">Player</label>
       <PlayerSearchInput
         ref="PlayerSearchInput"
-        :class="{'d-none': !displayPlayerSearch}"
         @playerSelected="playerChanged"
       />
     </div>
@@ -91,7 +90,7 @@ export default {
   name: 'AchievementFilters',
   data() {
     return {
-      displayPlayerSearch: true,
+      displayPlayerSearch: false,
       filters: {
         compare: 'global',
         player: {},
