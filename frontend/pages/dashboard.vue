@@ -116,6 +116,9 @@
                   <div class="text-muted">
                     League Points: {{ playerData.rank.league_points }}
                   </div>
+                  <div class="text-muted">
+                    Leve: {{ playerData.level }}
+                  </div>
                 </div>
               </div>
               <div v-else class="card h-100">
@@ -272,7 +275,7 @@ import moment from 'moment'
 
 export default {
   name: 'IndexPage',
-  middleware: 'auth',
+  middleware: ['auth', 'settings'],
   computed: {
     playerData() {
       return this.$store.state.dashboard.playerData

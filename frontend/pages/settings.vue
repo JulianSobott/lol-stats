@@ -54,6 +54,17 @@
       </div>
       <div class="row align-items-center mt-3">
         <div class="col">
+          <div class="btn-list justify-content-start">
+            <button
+              v-if="!firstSetup"
+              class="btn btn-danger"
+              @click="deleteAccount()"
+            >
+              Delete Account
+            </button>
+          </div>
+        </div>
+        <div class="col">
           <div class="btn-list justify-content-end">
             <NuxtLink
               v-if="!firstSetup"
@@ -110,11 +121,23 @@ export default {
     playerSelected(playerData) {
       this.form.player = playerData
     },
+    async deleteAccount() {
+      try {
+        await this.$axios.delete(`/auth/delete`)
+        this.$router.push('/login?logout=true')
+      } catch (e) {
+        this.error = true
+      }
+    },
     async getPlayerData() {
-      const user = this.$auth.user
-      const response = await this.$axios.get(`/players/${user.player_uuid}`)
-      this.$refs.playerSearchInput.setPlayerData(response.data.name)
-      this.form.region = user.region
+      try {
+        const user = this.$auth.user
+        const response = await this.$axios.get(`/players/${user.player_uuid}`)
+        this.$refs.playerSearchInput.setPlayerData(response.data.name)
+        this.form.region = user.region
+      } catch (e) {
+        this.error = true
+      }
     },
     async savePlayername() {
       try {
