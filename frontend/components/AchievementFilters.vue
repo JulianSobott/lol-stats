@@ -39,6 +39,7 @@
       <label class="form-label subheader mb-2">Player</label>
       <PlayerSearchInput
         ref="PlayerSearchInput"
+        :class="{'d-none': !displayPlayerSearch}"
         @playerSelected="playerChanged"
       />
     </div>
@@ -90,6 +91,7 @@ export default {
   name: 'AchievementFilters',
   data() {
     return {
+      displayPlayerSearch: true,
       filters: {
         compare: 'global',
         player: {},
@@ -292,9 +294,11 @@ export default {
     },
     playerRadioSelected() {
       this.$refs.PlayerSearchInput.disable(false)
+      this.displayPlayerSearch = true
     },
     globalFriendsRadioSelected() {
       this.$refs.PlayerSearchInput.disable(true)
+      this.displayPlayerSearch = false
     },
   },
 }
