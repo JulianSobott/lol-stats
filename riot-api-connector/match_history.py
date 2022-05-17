@@ -3,7 +3,7 @@ import traceback
 
 import cassiopeia as cass
 from cassiopeia import Summoner, Patch, MatchHistory, Match, GameType
-from cassiopeia.core.match import Participant
+from cassiopeia.core.match import Participant, Side
 
 from db_connector import db
 
@@ -55,7 +55,7 @@ def add_game_to_db(db: db, match: Match, puuid: str, c: challenges.Challenges):
             summoner: Summoner = participant.summoner
             db.add_summoner(puuid=summoner.puuid, region_id=summoner.id, name=summoner.name, level=None,
                             icon_path=None, tier=None, division=None, last_update_time=None)
-        if participant.side == 100:
+        if participant.side == Side.blue:
             win = match.blue_team.win
             side = 'blue'
         else:

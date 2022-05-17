@@ -1,4 +1,4 @@
-from asyncio import futures
+from concurrent import futures
 from playerImportRequest_pb2_grpc import ImporterServicer, add_ImporterServicer_to_server
 from playerImportRequest_pb2 import ImportRequest, ImportReply
 import grpc

@@ -59,7 +59,8 @@ class riot_api_connector:
             sys.stdout.write('\r')
             sys.stdout.write("[%-20s] %d%%" % ('='*int(20*j), 100*j))
             sys.stdout.flush()
-            self.update_summoner(puuid=row[0], region=region)
+            for _ in self.update_summoner_by_region_id(id=row[1], region=region):
+                pass
             i += 1
 
     # def test(self):
@@ -88,8 +89,9 @@ class riot_api_connector:
 
 print("Updating ...")
 x = riot_api_connector()
-x.update_summoner_by_name(name='Gemmling', region='EUW')
-playerImportRequest.serve(lambda y: x.update_summoner_by_region_id(id=y, region='EUW'))
+# x.update_summoner_by_name(name='Gemmling', region='EUW')
+x.update_all(region='EUW')
+# playerImportRequest.serve(lambda y: x.update_summoner_by_region_id(id=y, region='EUW'))
 # x.update_all(region='EUW')
 # x.db.create_tables()
 #x.update_summoner_by_name('LinkX20', region='EUW')
