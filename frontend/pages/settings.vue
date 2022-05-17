@@ -125,6 +125,7 @@ export default {
       try {
         await this.$axios.delete(`/auth/delete`)
         this.$router.push('/login?logout=true')
+        this.$auth.setUser(null)
       } catch (e) {
         this.error = true
       }
@@ -150,6 +151,7 @@ export default {
         this.error = true
       }
 
+      /*
       try {
         await this.$axios.post(
           `/players/${this.this.form.player.player_uuid}/import`
@@ -157,6 +159,8 @@ export default {
       } catch (e) {
         this.error = true
       }
+      */
+      await this.$auth.fetchUser()
       this.$router.push('/dashboard')
     },
   },
