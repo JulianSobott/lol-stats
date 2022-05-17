@@ -117,7 +117,7 @@
                     League Points: {{ playerData.rank.league_points }}
                   </div>
                   <div class="text-muted">
-                    Leve: {{ playerData.level }}
+                    Level: {{ playerData.level }}
                   </div>
                 </div>
               </div>
