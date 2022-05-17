@@ -1,6 +1,6 @@
 from enum import Enum
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, validator
 
 
 class TierEnum(str, Enum):
@@ -31,12 +31,7 @@ class Rank(BaseModel):
 
     @staticmethod
     def division_from_str(division: str) -> int:
-        return {
-            "one": 1,
-            "two": 2,
-            "three": 3,
-            "four": 4
-        }[division]
+        return {"one": 1, "two": 2, "three": 3, "four": 4}[division]
 
 
 class MostPlayed(BaseModel):
@@ -63,3 +58,19 @@ class BasicPlayer(BaseModel):
     name: str
     level: int
     rank: Rank
+
+
+class ImportProgress(BaseModel):
+    imported_games: int
+    total_games: int
+    percentage: int
+
+    @validator("percentage", always=True)
+    def validate_percentage(cls, value, values):
+        if values["total_games"] == 0:
+            return 100
+        percentage = int((values["imported_games"] / values["total_games"]) * 100)
+        assert (
+            0 <= percentage <= 100
+        ), f"percentage not between 0 and 100: percentage={percentage}"
+        return percentage

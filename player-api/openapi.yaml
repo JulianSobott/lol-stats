@@ -72,6 +72,36 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/HTTPValidationError'
+  /players/{player_id}/import:
+    post:
+      summary: Import Player
+      operationId: import_player_players__player_id__import_post
+      parameters:
+      - required: true
+        schema:
+          title: Player Id
+          type: string
+        name: player_id
+        in: path
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ImportProgress'
+        '404':
+          description: Player not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionMessage'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
   /players/{player_id}/recent-games:
     get:
       summary: Recent Games
@@ -226,6 +256,23 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/ValidationError'
+    ImportProgress:
+      title: ImportProgress
+      required:
+      - imported_games
+      - total_games
+      - percentage
+      type: object
+      properties:
+        imported_games:
+          title: Imported Games
+          type: integer
+        total_games:
+          title: Total Games
+          type: integer
+        percentage:
+          title: Percentage
+          type: integer
     MostPlayed:
       title: MostPlayed
       required:

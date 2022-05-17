@@ -1,3 +1,4 @@
+import os
 import json
 import string
 import random
@@ -7,6 +8,7 @@ from datetime import datetime
 from pathlib import Path
 
 from fastapi import FastAPI, HTTPException, Request, Depends
+from fastapi_sqlalchemy import DBSessionMiddleware, db
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy import func, text, case, desc
 import logging.config
@@ -30,7 +32,7 @@ from player_api.db import (
     db_to_datetime,
     datetime_to_db,
 )
-from player_api.models.player import Player, Rank, MostPlayed, BasicPlayer
+from player_api.models.player import Player, Rank, MostPlayed, BasicPlayer, ImportProgress
 from player_api.models.responses import ExceptionMessage
 
 logging.config.fileConfig(
@@ -175,6 +177,15 @@ def find_player(player_name: str, region: str = None, db: Session = Depends(get_
             league_points=player.league_points,
         ),
     )
+
+
+@app.post(
+    "/players/{player_id}/import",
+    response_model=ImportProgress,
+    responses={404: {"model": ExceptionMessage, "description": "Player not found"}},
+)
+def import_player(player_id: PlayerId):
+    pass
 
 
 def get_player_by_id(db: Session, player_id: str) -> Summoners | None:
