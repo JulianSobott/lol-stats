@@ -177,7 +177,7 @@
                         </div>
                         <div class="mb-2">
                           <p class="empty-title">
-                            No player stats not imported
+                            Player stats not imported :(
                           </p>
                           <p class="empty-subtitle text-muted">
                             There is no player data in our system yet. To be
@@ -198,8 +198,14 @@
                           </div>
                         </div>
                         <div class="empty-action">
-                          <a href="#" class="btn btn-primary" @click="importPlayer" :class="{'disabled': isImportingData}">
-                            <svg v-if="!isImportingData"
+                          <a
+                            href="#"
+                            class="btn btn-primary"
+                            @click="importPlayer"
+                            :class="{ disabled: isImportingData }"
+                          >
+                            <svg
+                              v-if="!isImportingData"
                               xmlns="http://www.w3.org/2000/svg"
                               class="icon icon-tabler icon-tabler-database-import"
                               width="24"
@@ -224,7 +230,12 @@
                                 d="M11.252 20.987c.246 .009 .496 .013 .748 .013c4.418 0 8 -1.343 8 -3v-6m-18 7h7m-3 -3l3 3l-3 3"
                               />
                             </svg>
-                            <span v-else class="spinner-border spinner-border-sm icon icon-tabler " role="status" aria-hidden="true"></span>
+                            <span
+                              v-else
+                              class="spinner-border spinner-border-sm icon icon-tabler"
+                              role="status"
+                              aria-hidden="true"
+                            ></span>
                             Import Player
                           </a>
                         </div>
@@ -387,7 +398,7 @@
 <script>
 export default {
   name: 'AchievementsPage',
-  middleware: 'auth',
+  middleware: ['auth', 'settings'],
   mounted() {
     if (this.$route.query.import !== undefined) {
       this.showImportPlayerModal = this.$route.query.import === 'true'
@@ -400,16 +411,34 @@ export default {
       showImportPlayerModal: false,
       showImportProgressbar: true,
       isImportingData: false,
+      selectedPlayerUuid: null,
     }
   },
   methods: {
-    importPlayer() {
-      this.isImportingData = true;
+    async importPlayer() {
+      this.isImportingData = true
+      try {
+        await this.$axios.post(`/players/${this.selectedPlayerUuid}/import`)
+      } catch (err) {
+        console.log(err)
+      }
+
+      this.$nextTick(function () {
+        window.setInterval(async () => {
+          try {
+            await this.$axios.post(`/players/${this.selectedPlayerUuid}/import`)
+          } catch (err) {
+            console.log(err)
+          }
+        }, 3000)
+      })
     },
     async filterApplied(filters) {
       try {
         const query = { ...filters }
         const puuids = []
+        this.selectedPlayerUuid = null
+        this.showImportPlayerModal = true
 
         if (query.compare === 'global') {
           // keep puuids empty
@@ -419,11 +448,11 @@ export default {
           puuids.push('123')
         } else if (query.compare === 'player') {
           // get id of player
-          console.log(query)
           const response = await this.$axios.get(
             `/players?player_name=${query.player.playername}`
           )
           puuids.push(response.data.id)
+          this.selectedPlayerUuid = response.data.id
         }
 
         await this.$axios.get(

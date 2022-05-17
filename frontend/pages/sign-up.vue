@@ -10,14 +10,22 @@
         <div v-if="error" class="card-status-top bg-danger"></div>
         <div class="card-body">
           <h2 class="card-title text-center mb-4">Create new account</h2>
-          <p v-if="error && errorMessage" class="card-subtitle text-red text-center">{{ errorMessage }}</p>
+          <p
+            v-if="error && errorMessage"
+            class="card-subtitle text-red text-center"
+          >
+            {{ errorMessage }}
+          </p>
           <div class="mb-3">
             <label class="form-label required">Email address</label>
             <input
               v-model="form.email"
               type="email"
               class="form-control"
-              :class="{ 'is-invalid': submitted && $v.form.email.$error || emailExists }"
+              :class="{
+                'is-invalid':
+                  (submitted && $v.form.email.$error) || emailExists,
+              }"
               placeholder="Enter email"
               required
             />
@@ -166,12 +174,14 @@ export default {
       }
 
       try {
-        await this.$axios.post('/auth/register', {
+        const response = await this.$axios.post('/auth/register', {
           email: this.form.email,
           password: this.form.password,
         })
-        this.errorMessage = null;
-        this.$router.push('/login')
+        this.errorMessage = null
+        if (response.status === 200) {
+          this.$router.push('/login')
+        }
       } catch (err) {
         if (err.response.status !== 200) {
           this.errorMessage = err.response.data.message

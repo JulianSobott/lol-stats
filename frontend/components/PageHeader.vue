@@ -22,7 +22,7 @@
       </h1>
       <div class="navbar-nav flex-row order-md-last">
         <div class="nav-item d-none d-md-flex me-3"></div>
-        <div v-if="user" class="nav-item dropdown">
+        <div v-if="user && $auth.loggedIn" class="nav-item dropdown">
           <a
             href="#"
             class="nav-link d-flex lh-1 text-reset p-0"
@@ -38,7 +38,7 @@
             </div>
           </a>
           <div class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
-            <NuxtLink to="/setup" class="dropdown-item">Settings</NuxtLink>
+            <NuxtLink to="/settings" class="dropdown-item">Settings</NuxtLink>
             <div class="dropdown-divider"></div>
             <a href="#" class="dropdown-item" @click="logoutUser">Logout</a>
           </div>

@@ -40,7 +40,10 @@
           </div>
           <div class="mb-3">
             <label class="form-label">Select your Player Name</label>
-            <PlayerSearchInput ref="playerSearchInput" @playerSelected="playerSelected" />
+            <PlayerSearchInput
+              ref="playerSearchInput"
+              @playerSelected="playerSelected"
+            />
             <div class="form-hint">
               In order for you to view player information and statistics, we
               still need your gamer tag. Please enter your gamer tag in this
@@ -50,6 +53,17 @@
         </div>
       </div>
       <div class="row align-items-center mt-3">
+        <div class="col">
+          <div class="btn-list justify-content-start">
+            <button
+              v-if="!firstSetup"
+              class="btn btn-danger"
+              @click="deleteAccount()"
+            >
+              Delete Account
+            </button>
+          </div>
+        </div>
         <div class="col">
           <div class="btn-list justify-content-end">
             <NuxtLink
@@ -107,13 +121,24 @@ export default {
     playerSelected(playerData) {
       this.form.player = playerData
     },
+    async deleteAccount() {
+      try {
+        await this.$axios.delete(`/auth/delete`)
+        this.$router.push('/login?logout=true')
+        this.$auth.setUser(null)
+      } catch (e) {
+        this.error = true
+      }
+    },
     async getPlayerData() {
-      const user = this.$auth.user
-      const response = await this.$axios.get(
-        `/players/${user.player_uuid}`
-      )
-      this.$refs.playerSearchInput.setPlayerData(response.data.name)
-      this.form.region = user.region
+      try {
+        const user = this.$auth.user
+        const response = await this.$axios.get(`/players/${user.player_uuid}`)
+        this.$refs.playerSearchInput.setPlayerData(response.data.name)
+        this.form.region = user.region
+      } catch (e) {
+        this.error = true
+      }
     },
     async savePlayername() {
       try {
@@ -122,10 +147,21 @@ export default {
           region: this.form.region,
           player_uuid: this.form.player.player_uuid,
         })
-        this.$router.push('/dashboard')
       } catch (e) {
         this.error = true
       }
+
+      /*
+      try {
+        await this.$axios.post(
+          `/players/${this.this.form.player.player_uuid}/import`
+        )
+      } catch (e) {
+        this.error = true
+      }
+      */
+      await this.$auth.fetchUser()
+      this.$router.push('/dashboard')
     },
   },
 }
