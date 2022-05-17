@@ -14,7 +14,7 @@ class Page(GenericModel, Generic[T]):
     next: str
 
 
-class TeamSide(Enum):
+class TeamSide(str, Enum):
     red = "red"
     blue = "blue"
 
@@ -29,15 +29,18 @@ class GamePlayer(BaseModel):
     name: str
 
 
-class NameValue(BaseModel):
-    name: str
-    value: float | int
+class PlayerStats(BaseModel):
+    kills: int
+    deaths: int
+    assists: int
+    creep_score: int
 
 
 class TeamMember(BaseModel):
     champion: Champion
     player: GamePlayer
-    player_stats: list[NameValue]
+    stats: PlayerStats
+    team: TeamSide
 
 
 class Game(BaseModel):
@@ -45,5 +48,7 @@ class Game(BaseModel):
     victorious_team: TeamSide
     ally_team: list[TeamMember]
     enemy_team: list[TeamMember]
+    self: TeamMember
+    win: bool
     duration: int
     timestamp: datetime

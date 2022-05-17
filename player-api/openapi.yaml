@@ -72,16 +72,16 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/HTTPValidationError'
-  /players/{player_name}/recent-games:
+  /players/{player_id}/recent-games:
     get:
       summary: Recent Games
-      operationId: recent_games_players__player_name__recent_games_get
+      operationId: recent_games_players__player_id__recent_games_get
       parameters:
       - required: true
         schema:
-          title: Player Name
+          title: Player Id
           type: string
-        name: player_name
+        name: player_id
         in: path
       - required: false
         schema:
@@ -171,6 +171,8 @@ components:
       - victorious_team
       - ally_team
       - enemy_team
+      - self
+      - win
       - duration
       - timestamp
       type: object
@@ -190,6 +192,11 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/TeamMember'
+        self:
+          $ref: '#/components/schemas/TeamMember'
+        win:
+          title: Win
+          type: boolean
         duration:
           title: Duration
           type: integer
@@ -246,21 +253,6 @@ components:
           maximum: 100.0
           minimum: 0.0
           type: integer
-    NameValue:
-      title: NameValue
-      required:
-      - name
-      - value
-      type: object
-      properties:
-        name:
-          title: Name
-          type: string
-        value:
-          title: Value
-          anyOf:
-          - type: number
-          - type: integer
     Page_Game_:
       title: Page[Game]
       required:
@@ -312,6 +304,27 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/MostPlayed'
+    PlayerStats:
+      title: PlayerStats
+      required:
+      - kills
+      - deaths
+      - assists
+      - creep_score
+      type: object
+      properties:
+        kills:
+          title: Kills
+          type: integer
+        deaths:
+          title: Deaths
+          type: integer
+        assists:
+          title: Assists
+          type: integer
+        creep_score:
+          title: Creep Score
+          type: integer
     Rank:
       title: Rank
       required:
@@ -337,23 +350,24 @@ components:
       required:
       - champion
       - player
-      - player_stats
+      - stats
+      - team
       type: object
       properties:
         champion:
           $ref: '#/components/schemas/Champion'
         player:
           $ref: '#/components/schemas/GamePlayer'
-        player_stats:
-          title: Player Stats
-          type: array
-          items:
-            $ref: '#/components/schemas/NameValue'
+        stats:
+          $ref: '#/components/schemas/PlayerStats'
+        team:
+          $ref: '#/components/schemas/TeamSide'
     TeamSide:
       title: TeamSide
       enum:
       - red
       - blue
+      type: string
       description: An enumeration.
     TierEnum:
       title: TierEnum

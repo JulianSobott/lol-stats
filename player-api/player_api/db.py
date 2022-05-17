@@ -16,6 +16,7 @@ from sqlalchemy import (
 )
 from sqlalchemy.orm import relationship, sessionmaker
 
+from models.game import TeamSide
 from player_api.models.player import TierEnum
 
 
@@ -84,11 +85,6 @@ class ChallengeClasses(Base):
     comparison_operator = Column(String, nullable=False)
 
 
-class TeamEnum(str, enum.Enum):
-    red = "red"
-    blue = "blue"
-
-
 class Games(Base):
     __tablename__ = "games"
 
@@ -99,7 +95,7 @@ class Games(Base):
     champ_id = Column(Integer, ForeignKey("champions.id"), nullable=False)
     start_time = Column(Integer, nullable=False)
     duration = Column(Integer, nullable=False)
-    team = Column(Enum(TeamEnum), nullable=False)
+    team = Column(Enum(TeamSide), nullable=False)
     win = Column(Boolean, nullable=False)
     lane = Column(String, nullable=False)
     stats = Column(String, nullable=False)

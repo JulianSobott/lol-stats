@@ -20,9 +20,16 @@ from player_api.models.game import (
     TeamMember,
     Champion,
     GamePlayer,
-    NameValue,
+    PlayerStats,
 )
-from player_api.db import Summoners, Games, Champions, SessionLocal, db_to_datetime, datetime_to_db
+from player_api.db import (
+    Summoners,
+    Games,
+    Champions,
+    SessionLocal,
+    db_to_datetime,
+    datetime_to_db,
+)
 from player_api.models.player import Player, Rank, MostPlayed, BasicPlayer
 from player_api.models.responses import ExceptionMessage
 
@@ -139,7 +146,9 @@ async def get_player(player_id: PlayerId, db: Session = Depends(get_db)):
         name=player.name,
         level=player.level,
         rank=Rank(
-            division=Rank.division_from_str(player.division), tier=player.tier, league_points=player.league_points
+            division=Rank.division_from_str(player.division),
+            tier=player.tier,
+            league_points=player.league_points,
         ),
         most_played=most_played,
         win_rate=win_rate,
@@ -161,7 +170,9 @@ def find_player(player_name: str, region: str = None, db: Session = Depends(get_
         name=player.name,
         level=player.level,
         rank=Rank(
-            division=Rank.division_from_str(player.division), tier=player.tier, league_points=player.league_points
+            division=Rank.division_from_str(player.division),
+            tier=player.tier,
+            league_points=player.league_points,
         ),
     )
 
@@ -183,7 +194,7 @@ def recent_games(
     request: Request,
     start_before: datetime = None,
     limit: int = DEFAULT_GAMES_PER_PAGE,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
 ):
     logger.debug(f"method=recent_games {player_id=}")
     player = get_player_by_id(db, player_id)
@@ -210,32 +221,54 @@ def recent_games(
     )
     ret_games = []
     for game in games:
-        games_of_team: list[Games] = db.query(Games).where(Games.match_id == game.match_id).all()
-        assert len(games_of_team) == 10, f"Game has not imported stats for all players. match_id={game.match_id}"
+        games_of_team: list[Games] = (
+            db.query(Games).where(Games.match_id == game.match_id).all()
+        )
+        assert (
+            len(games_of_team) == 10
+        ), f"Game has not imported stats for all players. match_id={game.match_id}"
         ally_team = []
         enemy_team = []
+        self = None
+        win = False
         for player_game in games_of_team:
-            stats = [NameValue(name=k, value=v) for k, v in json.loads(player_game.stats).items()]
+            all_stats = json.loads(player_game.stats)
+            stats = PlayerStats(
+                kills=all_stats["-kills"],
+                deaths=all_stats["-deaths"],
+                assists=all_stats["-assists"],
+                creep_score=all_stats["-totalMinionsKilled"],
+            )
             team_member = TeamMember(
-                        champion=Champion(
-                            name=player_game.champion.name, icon_path=player_game.champion.icon_path
-                        ),
-                        player=GamePlayer(id=player_game.summoner.puuid, name=player_game.summoner.name),
-                        player_stats=stats,
-                    )
+                champion=Champion(
+                    name=player_game.champion.name,
+                    icon_path=player_game.champion.icon_path,
+                ),
+                player=GamePlayer(
+                    id=player_game.summoner.puuid, name=player_game.summoner.name
+                ),
+                stats=stats,
+                team=TeamSide.red if game.team == TeamSide.red.value else TeamSide.blue
+            )
             if player_game.team == game.team:
                 ally_team.append(team_member)
             else:
                 enemy_team.append(team_member)
+            if player_game.summoner.puuid == player_id:
+                self = team_member
+                win = player_game.win
 
+        assert self is not None, "Own player not appeared in games"
         ret_games.append(
             Game(
                 match_id=game.match_id,
-                victorious_team=TeamSide.red,
+                victorious_team=TeamSide.red if self.team == TeamSide.red and win else TeamSide.blue,
                 ally_team=ally_team,
                 enemy_team=enemy_team,
                 duration=game.duration,
                 timestamp=db_to_datetime(game.start_time),
+                self=self,
+                win=win
             )
         )
     return Page[Game](items=ret_games, next=str(next_link))
