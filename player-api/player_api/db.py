@@ -1,4 +1,7 @@
 import os
+import time
+from datetime import datetime
+
 from sqlalchemy.ext.declarative import declarative_base
 import enum
 from sqlalchemy import (
@@ -7,14 +10,21 @@ from sqlalchemy import (
     Integer,
     String,
     Boolean,
-    DateTime,
     ForeignKey,
     Enum,
     CheckConstraint,
 )
-from sqlalchemy.orm import relationship
+from sqlalchemy.orm import relationship, sessionmaker
 
+from models.game import TeamSide
 from player_api.models.player import TierEnum
+
+
+engine = create_engine(
+        f"postgresql://postgres:{os.environ.get('POSTGRES_PASSWORD', 'postgres')}@"
+        f"{os.environ.get('POSTGRES_HOST', 'localhost')}/postgres",
+    )
+SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 
 Base = declarative_base()
@@ -35,7 +45,7 @@ class Summoners(Base):
     name = Column(String, nullable=False)
     level = Column(Integer, nullable=False)
     icon_path = Column(String, nullable=False)
-    last_update = Column(DateTime, nullable=False)
+    last_update = Column(Integer, nullable=False)
     tier = Column(Enum(TierEnum))
     division = Column(Enum(DivisionEnum))
     league_points = Column(
@@ -75,11 +85,6 @@ class ChallengeClasses(Base):
     comparison_operator = Column(String, nullable=False)
 
 
-class TeamEnum(str, enum.Enum):
-    red = "red"
-    blue = "blue"
-
-
 class Games(Base):
     __tablename__ = "games"
 
@@ -88,9 +93,9 @@ class Games(Base):
         String, ForeignKey("summoners.puuid"), nullable=False, primary_key=True
     )
     champ_id = Column(Integer, ForeignKey("champions.id"), nullable=False)
-    start_time = Column(DateTime, nullable=False)
+    start_time = Column(Integer, nullable=False)
     duration = Column(Integer, nullable=False)
-    team = Column(Enum(TeamEnum), nullable=False)
+    team = Column(Enum(TeamSide), nullable=False)
     win = Column(Boolean, nullable=False)
     lane = Column(String, nullable=False)
     stats = Column(String, nullable=False)
@@ -98,6 +103,14 @@ class Games(Base):
 
     summoner = relationship("Summoners", foreign_keys=[summoner_id])
     champion = relationship("Champions", foreign_keys=[champ_id])
+
+
+def datetime_to_db(ts: datetime) -> int:
+    return int(time.mktime(ts.timetuple()))
+
+
+def db_to_datetime(ts: int) -> datetime:
+    return datetime.fromtimestamp(ts)
 
 
 def setup_db():

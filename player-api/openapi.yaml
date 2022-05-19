@@ -72,6 +72,50 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/HTTPValidationError'
+  /players/{player_id}/recent-games:
+    get:
+      summary: Recent Games
+      operationId: recent_games_players__player_id__recent_games_get
+      parameters:
+      - required: true
+        schema:
+          title: Player Id
+          type: string
+        name: player_id
+        in: path
+      - required: false
+        schema:
+          title: Start Before
+          type: string
+          format: date-time
+        name: start_before
+        in: query
+      - required: false
+        schema:
+          title: Limit
+          type: integer
+          default: 5
+        name: limit
+        in: query
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Page_Game_'
+        '404':
+          description: Player not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionMessage'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
 components:
   schemas:
     BasicPlayer:
@@ -98,6 +142,19 @@ components:
           type: integer
         rank:
           $ref: '#/components/schemas/Rank'
+    Champion:
+      title: Champion
+      required:
+      - name
+      - icon_path
+      type: object
+      properties:
+        name:
+          title: Name
+          type: string
+        icon_path:
+          title: Icon Path
+          type: string
     ExceptionMessage:
       title: ExceptionMessage
       required:
@@ -106,6 +163,59 @@ components:
       properties:
         detail:
           title: Detail
+          type: string
+    Game:
+      title: Game
+      required:
+      - match_id
+      - victorious_team
+      - ally_team
+      - enemy_team
+      - self
+      - win
+      - duration
+      - timestamp
+      type: object
+      properties:
+        match_id:
+          title: Match Id
+          type: string
+        victorious_team:
+          $ref: '#/components/schemas/TeamSide'
+        ally_team:
+          title: Ally Team
+          type: array
+          items:
+            $ref: '#/components/schemas/TeamMember'
+        enemy_team:
+          title: Enemy Team
+          type: array
+          items:
+            $ref: '#/components/schemas/TeamMember'
+        self:
+          $ref: '#/components/schemas/TeamMember'
+        win:
+          title: Win
+          type: boolean
+        duration:
+          title: Duration
+          type: integer
+        timestamp:
+          title: Timestamp
+          type: string
+          format: date-time
+    GamePlayer:
+      title: GamePlayer
+      required:
+      - id
+      - name
+      type: object
+      properties:
+        id:
+          title: Id
+          type: string
+        name:
+          title: Name
           type: string
     HTTPValidationError:
       title: HTTPValidationError
@@ -143,6 +253,21 @@ components:
           maximum: 100.0
           minimum: 0.0
           type: integer
+    Page_Game_:
+      title: Page[Game]
+      required:
+      - items
+      - next
+      type: object
+      properties:
+        items:
+          title: Items
+          type: array
+          items:
+            $ref: '#/components/schemas/Game'
+        next:
+          title: Next
+          type: string
     Player:
       title: Player
       required:
@@ -179,17 +304,38 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/MostPlayed'
+    PlayerStats:
+      title: PlayerStats
+      required:
+      - kills
+      - deaths
+      - assists
+      - creep_score
+      type: object
+      properties:
+        kills:
+          title: Kills
+          type: integer
+        deaths:
+          title: Deaths
+          type: integer
+        assists:
+          title: Assists
+          type: integer
+        creep_score:
+          title: Creep Score
+          type: integer
     Rank:
       title: Rank
       required:
-      - rank
+      - division
       - tier
       - league_points
       type: object
       properties:
-        rank:
-          title: Rank
-          maximum: 5.0
+        division:
+          title: Division
+          maximum: 4.0
           minimum: 1.0
           type: integer
         tier:
@@ -199,18 +345,42 @@ components:
           maximum: 100.0
           minimum: 0.0
           type: integer
+    TeamMember:
+      title: TeamMember
+      required:
+      - champion
+      - player
+      - stats
+      - team
+      type: object
+      properties:
+        champion:
+          $ref: '#/components/schemas/Champion'
+        player:
+          $ref: '#/components/schemas/GamePlayer'
+        stats:
+          $ref: '#/components/schemas/PlayerStats'
+        team:
+          $ref: '#/components/schemas/TeamSide'
+    TeamSide:
+      title: TeamSide
+      enum:
+      - red
+      - blue
+      type: string
+      description: An enumeration.
     TierEnum:
       title: TierEnum
       enum:
-      - IRON
-      - BRONZE
-      - SILVER
-      - GOLD
-      - PLATINUM
-      - DIAMOND
-      - MASTER
-      - GRANDMASTER
-      - CHALLENGER
+      - iron
+      - bronze
+      - silver
+      - gold
+      - platinum
+      - diamond
+      - master
+      - grandmaster
+      - challenger
       type: string
       description: An enumeration.
     ValidationError:

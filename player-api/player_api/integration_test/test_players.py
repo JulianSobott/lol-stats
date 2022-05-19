@@ -11,7 +11,7 @@ random.seed(1)
 
 
 def test_find_player(db_session):
-    players = PlayerFactory().player()
+    players = PlayerFactory(db_session).player()
     with players:
         pass
     res = _player_reqeust_by_name(players[0].name)
@@ -21,7 +21,7 @@ def test_find_player(db_session):
 
 
 def test_find_player_not_exist(db_session):
-    players = PlayerFactory().player()
+    players = PlayerFactory(db_session).player()
     with players:
         pass
     res = _player_reqeust_by_name("NON_EXISTENT")
