@@ -16,7 +16,7 @@ from sqlalchemy import (
 )
 from sqlalchemy.orm import relationship, sessionmaker
 
-from models.game import TeamSide
+from player_api.models.game import TeamSide
 from player_api.models.player import TierEnum
 
 
