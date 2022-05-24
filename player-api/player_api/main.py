@@ -224,9 +224,10 @@ def recent_games(
         games_of_team: list[Games] = (
             db.query(Games).where(Games.match_id == game.match_id).all()
         )
-        assert (
-            len(games_of_team) == 10
-        ), f"Game has not imported stats for all players. match_id={game.match_id}"
+        if len(games_of_team) != 10:
+            logger.warning(f"Game has not imported stats for all players. match_id={game.match_id}")
+            continue
+
         ally_team = []
         enemy_team = []
         self = None
