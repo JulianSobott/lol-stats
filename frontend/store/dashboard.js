@@ -1,7 +1,8 @@
 // state
 export const state = () => ({
   playerData: {},
-  recentGames: {},
+  recentGames: [],
+  nextRecentGamesLink: ''
 })
 
 // getters
@@ -11,6 +12,9 @@ export const getters = {
   },
   getRecentGames(state) {
     return state.recentGames;
+  },
+  getNextRecentGamesLink(state) {
+    return state.nextRecentGamesLink;
   }
 }
 
@@ -28,7 +32,24 @@ export const actions = {
   }) {
     const playerUuid = this.$auth.user.player_uuid
     const response = await this.$axios.get(`/players/${playerUuid}/recent-games`);
-    commit("setRecentGames", response.data);
+    commit("setRecentGames", response.data.items);
+    commit("setNextRecentGamesLink", response.data.next);
+  },
+  async loadMoreRecentGames({
+    commit,
+    state
+  }) {
+    if (state.nextRecentGamesLink !== null) {
+      const response = await this.$axios.get(state.nextRecentGamesLink);
+      commit("setRecentGames", response.data.items);
+      commit("setNextRecentGamesLink", response.data.next);
+    }
+  },
+  clearRecentGames({
+    commit,
+    state
+  }) {
+    commit("clearRecentGames");
   }
 }
 
@@ -38,6 +59,12 @@ export const mutations = {
     state.playerData = data;
   },
   setRecentGames(state, data) {
-    state.recentGames = data;
-  }
+    state.recentGames.push(...data);
+  },
+  setNextRecentGamesLink(state, data) {
+    state.nextRecentGamesLink = data;
+  },
+  clearRecentGames(state) {
+    state.recentGames = [];
+  },
 }

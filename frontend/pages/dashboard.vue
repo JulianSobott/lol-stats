@@ -188,7 +188,7 @@
                     </thead>
                     <tbody>
                       <tr
-                        v-for="game in recentGames.items"
+                        v-for="game in recentGames"
                         :key="game.match_id"
                       >
                         <td>
@@ -227,7 +227,8 @@
                   <div class="text-center">
                     <button
                       class="btn btn-primary ms-auto"
-                      @click="loadMoreGames(recentGames.next)"
+                      @click="loadMoreGames()"
+                      :disabled="!getNextRecentGamesLink()"
                     >
                       <span
                         v-if="moreGamesLoading"
@@ -275,7 +276,7 @@
 </template>
 
 <script>
-import { mapActions } from 'vuex'
+import { mapActions, mapGetters } from 'vuex'
 import moment from 'moment'
 
 export default {
@@ -296,6 +297,7 @@ export default {
     if (this.$route.query.welcome !== undefined) {
       this.fetchUserData()
     }
+    this.clearRecentGames()
     this.getPlayerData()
     this.getRecentGames()
   },
@@ -306,9 +308,14 @@ export default {
     }
   },
   methods: {
+    ...mapGetters({
+      getNextRecentGamesLink: 'dashboard/getNextRecentGamesLink',
+    }),
     ...mapActions({
       getPlayerData: 'dashboard/getPlayerData',
       getRecentGames: 'dashboard/getRecentGames',
+      loadMoreRecentGames: 'dashboard/loadMoreRecentGames',
+      clearRecentGames: 'dashboard/clearRecentGames',
     }),
     championIconPath(champion) {
       return `background-image: url("${champion.icon_path}");`
@@ -322,11 +329,10 @@ export default {
     converDuration(secs) {
       return moment.utc(secs * 1000).format('mm:ss')
     },
-    async loadMoreGames(link) {
-      console.log(link)
+    async loadMoreGames() {
       try {
         this.moreGamesLoading = true
-        await this.$axios.get(link)
+        await this.loadMoreRecentGames()
         this.moreGamesLoading = false
       } catch (e) {
         console.log(e)
