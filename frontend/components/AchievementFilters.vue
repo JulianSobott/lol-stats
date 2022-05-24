@@ -71,13 +71,14 @@
       </div>
     </div>
     <div class="mt-4">
-      <a
+      <button
         class="btn btn-primary w-100"
         data-bs-dismiss="offcanvas"
+        :disabled="!canSubmit"
         @click="search"
       >
         Confirm changes
-      </a>
+      </button>
       <a class="btn btn-link w-100" @click="clearFilters">
         Reset to defaults
       </a>
@@ -90,10 +91,11 @@ export default {
   name: 'AchievementFilters',
   data() {
     return {
+      canSubmit: true,
       displayPlayerSearch: false,
       filters: {
         compare: 'global',
-        player: {},
+        player: null,
         champion: '*',
         rank: '*',
       },
@@ -281,23 +283,30 @@ export default {
     },
     playerChanged(playerData) {
       this.filters.player = playerData
+      this.canSubmit = playerData != null
     },
     clearFilters() {
       this.$refs.PlayerSearchInput.clear()
       this.filters = {
         compare: 'global',
-        player: {},
+        player: null,
         champion: '*',
         rank: '*',
       }
+      this.canSubmit = true
+      this.displayPlayerSearch = false
     },
     playerRadioSelected() {
       this.$refs.PlayerSearchInput.disable(false)
       this.displayPlayerSearch = true
+      if(this.filters.player === null) {
+        this.canSubmit = false
+      }
     },
     globalFriendsRadioSelected() {
       this.$refs.PlayerSearchInput.disable(true)
       this.displayPlayerSearch = false
+      this.canSubmit = true
     },
   },
 }
