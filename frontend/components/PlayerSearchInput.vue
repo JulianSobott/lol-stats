@@ -2,7 +2,7 @@
   <div class="input-icon mb-3">
     <input
       v-model="playername"
-      :class="{ 'is-invalid': error, 'is-valid': success }"
+      :class="{ 'is-invalid': error, 'is-valid': success && !loading }"
       placeholder="Search Player name"
       type="text"
       class="form-control"
