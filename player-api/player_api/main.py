@@ -232,7 +232,7 @@ def recent_games(
         self = None
         win = False
         for player_game in games_of_team:
-            all_stats = json.loads(player_game.stats)
+            all_stats = json.loads(player_game.challenges)
             stats = PlayerStats(
                 kills=all_stats["-kills"],
                 deaths=all_stats["-deaths"],

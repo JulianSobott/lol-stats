@@ -19,10 +19,14 @@ from sqlalchemy.orm import relationship, sessionmaker
 from player_api.models.game import TeamSide
 from player_api.models.player import TierEnum
 
+db_user = os.environ.get('POSTGRES_USER', 'postgres')
+db_pw = os.environ.get('POSTGRES_PASSWORD', 'postgres')
+db_host = os.environ.get('POSTGRES_HOST', 'localhost')
+db_type = os.environ.get('DB_TYPE', 'postgresql')
+db_database = os.environ.get('DB_DATABASE', 'postgres')
 
 engine = create_engine(
-        f"postgresql://postgres:{os.environ.get('POSTGRES_PASSWORD', 'postgres')}@"
-        f"{os.environ.get('POSTGRES_HOST', 'localhost')}/postgres",
+        f"{db_type}://{db_user}:{db_pw}@{db_host}/{db_database}",
     )
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
@@ -98,7 +102,6 @@ class Games(Base):
     team = Column(Enum(TeamSide), nullable=False)
     win = Column(Boolean, nullable=False)
     lane = Column(String, nullable=False)
-    stats = Column(String, nullable=False)
     challenges = Column(String, nullable=False)
 
     summoner = relationship("Summoners", foreign_keys=[summoner_id])

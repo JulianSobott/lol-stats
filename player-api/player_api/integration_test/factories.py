@@ -129,12 +129,11 @@ class GamesFactory:
                     summoner_id=self.player.summoner.puuid,
                     champ_id=Champion(self.db, self.champion).id,
                     start_time=datetime_to_db(self.start + timedelta(minutes=i * DEFAULT_GAME_LENGTH)),
-                    duration=timedelta(minutes=DEFAULT_GAME_LENGTH).total_seconds(),
+                    duration=int(timedelta(minutes=DEFAULT_GAME_LENGTH).total_seconds()),
                     win=won,
                     lane="bottom",
                     team="red",
-                    stats=stats,
-                    challenges="",
+                    challenges=stats,
                 )
             )
             for j in range(9):
@@ -147,12 +146,11 @@ class GamesFactory:
                         summoner_id=summoner.puuid,
                         champ_id=Champion(self.db, self.champion).id,
                         start_time=datetime_to_db(self.start + timedelta(minutes=i * DEFAULT_GAME_LENGTH)),
-                        duration=timedelta(minutes=DEFAULT_GAME_LENGTH).total_seconds(),
+                        duration=int(timedelta(minutes=DEFAULT_GAME_LENGTH).total_seconds()),
                         win=won if j < 4 else not won,
                         lane="bottom",
                         team="red" if j < 4 else "blue",
-                        stats=stats,
-                        challenges="",
+                        challenges=stats,
                     )
                 )
         return objects
