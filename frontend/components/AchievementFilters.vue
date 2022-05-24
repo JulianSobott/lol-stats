@@ -293,6 +293,8 @@ export default {
         champion: '*',
         rank: '*',
       }
+      this.canSubmit = true
+      this.displayPlayerSearch = false
     },
     playerRadioSelected() {
       this.$refs.PlayerSearchInput.disable(false)
