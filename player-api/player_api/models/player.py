@@ -1,6 +1,7 @@
 from enum import Enum
+from typing import Optional
 
-from pydantic import BaseModel, Field, validator
+from pydantic import BaseModel, Field, validator, root_validator
 
 
 class TierEnum(str, Enum):
@@ -50,6 +51,7 @@ class Player(BaseModel):
     level: int
     rank: Rank
     most_played: list[MostPlayed]
+    imported: bool
 
 
 class BasicPlayer(BaseModel):
@@ -57,20 +59,28 @@ class BasicPlayer(BaseModel):
     player_icon_path: str
     name: str
     level: int
-    rank: Rank
+    rank: Rank | None
+    imported: bool
+
+
+class ImportState(str, Enum):
+    PENDING = "PENDING"  # client has to send a new request, to get more information
+    IMPORTING = (
+        "IMPORTING"  # client has to send a new request, to get the latest information
+    )
+    FINISHED = "FINISHED"  # client should send no new request
+    FAILED = "FAILED"  # client may send a new request after some time to try again
 
 
 class ImportProgress(BaseModel):
     imported_games: int
     total_games: int
+    imported: bool
+    import_state: ImportState
     percentage: int
 
-    @validator("percentage", always=True)
-    def validate_percentage(cls, value, values):
-        if values["total_games"] == 0:
+    @staticmethod
+    def calc_percentage(imported_games: int, total_games: int):
+        if total_games == 0:
             return 100
-        percentage = int((values["imported_games"] / values["total_games"]) * 100)
-        assert (
-            0 <= percentage <= 100
-        ), f"percentage not between 0 and 100: percentage={percentage}"
-        return percentage
+        return int((imported_games / total_games) * 100)

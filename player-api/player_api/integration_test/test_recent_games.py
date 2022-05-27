@@ -83,12 +83,16 @@ def test_contains_team_members(db_session):
     game1 = res.items[0]
     assert len(game1.ally_team) == 5
     assert len(game1.enemy_team) == 5
-    assert all(map(lambda p: p.champion.name == "Aatrox", game1.ally_team + game1.enemy_team))
+    assert all(
+        map(lambda p: p.champion.name == "Aatrox", game1.ally_team + game1.enemy_team)
+    )
 
     game2 = res.items[1]
     assert len(game2.ally_team) == 5
     assert len(game2.enemy_team) == 5
-    assert all(map(lambda p: p.champion.name == "Lux", game2.ally_team + game2.enemy_team))
+    assert all(
+        map(lambda p: p.champion.name == "Lux", game2.ally_team + game2.enemy_team)
+    )
 
 
 def _recent_game_request(player: Testplayer) -> Page[Game]:

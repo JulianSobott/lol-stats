@@ -67,7 +67,6 @@ def test_get_most_played_many_champs(db_session):
     assert res.most_played[2].champion_id == Champion(db_session, "Annie").id
 
 
-
 @pytest.mark.skip
 def test_performance(db_session, benchmark):
     players = PlayerFactory(db_session).n_players(5000)

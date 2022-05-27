@@ -155,7 +155,7 @@ components:
       - player_icon_path
       - name
       - level
-      - rank
+      - imported
       type: object
       properties:
         id:
@@ -172,6 +172,9 @@ components:
           type: integer
         rank:
           $ref: '#/components/schemas/Rank'
+        imported:
+          title: Imported
+          type: boolean
     Champion:
       title: Champion
       required:
@@ -261,6 +264,8 @@ components:
       required:
       - imported_games
       - total_games
+      - imported
+      - import_state
       - percentage
       type: object
       properties:
@@ -270,9 +275,23 @@ components:
         total_games:
           title: Total Games
           type: integer
+        imported:
+          title: Imported
+          type: boolean
+        import_state:
+          $ref: '#/components/schemas/ImportState'
         percentage:
           title: Percentage
           type: integer
+    ImportState:
+      title: ImportState
+      enum:
+      - PENDING
+      - IMPORTING
+      - FINISHED
+      - FAILED
+      type: string
+      description: An enumeration.
     MostPlayed:
       title: MostPlayed
       required:
@@ -325,6 +344,7 @@ components:
       - level
       - rank
       - most_played
+      - imported
       type: object
       properties:
         id:
@@ -351,6 +371,9 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/MostPlayed'
+        imported:
+          title: Imported
+          type: boolean
     PlayerStats:
       title: PlayerStats
       required:
