@@ -149,16 +149,20 @@ async def get_player(player_id: PlayerId, db: Session = Depends(get_db)):
     )
     win_rate = calc_win_rate(result.num_played, result.won)
     logging.debug(f"method=get_player {win_rate=}")
+    if player.division is None or player.tier is None or player.league_points is None:
+        rank = None
+    else:
+        rank = Rank(
+            division=Rank.division_from_str(player.division),
+            tier=player.tier,
+            league_points=player.league_points,
+        )
     return Player(
         id=player.puuid,
         player_icon_path=player.icon_path,
         name=player.name,
         level=player.level,
-        rank=Rank(
-            division=Rank.division_from_str(player.division),
-            tier=player.tier,
-            league_points=player.league_points,
-        ),
+        rank=rank,
         most_played=most_played,
         win_rate=win_rate,
         imported=True,
@@ -364,7 +368,8 @@ def is_player_currently_imported(player_id: PlayerId) -> bool:
 
 
 def is_player_imported(db: Session, player_id: PlayerId) -> bool:
-    return get_player_by_id(db, player_id) is not None
+    player = get_player_by_id(db, player_id)
+    return player is not None and player.last_update is not None
 
 
 def get_import_progress(player_id: PlayerId) -> ImportProgress:
