@@ -34,6 +34,7 @@ services:
 
   frontend:
     build: frontend/
+    restart: unless-stopped
     container_name: frontend
     labels:
       - traefik.enable=true
@@ -47,6 +48,7 @@ services:
 
   player-api:
     build: player-api
+    restart: unless-stopped
     environment:
       POSTGRES_PASSWORD: $POSTGRES_PASSWORD
       POSTGRES_HOST: psql-achievements
