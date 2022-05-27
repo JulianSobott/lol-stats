@@ -364,7 +364,8 @@ def is_player_currently_imported(player_id: PlayerId) -> bool:
 
 
 def is_player_imported(db: Session, player_id: PlayerId) -> bool:
-    return get_player_by_id(db, player_id) is not None
+    player = get_player_by_id(db, player_id)
+    return player is not None and player.last_update is not None
 
 
 def get_import_progress(player_id: PlayerId) -> ImportProgress:
