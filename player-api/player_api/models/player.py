@@ -1,6 +1,7 @@
 from enum import Enum
+from typing import Optional
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, validator, root_validator
 
 
 class TierEnum(str, Enum):
@@ -31,12 +32,7 @@ class Rank(BaseModel):
 
     @staticmethod
     def division_from_str(division: str) -> int:
-        return {
-            "one": 1,
-            "two": 2,
-            "three": 3,
-            "four": 4
-        }[division]
+        return {"one": 1, "two": 2, "three": 3, "four": 4}[division]
 
 
 class MostPlayed(BaseModel):
@@ -55,6 +51,7 @@ class Player(BaseModel):
     level: int
     rank: Rank
     most_played: list[MostPlayed]
+    imported: bool
 
 
 class BasicPlayer(BaseModel):
@@ -62,4 +59,28 @@ class BasicPlayer(BaseModel):
     player_icon_path: str
     name: str
     level: int
-    rank: Rank
+    rank: Rank | None
+    imported: bool
+
+
+class ImportState(str, Enum):
+    PENDING = "PENDING"  # client has to send a new request, to get more information
+    IMPORTING = (
+        "IMPORTING"  # client has to send a new request, to get the latest information
+    )
+    FINISHED = "FINISHED"  # client should send no new request
+    FAILED = "FAILED"  # client may send a new request after some time to try again
+
+
+class ImportProgress(BaseModel):
+    imported_games: int
+    total_games: int
+    imported: bool
+    import_state: ImportState
+    percentage: int
+
+    @staticmethod
+    def calc_percentage(imported_games: int, total_games: int):
+        if total_games == 0:
+            return 100
+        return int((imported_games / total_games) * 100)

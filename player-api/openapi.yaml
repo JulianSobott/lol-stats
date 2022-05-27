@@ -72,6 +72,36 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/HTTPValidationError'
+  /players/{player_id}/import:
+    post:
+      summary: Import Player
+      operationId: import_player_players__player_id__import_post
+      parameters:
+      - required: true
+        schema:
+          title: Player Id
+          type: string
+        name: player_id
+        in: path
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ImportProgress'
+        '404':
+          description: Player not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionMessage'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
   /players/{player_id}/recent-games:
     get:
       summary: Recent Games
@@ -125,7 +155,7 @@ components:
       - player_icon_path
       - name
       - level
-      - rank
+      - imported
       type: object
       properties:
         id:
@@ -142,6 +172,9 @@ components:
           type: integer
         rank:
           $ref: '#/components/schemas/Rank'
+        imported:
+          title: Imported
+          type: boolean
     Champion:
       title: Champion
       required:
@@ -226,6 +259,39 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/ValidationError'
+    ImportProgress:
+      title: ImportProgress
+      required:
+      - imported_games
+      - total_games
+      - imported
+      - import_state
+      - percentage
+      type: object
+      properties:
+        imported_games:
+          title: Imported Games
+          type: integer
+        total_games:
+          title: Total Games
+          type: integer
+        imported:
+          title: Imported
+          type: boolean
+        import_state:
+          $ref: '#/components/schemas/ImportState'
+        percentage:
+          title: Percentage
+          type: integer
+    ImportState:
+      title: ImportState
+      enum:
+      - PENDING
+      - IMPORTING
+      - FINISHED
+      - FAILED
+      type: string
+      description: An enumeration.
     MostPlayed:
       title: MostPlayed
       required:
@@ -278,6 +344,7 @@ components:
       - level
       - rank
       - most_played
+      - imported
       type: object
       properties:
         id:
@@ -304,6 +371,9 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/MostPlayed'
+        imported:
+          title: Imported
+          type: boolean
     PlayerStats:
       title: PlayerStats
       required:

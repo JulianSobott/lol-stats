@@ -128,8 +128,12 @@ class GamesFactory:
                     match_id=match_id,
                     summoner_id=self.player.summoner.puuid,
                     champ_id=Champion(self.db, self.champion).id,
-                    start_time=datetime_to_db(self.start + timedelta(minutes=i * DEFAULT_GAME_LENGTH)),
-                    duration=int(timedelta(minutes=DEFAULT_GAME_LENGTH).total_seconds()),
+                    start_time=datetime_to_db(
+                        self.start + timedelta(minutes=i * DEFAULT_GAME_LENGTH)
+                    ),
+                    duration=int(
+                        timedelta(minutes=DEFAULT_GAME_LENGTH).total_seconds()
+                    ),
                     win=won,
                     lane="bottom",
                     team="red",
@@ -145,8 +149,12 @@ class GamesFactory:
                         match_id=match_id,
                         summoner_id=summoner.puuid,
                         champ_id=Champion(self.db, self.champion).id,
-                        start_time=datetime_to_db(self.start + timedelta(minutes=i * DEFAULT_GAME_LENGTH)),
-                        duration=int(timedelta(minutes=DEFAULT_GAME_LENGTH).total_seconds()),
+                        start_time=datetime_to_db(
+                            self.start + timedelta(minutes=i * DEFAULT_GAME_LENGTH)
+                        ),
+                        duration=int(
+                            timedelta(minutes=DEFAULT_GAME_LENGTH).total_seconds()
+                        ),
                         win=won if j < 4 else not won,
                         lane="bottom",
                         team="red" if j < 4 else "blue",
@@ -157,7 +165,6 @@ class GamesFactory:
 
 
 class Champion:
-
     def __new__(cls, db: Session, name, *args, **kwargs) -> Champions:
         res = db.query(Champions).where(Champions.name == name).all()
         if res:

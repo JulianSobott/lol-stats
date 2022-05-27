@@ -14,12 +14,15 @@ opentelemetry-instrumentation-fastapi = "*"
 opentelemetry-exporter-otlp = "*"
 opentelemetry-distro = "*"
 opentelemetry-instrumentation-sqlalchemy = "*"
+requests = "*"
 
 [dev-packages]
 pytest = "*"
 requests = "*"
 black = "*"
 locust = "*"
+pytest-mock = "*"
+requests-mock = "*"
 
 [requires]
 python_version = "3.10"
