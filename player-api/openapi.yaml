@@ -340,10 +340,7 @@ components:
       - id
       - player_icon_path
       - name
-      - win_rate
       - level
-      - rank
-      - most_played
       - imported
       type: object
       properties:
@@ -374,6 +371,8 @@ components:
         imported:
           title: Imported
           type: boolean
+      description: Optional fields are only None, when player is not imported yet,
+        but exists.
     PlayerStats:
       title: PlayerStats
       required:

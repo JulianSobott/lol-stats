@@ -3,6 +3,7 @@ import json
 import string
 import random
 import time
+from enum import Enum
 from urllib.parse import urlencode
 from datetime import datetime
 from pathlib import Path
@@ -108,7 +109,21 @@ async def get_player(player_id: PlayerId, db: Session = Depends(get_db)):
     logger.debug(f"method=get_player {player_id=}")
     player = get_player_by_id(db, player_id)
     if player is None:
-        raise HTTPException(status_code=404, detail="player not found")
+        player = find_player_in_riot_api_by(player_id, SearchTerm.id)
+        if player:
+            logger.debug(f"method=get_player msg=\"found player in riot API\" {player.name=}")
+            return Player(
+                id=player.id,
+                player_icon_path=player.player_icon_path,
+                name=player.name,
+                win_rate=None,
+                level=player.level,
+                rank=None,
+                most_played=None,
+                imported=False,
+            )
+        else:
+            raise HTTPException(status_code=404, detail="player not found")
     logger.debug(f"method=get_player {player_id=} {player.name=}")
 
     most_played_db = (
@@ -193,7 +208,7 @@ def find_player(player_name: str, region: str = None, db: Session = Depends(get_
             ),
             imported=imported,
         )
-    player = find_player_in_riot_api(player_name)
+    player = find_player_in_riot_api_by(player_name, SearchTerm.name)
     if player:
         return player
     raise HTTPException(status_code=404, detail="player not found")
@@ -331,10 +346,12 @@ def get_player_by_name(db: Session, player_name: str) -> Summoners | None:
     return player
 
 
-def find_player_in_riot_api(player_name: str) -> BasicPlayer | None:
+def find_player_in_riot_api_by(
+    player: PlayerId | PlayerName, search: "SearchTerm"
+) -> BasicPlayer | None:
     region = "euw1"
     response = requests.get(
-        f"https://{region}.api.riotgames.com/lol/summoner/v4/summoners/by-name/{player_name}",
+        f"https://{region}.api.riotgames.com/lol/summoner/v4/summoners/by-{search.value}/{player}",
         headers={"X-Riot-Token": os.environ.get("RIOT_API_KEY")},
     )
     if not response.ok:
@@ -395,6 +412,11 @@ def start_import(
 
 def import_player_task(player_id: PlayerId):
     pass
+
+
+class SearchTerm(str, Enum):
+    name = "name"
+    id = "puuid"
 
 
 class GlobalImportState:

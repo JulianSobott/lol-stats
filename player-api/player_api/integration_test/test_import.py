@@ -25,11 +25,15 @@ def test_import_state(requests_mock, clean_global_state):
         f"https://{REGION}.api.riotgames.com/lol/summoner/v4/summoners/by-name/{PLAYER_NAME}",
         json={"name": PLAYER_NAME, "puuid": PLAYER_ID, "summonerLevel": 1},
     )
+    requests_mock.get(
+        f"https://{REGION}.api.riotgames.com/lol/summoner/v4/summoners/by-puuid/{PLAYER_ID}",
+        json={"name": PLAYER_NAME, "puuid": PLAYER_ID, "summonerLevel": 1},
+    )
     res = import_player(PLAYER_ID)
     assert res.imported is False
 
-    # res = get_player(PLAYER_ID)
-    # assert res.imported is False
+    res = get_player(PLAYER_ID)
+    assert res.imported is False
     res = find_player(PLAYER_NAME)
     assert res.imported is False
 
