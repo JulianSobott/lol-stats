@@ -93,14 +93,7 @@ def token_required(f):
 @app.route('/api/auth/me', methods=['GET'])
 @token_required
 def get_own_data(current_user, access_token):
-    user = {
-        "id": current_user.id,
-        "player_uuid": current_user.player_uuid,
-        "email": current_user.email,
-        "token": access_token,
-        "region": "euw" # placeholder
-    }
-
+    
     # TODO implement call to player endpoint and retrieve player data
     player_stats = {}
 
@@ -119,8 +112,18 @@ def get_own_data(current_user, access_token):
         }
         competitor_output.append(data)
 
+    user = {
+        "id": current_user.id,
+        "player_uuid": current_user.player_uuid,
+        "email": current_user.email,
+        "token": access_token,
+        "region": "euw", # placeholder
+        "player_stats": player_stats,
+        "competitors": competitor_output
+    }
+
     return make_response(
-        jsonify({"status": "success", "user": user, "player_stats": player_stats, "competitors": competitor_output}),
+        jsonify({"status": "success", "user": user}),
         200)
 
 
