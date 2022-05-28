@@ -31,7 +31,7 @@
           >
             <span class="avatar avatar-sm" :style="userIcon"></span>
             <div class="d-none d-xl-block ps-2">
-              <div>{{ $auth.user.name }}</div>
+              <div>{{ $auth.user.player_stats.name }}</div>
               <div class="mt-1 small text-muted">
                 {{ $auth.user.player_stats.rank.tier.toUpperCase() }} {{ $auth.user.player_stats.rank.division }}
               </div>
@@ -78,27 +78,10 @@ export default {
   name: 'PageHeader',
   computed: {
     userIcon() {
-      return `background-image: url("${this.user.player_stats.player_icon_path}");`
+      return `background-image: url("${this.$auth.user.player_stats.player_icon_path}");`
     },
-  },
-  mounted() {
-    this.getUserData()
-  },
-  data() {
-    return {
-      user: null,
-    }
   },
   methods: {
-    getUserData() {
-      try {
-        if (this.$auth.loggedIn) {
-          console.log("foo")
-        }
-      } catch (err) {
-        console.log(err)
-      }
-    },
     async logoutUser() {
       try {
         await this.$auth.logout('local')
