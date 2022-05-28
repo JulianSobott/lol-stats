@@ -15,6 +15,7 @@ opentelemetry-exporter-otlp = "*"
 opentelemetry-distro = "*"
 opentelemetry-instrumentation-sqlalchemy = "*"
 requests = "*"
+starlette = "*"
 
 [dev-packages]
 pytest = "*"

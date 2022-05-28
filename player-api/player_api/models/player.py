@@ -1,7 +1,6 @@
 from enum import Enum
-from typing import Optional
 
-from pydantic import BaseModel, Field, validator, root_validator
+from pydantic import BaseModel, Field
 
 
 class TierEnum(str, Enum):
@@ -88,3 +87,7 @@ class ImportProgress(BaseModel):
         if total_games == 0:
             return 100
         return int((imported_games / total_games) * 100)
+
+
+PlayerId = str
+PlayerName = str

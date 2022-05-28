@@ -1,7 +1,7 @@
 from pytest import fixture
 
-from db import Base, engine
-from main import get_db
+from player_api.db import Base, engine
+from player_api.middlewares import get_db
 
 
 @fixture

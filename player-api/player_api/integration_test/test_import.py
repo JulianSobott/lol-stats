@@ -3,9 +3,16 @@ from unittest.mock import MagicMock
 import pytest
 from fastapi.testclient import TestClient
 
-from main import PlayerId, PlayerName, global_import_state
-from models.player import ImportProgress, Player, BasicPlayer, ImportState
-from main import app
+from player_api.import_state import global_import_state
+from player_api.models.player import (
+    ImportProgress,
+    Player,
+    BasicPlayer,
+    ImportState,
+    PlayerId,
+    PlayerName,
+)
+from player_api.main import app
 
 client = TestClient(app)
 
