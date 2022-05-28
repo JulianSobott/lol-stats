@@ -44,13 +44,17 @@ class MostPlayed(BaseModel):
 
 
 class Player(BaseModel):
+    """
+    Optional fields are only None, when player is not imported yet, but exists.
+    """
+
     id: str
     player_icon_path: str
     name: str
-    win_rate: int = Field(ge=0, le=100)
+    win_rate: int | None = Field(ge=0, le=100)
     level: int
-    rank: Rank
-    most_played: list[MostPlayed]
+    rank: Rank | None
+    most_played: list[MostPlayed] | None
     imported: bool
 
 
