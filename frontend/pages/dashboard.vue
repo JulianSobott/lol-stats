@@ -17,7 +17,7 @@
       <div class="page-body">
         <div class="container-xl">
           <div class="row row-cards">
-            <div v-if="importPlayerData" class="col-md-12 col-lg-12">
+            <div v-if="!$auth.user.player_stats.imported" class="col-md-12 col-lg-12">
               <div class="card bg-primary mb-3">
                 <div class="card-stamp">
                   <div class="card-stamp-icon bg-white text-primary">
@@ -99,7 +99,7 @@
               </div>
             </div>
             <div class="col-sm-4 col-lg-4">
-              <div v-if="playerData.rank" class="card h-100">
+              <div v-if="playerData.rank !== undefined && playerData.rank != null" class="card h-100">
                 <div class="card-body text-center">
                   <div class="mb-3">
                     <span
@@ -296,8 +296,10 @@ export default {
   mounted() {
     this.fetchUserData()
     this.clearRecentGames()
-    this.getPlayerData()
-    this.getRecentGames()
+    if (this.$auth.user.player_stats.imported) {
+      this.getPlayerData()
+      this.getRecentGames()
+    }
   },
   data() {
     return {
@@ -320,6 +322,7 @@ export default {
     },
     async fetchUserData() {
       await this.$auth.fetchUser()
+      this.importPlayerData = this.$auth.user.imported
     },
     converTimestamp(value) {
       return moment(String(value)).format('MM-DD-YYYY')

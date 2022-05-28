@@ -130,12 +130,10 @@ export default {
         this.error = true
       }
     },
-    async getPlayerData() {
+    getPlayerData() {
       try {
-        const user = this.$auth.user
-        const response = await this.$axios.get(`/players/${user.player_uuid}`)
-        this.$refs.playerSearchInput.setPlayerData(response.data.name)
-        this.form.region = user.region
+        this.$refs.playerSearchInput.setPlayerData(this.$auth.user.player_stats.name)
+        this.form.region = this.$auth.user.region
       } catch (e) {
         this.error = true
       }
@@ -147,19 +145,13 @@ export default {
           region: this.form.region,
           player_uuid: this.form.player.player_uuid,
         })
-      } catch (e) {
-        this.error = true
-      }
-
-      /*
-      try {
+ 
         await this.$axios.post(
           `/players/${this.this.form.player.player_uuid}/import`
         )
       } catch (e) {
         this.error = true
       }
-      */
       await this.$auth.fetchUser()
       this.$router.push('/dashboard')
     },

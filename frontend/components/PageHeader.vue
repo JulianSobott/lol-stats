@@ -22,7 +22,7 @@
       </h1>
       <div class="navbar-nav flex-row order-md-last">
         <div class="nav-item d-none d-md-flex me-3"></div>
-        <div v-if="$auth.loggedIn && $auth.user" class="nav-item dropdown">
+        <div v-if="$auth.loggedIn && Object.keys($auth.user.player_stats).length > 1" class="nav-item dropdown">
           <a
             href="#"
             class="nav-link d-flex lh-1 text-reset p-0"
@@ -32,7 +32,7 @@
             <span class="avatar avatar-sm" :style="userIcon"></span>
             <div class="d-none d-xl-block ps-2">
               <div>{{ $auth.user.player_stats.name }}</div>
-              <div class="mt-1 small text-muted">
+              <div v-if="$auth.user.player_stats.rank !== undefined && $auth.user.player_stats.rank != null" class="mt-1 small text-muted">
                 {{ $auth.user.player_stats.rank.tier.toUpperCase() }} {{ $auth.user.player_stats.rank.division }}
               </div>
             </div>
@@ -78,6 +78,9 @@ export default {
   name: 'PageHeader',
   computed: {
     userIcon() {
+      if (this.$auth.user.player_stats.player_icon_path === "") {
+        return "background-image: url('https://cdn.pixabay.com/photo/2016/08/08/09/17/avatar-1577909_1280.png')";
+      }
       return `background-image: url("${this.$auth.user.player_stats.player_icon_path}");`
     },
   },
