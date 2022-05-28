@@ -17,7 +17,7 @@
       <div class="page-body">
         <div class="container-xl">
           <div class="row row-cards">
-            <div v-if="!$auth.user.player_stats.imported" class="col-md-12 col-lg-12">
+            <div v-if="!this.importPlayerData" class="col-md-12 col-lg-12">
               <div class="card bg-primary mb-3">
                 <div class="card-stamp">
                   <div class="card-stamp-icon bg-white text-primary">
@@ -322,7 +322,7 @@ export default {
     },
     async fetchUserData() {
       await this.$auth.fetchUser()
-      this.importPlayerData = this.$auth.user.imported
+      this.importPlayerData = this.$auth.user.player_stats.imported
     },
     converTimestamp(value) {
       return moment(String(value)).format('MM-DD-YYYY')
