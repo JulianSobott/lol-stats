@@ -176,9 +176,7 @@
                           </svg>
                         </div>
                         <div class="mb-2">
-                          <p class="empty-title">
-                            Player stats not imported :(
-                          </p>
+                          <p class="empty-title">Player not imported</p>
                           <p class="empty-subtitle text-muted">
                             There is no player data in our system yet. To be
                             able to compare you with the player, please click
@@ -187,13 +185,31 @@
                         </div>
                         <div v-if="showImportProgressbar" class="w-100">
                           <div class="mb-2 text-center">
-                            <i>Import: Recent matches 1 / 20 ....</i>
+                            <div class="d-flex">
+                              <div>
+                                Import: Recent matches
+                                {{ importData.imported_games }} of
+                                {{ importData.total_games }}
+                              </div>
+                              <div class="ms-auto">
+                                <span
+                                  class="text-green d-inline-flex align-items-center lh-1"
+                                >
+                                  {{ importData.percentage }}%
+                                </span>
+                              </div>
+                            </div>
                           </div>
-                          <div class="progress mb-2">
+                          <div class="progress mb-2" v-if="importData">
                             <div
+                              v-if="['PENDING', 'FINISHED'].includes(importData.import_state)"
+                              class="progress-bar progress-bar-indeterminate bg-lime"
+                            ></div>
+                            <div
+                              v-else-if="importData.import_state == 'IMPORTING'"
                               role="progressbar"
                               class="progress-bar bg-lime"
-                              style="width: 38%"
+                              :style="{ width: importData.percentage + '%' }"
                             ></div>
                           </div>
                         </div>
@@ -201,7 +217,7 @@
                           <a
                             href="#"
                             class="btn btn-primary"
-                            @click="importPlayer"
+                            @click="triggerImportPlayer"
                             :class="{ disabled: isImportingData }"
                           >
                             <svg
@@ -406,39 +422,59 @@ export default {
       this.showImportPlayerModal = false
     }
   },
+  destroyed() {
+    clearInterval(this.importInterval)
+  },
   data() {
     return {
       showImportPlayerModal: false,
-      showImportProgressbar: true,
+      showImportProgressbar: false,
       isImportingData: false,
       selectedPlayerUuid: null,
+      requiresImport: false,
+      importData: {
+        imported_games: 0,
+        total_games: 0,
+        imported: false,
+        percentage: 100,
+      },
+      importInterval: null,
     }
   },
   methods: {
     async importPlayer() {
-      this.isImportingData = true
       try {
-        await this.$axios.post(`/players/${this.selectedPlayerUuid}/import`)
+        const response = await this.$axios.post(
+          `/players/${this.selectedPlayerUuid}/import`,
+          {}
+        )
+        this.importData = response.data
+
+        if (this.importData.imported) {
+          clearInterval(this.importInterval)
+          this.isImportingData = false
+          this.showImportPlayerModal = false
+          // send request to show all data
+        }
       } catch (err) {
         console.log(err)
       }
+    },
+    triggerImportPlayer() {
+      this.isImportingData = true
+      this.showImportProgressbar = true
 
-      this.$nextTick(function () {
-        window.setInterval(async () => {
-          try {
-            await this.$axios.post(`/players/${this.selectedPlayerUuid}/import`)
-          } catch (err) {
-            console.log(err)
-          }
-        }, 3000)
-      })
+      this.importPlayer()
+      this.importInterval = setInterval((async) => {
+        this.importPlayer()
+      }, 5000)
     },
     async filterApplied(filters) {
       try {
         const query = { ...filters }
         const puuids = []
         this.selectedPlayerUuid = null
-        this.showImportPlayerModal = true
+        this.showImportPlayerModal = false
 
         if (query.compare === 'global') {
           // keep puuids empty
@@ -453,13 +489,20 @@ export default {
           )
           puuids.push(response.data.id)
           this.selectedPlayerUuid = response.data.id
+
+          if (!response.data.imported) {
+            this.showImportPlayerModal = true
+            this.requiresImport = true
+          }
         }
 
-        await this.$axios.get(
-          `/achievements?puuids=[${puuids.join()}]&champion=${
-            query.champion
-          }&rank=${query.rank}`
-        )
+        if (!this.isImportingData && !this.requiresImport) {
+          await this.$axios.get(
+            `/achievements?puuids=[${puuids.join()}]&champion=${
+              query.champion
+            }&rank=${query.rank}`
+          )
+        }
       } catch (err) {
         console.log(err)
       }
