@@ -19,6 +19,7 @@ def create_app():
     CORS(flask_app, origins=['*', 'http://localhost:3000'], allow_headers=['*'], supports_credentials=False)
     flask_app.config['SQLALCHEMY_DATABASE_URI'] = config.DATABASE_CONNECTION_URI
     flask_app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+    flask_app.url_map.strict_slashes = False
     flask_app.app_context().push()
     db.init_app(flask_app)
     flask_app.config["JWT_SECRET_KEY"] = config.JWT_SECRET_KEY
