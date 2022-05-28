@@ -22,7 +22,7 @@
       </h1>
       <div class="navbar-nav flex-row order-md-last">
         <div class="nav-item d-none d-md-flex me-3"></div>
-        <div v-if="$auth.loggedIn && $auth.user" class="nav-item dropdown">
+        <div v-if="$auth.loggedIn && Object.keys($auth.user.player_stats).length != 0" class="nav-item dropdown">
           <a
             href="#"
             class="nav-link d-flex lh-1 text-reset p-0"
