@@ -104,8 +104,9 @@ def get_own_data(current_user, access_token):
     # TODO implement call to player endpoint and retrieve player data
     player_stats = {}
 
-    response = requests.get(f"https://lol-stats.de/api/players/{current_user.player_uuid}")
-    player_stats = response.json()
+    if current_user.player_uuid is not None:
+        response = requests.get(f"https://lol-stats.de/api/players/{current_user.player_uuid}")
+        player_stats = response.json()
 
     competitors = Competitors.query.filter_by(user_id=current_user.id).all()
     competitor_output = []
