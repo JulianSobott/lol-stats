@@ -186,13 +186,16 @@
                         <div v-if="showImportProgressbar" class="w-100">
                           <div class="mb-2 text-center">
                             <div class="d-flex">
-                              <div>
+                              <div v-if="importData.import_state == 'IMPORTING'">
                                 Import: Recent matches
                                 {{ importData.imported_games }} of
                                 {{ importData.total_games }}
                               </div>
+                              <div v-if="importData.import_state == 'PENDING'">
+                                Start importing data...
+                              </div>
                               <div class="ms-auto">
-                                <span
+                                <span v-if="importData.import_state == 'IMPORTING'"
                                   class="text-green d-inline-flex align-items-center lh-1"
                                 >
                                   {{ importData.percentage }}%
