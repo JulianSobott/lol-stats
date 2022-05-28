@@ -115,12 +115,14 @@ def get_own_data(current_user, access_token):
             "id": competitor.id,
             "player_uuid": competitor.player_uuid,
             "name": competitor.username,
-            "region": "euw" # placeholder
+            "region": "euw", # placeholder
+            "player_stats": player_stats,
+            "competitors": competitor_output
         }
         competitor_output.append(data)
 
     return make_response(
-        jsonify({"status": "success", "user": user, "player_stats": player_stats, "competitors": competitor_output}),
+        jsonify({"status": "success", "user": user}),
         200)
 
 
