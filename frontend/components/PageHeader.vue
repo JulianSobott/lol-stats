@@ -22,7 +22,7 @@
       </h1>
       <div class="navbar-nav flex-row order-md-last">
         <div class="nav-item d-none d-md-flex me-3"></div>
-        <div v-if="user && $auth.loggedIn" class="nav-item dropdown">
+        <div v-if="$auth.loggedIn && $auth.user" class="nav-item dropdown">
           <a
             href="#"
             class="nav-link d-flex lh-1 text-reset p-0"
@@ -31,9 +31,9 @@
           >
             <span class="avatar avatar-sm" :style="userIcon"></span>
             <div class="d-none d-xl-block ps-2">
-              <div>{{ user.name }}</div>
+              <div>{{ $auth.user.player_stats.name }}</div>
               <div class="mt-1 small text-muted">
-                {{ user.rank.tier.toUpperCase() }} {{ user.rank.division }}
+                {{ $auth.user.player_stats.rank.tier.toUpperCase() }} {{ $auth.user.player_stats.rank.division }}
               </div>
             </div>
           </a>
@@ -78,29 +78,10 @@ export default {
   name: 'PageHeader',
   computed: {
     userIcon() {
-      return `background-image: url("${this.user.player_icon_path}");`
+      return `background-image: url("${this.$auth.user.player_stats.player_icon_path}");`
     },
-  },
-  mounted() {
-    this.getUserData()
-  },
-  data() {
-    return {
-      user: null,
-    }
   },
   methods: {
-    async getUserData() {
-      try {
-        if (this.$auth.loggedIn) {
-          const playerUuid = this.$auth.user.player_uuid
-          const response = await this.$axios.get(`/players/${playerUuid}`)
-          this.user = response.data
-        }
-      } catch (err) {
-        console.log(err)
-      }
-    },
     async logoutUser() {
       try {
         await this.$auth.logout('local')

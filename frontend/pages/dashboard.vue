@@ -294,16 +294,14 @@ export default {
     },
   },
   mounted() {
-    if (this.$route.query.welcome !== undefined) {
-      this.fetchUserData()
-    }
+    this.fetchUserData()
     this.clearRecentGames()
     this.getPlayerData()
     this.getRecentGames()
   },
   data() {
     return {
-      importPlayerData: true,
+      importPlayerData: false,
       moreGamesLoading: false,
     }
   },

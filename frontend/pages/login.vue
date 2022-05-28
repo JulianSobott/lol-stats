@@ -123,8 +123,8 @@ export default {
             },
           })
           .then(() => {
-            const user = this.$auth.user
-            if (user.player_uuid === null) {
+            this.$auth.fetchUser()
+            if (this.$auth.user.player_uuid === null) {
               this.$router.push('/settings?firstsetup=true')
             } else {
               this.$router.push('/dashboard?welcome=true')
