@@ -2,6 +2,7 @@ import datetime
 import os
 from functools import wraps
 from urllib import response
+import requests
 
 import jwt
 from flask_cors import CORS
@@ -102,6 +103,11 @@ def get_own_data(current_user, access_token):
 
     # TODO implement call to player endpoint and retrieve player data
     player_stats = {}
+    try:
+        response = requests.get(f"/api/players/{current_user.player_uuid}")
+        player_stats = response.json()
+    except Exception as exc:
+        pass
 
     competitors = Competitors.query.filter_by(user_id=current_user.id).all()
     competitor_output = []
