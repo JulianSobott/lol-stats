@@ -5,7 +5,7 @@ from datetime import datetime, timedelta
 
 from sqlalchemy.orm import Session
 
-from models.player import Player
+from player_api.models.player import Player
 from player_api.db import Champions, Summoners, Base, Games, datetime_to_db
 from player_api.models.factories import PlayerModelFactory
 

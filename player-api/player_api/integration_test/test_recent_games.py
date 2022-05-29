@@ -4,9 +4,10 @@ import urllib.parse
 
 from fastapi.testclient import TestClient
 
-from integration_test.factories import PlayerFactory, Testplayer, DEFAULT_GAME_LENGTH
-from main import DEFAULT_GAMES_PER_PAGE, app
-from models.game import Game, Page, TeamMember
+from player_api.endpoints.recent_games import DEFAULT_GAMES_PER_PAGE
+from player_api.integration_test.factories import PlayerFactory, Testplayer
+from player_api.main import app
+from player_api.models.game import Game, Page, TeamMember
 
 client = TestClient(app)
 random.seed(1)

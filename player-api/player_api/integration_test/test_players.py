@@ -2,9 +2,9 @@ import random
 
 from fastapi.testclient import TestClient
 
-from integration_test.test_main import PlayerFactory, Testplayer
-from main import app
-from models.player import BasicPlayer
+from player_api.integration_test.factories import PlayerFactory
+from player_api.main import app
+from player_api.models.player import BasicPlayer
 
 client = TestClient(app)
 random.seed(1)

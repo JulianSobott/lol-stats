@@ -3,8 +3,12 @@ import random
 import pytest
 from fastapi.testclient import TestClient
 
-from integration_test.factories import PlayerFactory, Testplayer, Champion
-from player_api.main import app, calc_win_rate, DEFAULT_NUM_MOST_PLAYED_CHAMPS
+from player_api.endpoints.get_player import (
+    calc_win_rate,
+    DEFAULT_NUM_MOST_PLAYED_CHAMPS,
+)
+from player_api.integration_test.factories import PlayerFactory, Testplayer, Champion
+from player_api.main import app
 from player_api.models.player import Player
 
 client = TestClient(app)
