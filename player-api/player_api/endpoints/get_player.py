@@ -1,3 +1,5 @@
+import asyncio
+
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy import func, case, text
 from sqlalchemy.orm import Session
@@ -45,44 +47,13 @@ async def get_player(player_id: PlayerId, db: Session = Depends(get_db)):
             raise HTTPException(status_code=404, detail="player not found")
     logger.debug(f"method=get_player {player_id=} {player.name=}")
 
-    most_played_db = (
-        db.query(
-            Games.champ_id,
-            Champions.name,
-            Champions.icon_path,
-            func.count(Games.champ_id).label("num_played"),
-            func.count(case([(Games.win, 1)])).label("won"),
-        )
-        .join(Champions)
-        .where(Games.summoner_id == player.puuid)
-        .group_by(Games.champ_id, Champions.name, Champions.icon_path)
-        .order_by(text("num_played DESC"))
-        .limit(DEFAULT_NUM_MOST_PLAYED_CHAMPS)
-        .all()
+    most_played, win_rate = await asyncio.gather(
+        query_most_played(db, player.puuid), query_win_rate(db, player.puuid)
     )
-    most_played = []
-    for champ in most_played_db:
-        most_played.append(
-            MostPlayed(
-                champion_id=champ[0],
-                champion_name=champ[1],
-                icon_path=champ[2],
-                games=champ[3],
-                win_rate=calc_win_rate(games=champ[3], won=champ[4]),
-            )
-        )
-    logger.debug(f"method=get_player {most_played=}")
 
-    result = (
-        db.query(
-            func.count(Games.summoner_id).label("num_played"),
-            func.count(case([(Games.win, 1)])).label("won"),
-        )
-        .where(Games.summoner_id == player.puuid)
-        .first()
-    )
-    win_rate = calc_win_rate(result.num_played, result.won)
+    logger.debug(f"method=get_player {most_played=}")
     logger.debug(f"method=get_player {win_rate=}")
+
     if player.division is None or player.tier is None or player.league_points is None:
         rank = None
     else:
@@ -101,6 +72,49 @@ async def get_player(player_id: PlayerId, db: Session = Depends(get_db)):
         win_rate=win_rate,
         imported=True,
     )
+
+
+async def query_win_rate(db: Session, player_id: PlayerId) -> int:
+    result = (
+        db.query(
+            func.count(Games.summoner_id).label("num_played"),
+            func.count(case([(Games.win, 1)])).label("won"),
+        )
+        .where(Games.summoner_id == player_id)
+        .first()
+    )
+    win_rate = calc_win_rate(result.num_played, result.won)
+    return win_rate
+
+
+async def query_most_played(db: Session, player_id: PlayerId) -> list[MostPlayed]:
+    most_played_db = (
+        db.query(
+            Games.champ_id,
+            Champions.name,
+            Champions.icon_path,
+            func.count(Games.champ_id).label("num_played"),
+            func.count(case([(Games.win, 1)])).label("won"),
+        )
+        .join(Champions)
+        .where(Games.summoner_id == player_id)
+        .group_by(Games.champ_id, Champions.name, Champions.icon_path)
+        .order_by(text("num_played DESC"))
+        .limit(DEFAULT_NUM_MOST_PLAYED_CHAMPS)
+        .all()
+    )
+    most_played = []
+    for champ in most_played_db:
+        most_played.append(
+            MostPlayed(
+                champion_id=champ[0],
+                champion_name=champ[1],
+                icon_path=champ[2],
+                games=champ[3],
+                win_rate=calc_win_rate(games=champ[3], won=champ[4]),
+            )
+        )
+    return most_played
 
 
 def calc_win_rate(games: int, won: int) -> int:
