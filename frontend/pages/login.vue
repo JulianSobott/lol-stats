@@ -11,7 +11,7 @@
         <div class="card-body">
           <h2 class="card-title text-center mb-4">Login to your account</h2>
           <p v-if="logoutSuccess" class="card-subtitle text-green text-center">
-            You have been logged out successfully. 
+            You have been logged out successfully.
           </p>
           <div class="mb-3">
             <label class="form-label">Email address</label>
@@ -67,6 +67,7 @@
 
 <script>
 import { required } from 'vuelidate/lib/validators'
+import { mapActions } from 'vuex'
 
 export default {
   name: 'LoginPage',
@@ -104,6 +105,9 @@ export default {
     },
   },
   methods: {
+    ...mapActions({
+      clearStore: 'dashboard/clearStore',
+    }),
     async login() {
       this.submitted = true
       this.error = false
@@ -113,6 +117,8 @@ export default {
         this.error = true
         return
       }
+
+      this.clearStore()
 
       try {
         await this.$auth
