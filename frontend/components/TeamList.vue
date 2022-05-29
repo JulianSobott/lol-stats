@@ -14,7 +14,7 @@
       <div class="col d-none d-md-block" :class="{ 'text-red': player.team === 'red',  'text-blue': player.team === 'blue'}">
         <span v-if="match.self.player.name === player.player.name">You</span>
         <span v-else
-          >{{ player.player.name }}
+          ><NuxtLink :to="'profiles/' + player.player.id">{{ player.player.name }}</NuxtLink>
           <span class="text-muted"
             >({{ player.stats.kills }}/{{ player.stats.deaths }}/{{
               player.stats.assists
