@@ -22,7 +22,7 @@
       </h1>
       <div class="navbar-nav flex-row order-md-last">
         <div class="nav-item d-none d-md-flex me-3"></div>
-        <div v-if="$auth.loggedIn && Object.keys($auth.user.player_stats).length > 1" class="nav-item dropdown">
+        <div v-if="$auth.loggedIn" class="nav-item dropdown">
           <a
             href="#"
             class="nav-link d-flex lh-1 text-reset p-0"
@@ -31,9 +31,13 @@
           >
             <span class="avatar avatar-sm" :style="userIcon"></span>
             <div class="d-none d-xl-block ps-2">
-              <div>{{ $auth.user.player_stats.name }}</div>
+              <div v-if="$auth.user.player_stats.name">{{ $auth.user.player_stats.name }}</div>
+              <div v-else>{{ $auth.user.email }}</div>
               <div v-if="$auth.user.player_stats.rank !== undefined && $auth.user.player_stats.rank != null" class="mt-1 small text-muted">
                 {{ $auth.user.player_stats.rank.tier.toUpperCase() }} {{ $auth.user.player_stats.rank.division }}
+              </div>
+              <div v-else class="mt-1 small text-muted">
+                No Data
               </div>
             </div>
           </a>
