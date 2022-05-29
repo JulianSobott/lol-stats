@@ -23,6 +23,7 @@ export const actions = {
   async getPlayerData({
     commit
   }) {
+    commit("clearStore")
     const playerUuid = this.$auth.user.player_uuid
     const response = await this.$axios.get(`/players/${playerUuid}`);
     commit("setPlayerData", response.data);
@@ -47,9 +48,11 @@ export const actions = {
   },
   clearRecentGames({
     commit,
-    state
   }) {
     commit("clearRecentGames");
+  },
+  clearStore({ commit }) {
+    commit("clearStore")
   }
 }
 
@@ -66,5 +69,10 @@ export const mutations = {
   },
   clearRecentGames(state) {
     state.recentGames = [];
+  },
+  clearStore(state) {
+    state.recentGames = [];
+    state.playerData = {};
+    state.nextRecentGamesLink = '';
   },
 }
