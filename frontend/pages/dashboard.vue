@@ -17,7 +17,7 @@
       <div class="page-body">
         <div class="container-xl">
           <div class="row row-cards">
-            <div v-if="!this.importPlayerData" class="col-md-12 col-lg-12">
+            <div v-if="this.isImportPlayerData" class="col-md-12 col-lg-12">
               <div class="card bg-primary mb-3">
                 <div class="card-stamp">
                   <div class="card-stamp-icon bg-white text-primary">
@@ -51,23 +51,42 @@
                     Your player data is being imported!
                   </h3>
                   <p>
-                    Please wait, your player data is being imported from the
-                    League of Legends database. Get yourself a tea or a coffee
-                    :)
+                    Please wait, your player data is being imported and
+                    calculated. Get yourself a tea or a coffee :)
                   </p>
-                  <div class="d-flex mb-2"><i>Current Status ....</i></div>
+                  <div class="d-flex mb-2">
+                    <div v-if="importData.import_state == 'IMPORTING'">
+                      Import: Recent matches
+                      {{ importData.imported_games }} of
+                      {{ importData.total_games }}
+                    </div>
+                    <div v-if="importData.import_state == 'PENDING'">
+                      Start importing data...
+                    </div>
+                    <div class="ms-auto">
+                      <span
+                        v-if="importData.import_state == 'IMPORTING'"
+                        class="text-white d-inline-flex align-items-center lh-1"
+                      >
+                        {{ importData.percentage }}%
+                      </span>
+                    </div>
+                  </div>
                   <div class="progress mb-2">
                     <div
+                      v-if="
+                        ['PENDING', 'FINISHED'].includes(
+                          importData.import_state
+                        )
+                      "
+                      class="progress-bar progress-bar-indeterminate bg-lime"
+                    ></div>
+                    <div
+                      v-else-if="importData.import_state == 'IMPORTING'"
                       class="progress-bar bg-lime"
-                      style="width: 38%"
+                      :style="{ width: importData.percentage + '%' }"
                       role="progressbar"
-                      aria-valuenow="38"
-                      aria-valuemin="0"
-                      aria-valuemax="100"
-                      aria-label="38% Complete"
-                    >
-                      <span class="visually-hidden">38% Complete</span>
-                    </div>
+                    ></div>
                   </div>
                 </div>
               </div>
@@ -78,7 +97,8 @@
                   <div class="d-flex align-items-center">
                     <div class="subheader">Winrate</div>
                   </div>
-                  <div class="h1 mb-3">{{ playerData.win_rate }}%</div>
+                  <div v-if="playerData.win_rate" class="h1 mb-3">{{ playerData.win_rate }}%</div>
+                  <div v-else class="h1 mb-3">0%</div>
                   <div class="d-flex mb-2">
                     <div>Winrate</div>
                   </div>
@@ -99,7 +119,10 @@
               </div>
             </div>
             <div class="col-sm-4 col-lg-4">
-              <div v-if="playerData.rank !== undefined && playerData.rank != null" class="card h-100">
+              <div
+                v-if="playerData.rank !== undefined && playerData.rank != null"
+                class="card h-100"
+              >
                 <div class="card-body text-center">
                   <div class="mb-3">
                     <span
@@ -187,20 +210,21 @@
                       </tr>
                     </thead>
                     <tbody>
-                      <tr
-                        v-for="game in recentGames"
-                        :key="game.match_id"
-                      >
+                      <tr v-for="game in recentGames" :key="game.match_id">
                         <td>
-                          <strong v-if="game.win" class="text-green">Victory</strong>
+                          <strong v-if="game.win" class="text-green"
+                            >Victory</strong
+                          >
                           <strong v-else class="text-red">Defeat</strong>
                         </td>
                         <td class="text-center">
                           <span
-                              class="avatar avatar-s avatar-rounded m-1"
-                              :style="championIconPath(game.self.champion)"
-                            ></span>
-                            <span class="text-muted d-block">{{ game.self.champion.name}}</span>
+                            class="avatar avatar-s avatar-rounded m-1"
+                            :style="championIconPath(game.self.champion)"
+                          ></span>
+                          <span class="text-muted d-block">{{
+                            game.self.champion.name
+                          }}</span>
                         </td>
                         <td>
                           <div class="row">
@@ -217,8 +241,12 @@
                           {{ game.self.stats.deaths }} /
                           {{ game.self.stats.assists }}
                         </td>
-                        <td class="text-center">{{ converDuration(game.duration) }}</td>
-                        <td class="text-center">{{ converTimestamp(game.timestamp) }}</td>
+                        <td class="text-center">
+                          {{ converDuration(game.duration) }}
+                        </td>
+                        <td class="text-center">
+                          {{ converTimestamp(game.timestamp) }}
+                        </td>
                       </tr>
                     </tbody>
                   </table>
@@ -232,10 +260,7 @@
                     >
                       <span
                         v-if="moreGamesLoading"
-                        class="
-                          spinner-border spinner-border-sm
-                          icon icon-tabler
-                        "
+                        class="spinner-border spinner-border-sm icon icon-tabler"
                         role="status"
                         aria-hidden="true"
                       ></span>
@@ -299,12 +324,29 @@ export default {
     if (this.$auth.user.player_stats.imported) {
       this.getPlayerData()
       this.getRecentGames()
+    } else {
+      this.isImportingData = true
+      this.importPlayerData()
+      this.importInterval = setInterval((async) => {
+        this.importPlayerData()
+      }, 5000)
     }
+  },
+  destroyed() {
+    clearInterval(this.importInterval)
   },
   data() {
     return {
-      importPlayerData: false,
+      isImportPlayerData: false,
       moreGamesLoading: false,
+      importInterval: null,
+      importData: {
+        import_state: 'PENDING',
+        imported_games: 0,
+        total_games: 0,
+        imported: true,
+        percentage: 100,
+      },
     }
   },
   methods: {
@@ -320,9 +362,27 @@ export default {
     championIconPath(champion) {
       return `background-image: url("${champion.icon_path}");`
     },
+    async importPlayerData() {
+      try {
+        const response = await this.$axios.post(
+          `/players/${this.$auth.user.player_uuid}/import`,
+          {}
+        )
+        this.importData = response.data
+
+        if (this.importData.imported) {
+          clearInterval(this.importInterval)
+          this.isImportingData = false
+          this.$router.go(this.$router.currentRoute)
+          // send request to show all data
+        }
+      } catch (err) {
+        console.log(err)
+      }
+    },
     async fetchUserData() {
       await this.$auth.fetchUser()
-      this.importPlayerData = this.$auth.user.player_stats.imported
+      this.isImportPlayerData = !this.$auth.user.player_stats.imported
     },
     converTimestamp(value) {
       return moment(String(value)).format('MM-DD-YYYY')
