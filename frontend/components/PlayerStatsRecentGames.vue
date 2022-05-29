@@ -58,7 +58,7 @@
           <button
             class="btn btn-primary ms-auto"
             @click="loadMoreGames()"
-            :disabled="!getNextRecentGamesLink()"
+            :disabled="nextRecentGamesLink === ''"
           >
             <span
               v-if="moreGamesLoading"
@@ -96,7 +96,14 @@ import moment from 'moment'
 
 export default {
   name: 'PlayerStatsRecentGames',
-  props: ['recentGames'],
+  props: ['playerUuid'],
+  data() {
+    return {
+      nextRecentGamesLink: "",
+      recentGames: [],
+      moreGamesLoading: false,
+    }
+  },
   methods: {
     championIconPath(champion) {
       return `background-image: url("${champion.icon_path}");`
@@ -107,8 +114,19 @@ export default {
     converDuration(secs) {
       return moment.utc(secs * 1000).format('mm:ss')
     },
-    loadMoreGames() {
-      console.log("TODO")
+    async fetchPlayerData() {
+      const recentGamesResponse = await this.$axios.get(
+        `/players/${this.playerUuid}/recent-games`
+      )
+      this.recentGames = recentGamesResponse.data.items
+      this.nextRecentGamesLink = recentGamesResponse.data.next
+    },
+    async loadMoreGames() {
+      this.moreGamesLoading = true
+      const response = await this.$axios.get(this.nextRecentGamesLink);
+      this.recentGames.push(...response.data.items);
+      this.nextRecentGamesLink = response.data.next
+      this.moreGamesLoading = false
     },
   },
 }
