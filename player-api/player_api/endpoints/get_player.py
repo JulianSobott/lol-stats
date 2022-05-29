@@ -6,6 +6,7 @@ from sqlalchemy.orm import Session
 
 from player_api.db import Games, Champions
 from player_api.get_player import get_player_by_id
+from player_api.import_state import is_player_imported
 from player_api.log import get_logger
 from player_api.middlewares import get_db
 from player_api.models.player import Player, PlayerId, MostPlayed, Rank
@@ -26,8 +27,7 @@ logger = get_logger(__name__)
 async def get_player(player_id: PlayerId, db: Session = Depends(get_db)):
     """Get a player by riots puuid"""
     logger.debug(f"method=get_player {player_id=}")
-    player = get_player_by_id(db, player_id)
-    if player is None:
+    if not is_player_imported(db, player_id):
         player = find_player_in_riot_api_by(player_id, SearchTerm.id)
         if player:
             logger.debug(
@@ -45,6 +45,8 @@ async def get_player(player_id: PlayerId, db: Session = Depends(get_db)):
             )
         else:
             raise HTTPException(status_code=404, detail="player not found")
+
+    player = get_player_by_id(db, player_id)
     logger.debug(f"method=get_player {player_id=} {player.name=}")
 
     most_played, win_rate = await asyncio.gather(

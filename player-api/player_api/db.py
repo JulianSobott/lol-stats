@@ -47,9 +47,9 @@ class Summoners(Base):
     puuid = Column(String, primary_key=True)
     region_id = Column(String)
     name = Column(String, nullable=False)
-    level = Column(Integer, nullable=False)
-    icon_path = Column(String, nullable=False)
-    last_update = Column(Integer, nullable=False)
+    level = Column(Integer, nullable=True)
+    icon_path = Column(String, nullable=True)
+    last_update = Column(Integer, nullable=True)
     tier = Column(Enum(TierEnum))
     division = Column(Enum(DivisionEnum))
     league_points = Column(
