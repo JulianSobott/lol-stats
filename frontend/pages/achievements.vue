@@ -1,5 +1,6 @@
 <template>
   <div class="page">
+    <ImportHeaderWarning />
     <PageHeader />
     <PageNavigation />
     <div class="page-wrapper">
