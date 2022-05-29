@@ -33,4 +33,9 @@ export const mutations = {
   clearStore(state) {
     state.playerData = {};
   },
+  clearStore(state) {
+    state.recentGames = [];
+    state.playerData = {};
+    state.nextRecentGamesLink = '';
+  },
 }
