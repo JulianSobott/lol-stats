@@ -8,9 +8,7 @@
         <div class="mb-3">
           <span
             class="avatar avatar-xl avatar-rounded"
-            style="
-              background-image: url(https://opgg-static.akamaized.net/images/medals/bronze_4.png?image=q_auto&image=q_auto,f_webp,w_auto&v=1651226741046);
-            "
+            :style="loadRankIcon(playerData.rank.tier)"
           ></span>
         </div>
         <div class="card-title mb-1">
@@ -41,5 +39,11 @@
 export default {
   name: 'PlayerStatsRank',
   props: ['playerData'],
+  methods: {
+    loadRankIcon(rankIcon) {
+      const path = require(`../assets/images/ranks/${rankIcon}.png`)
+      return `background-image: url("${path}"); background-size: 75%`
+    },
+  }
 }
 </script>
