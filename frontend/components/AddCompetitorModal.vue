@@ -25,6 +25,7 @@
               @playerSelected="playerSelected"
             />
           </div>
+          <p v-if="competitorExists" class="text-red m-0">Competitorship already exists. Please select another one.</p>
         </div>
         <div class="modal-footer">
           <a
@@ -57,6 +58,7 @@ export default {
       },
       submitted: false,
       error: null,
+      competitorExists: false
     }
   },
   methods: {
@@ -75,8 +77,13 @@ export default {
         // dirty hack to reload the page
         window.location.reload(true)
       } catch (e) {
+        if (e.response.status === 409) {
+          this.competitorExists = true
+        }
         this.error = true
       }
+
+      document.querySelectorAll('.modal-backdrop').forEach((el) => el.remove())
 
       if (this.error) return
 
@@ -95,6 +102,8 @@ export default {
     },
     playerSelected(playerData) {
       this.form.player = playerData
+      this.competitorExists = false
+      this.error = false
     },
   },
 }
