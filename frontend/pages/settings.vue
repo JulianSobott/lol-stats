@@ -14,7 +14,7 @@
             <p class="text-muted">
               On LoL Stats you can compare your player stats and achievements
               with all League of legends players over the world or just with
-              your friends.
+              your competitors.
             </p>
           </div>
         </div>

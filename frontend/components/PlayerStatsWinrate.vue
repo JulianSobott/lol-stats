@@ -8,7 +8,7 @@
         <div v-if="playerData.win_rate" class="h1 mb-3">
           {{ playerData.win_rate }}%
         </div>
-        <div v-else class="h1 mb-3">0%</div>
+        <div v-else class="h1 mb-3"><div class="placeholder col-4"></div></div>
         <div class="d-flex mb-2">
           <div>Winrate</div>
         </div>

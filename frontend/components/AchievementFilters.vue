@@ -9,7 +9,7 @@
             type="radio"
             class="form-check-input"
             value="global"
-            @change="globalFriendsRadioSelected()"
+            @change="globalAndCompetitorsRadioSelected()"
           />
           <span class="form-check-label">Global</span>
         </label>
@@ -18,10 +18,10 @@
             v-model="filters.compare"
             type="radio"
             class="form-check-input"
-            value="friends"
-            @change="globalFriendsRadioSelected()"
+            value="competitors"
+            @change="globalAndCompetitorsRadioSelected()"
           />
-          <span class="form-check-label">Friends</span>
+          <span class="form-check-label">Competitors</span>
         </label>
         <label class="form-check mb-1">
           <input
@@ -268,11 +268,11 @@ export default {
 
     if (this.$route.query.playername !== undefined) {
       this.filters.compare = 'player'
-      this.filters.player.playername = this.$route.query.playername
       this.$refs.PlayerSearchInput.setPlayerData(
-        this.filters.player.playername,
+         this.$route.query.playername,
         null
       )
+      this.displayPlayerSearch = true
       this.$refs.PlayerSearchInput.disable(false)
     }
   },
@@ -303,7 +303,7 @@ export default {
         this.canSubmit = false
       }
     },
-    globalFriendsRadioSelected() {
+    globalAndCompetitorsRadioSelected() {
       this.$refs.PlayerSearchInput.disable(true)
       this.displayPlayerSearch = false
       this.canSubmit = true
