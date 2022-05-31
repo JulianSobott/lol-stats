@@ -34,7 +34,6 @@
                   <table class="table table-vcenter card-table">
                     <thead>
                       <tr>
-                        <th class="w-1">ID</th>
                         <th>Name</th>
                         <th>Tier</th>
                         <th>Winrate</th>
@@ -44,7 +43,6 @@
                     </thead>
                     <tbody>
                       <tr v-for="item in competitors" :key="item.id">
-                        <td class="text-muted">{{item.id}}</td>
                         <td>
                           <div class="d-flex py-1 align-items-center">
                             <span
@@ -55,7 +53,7 @@
                             ></span>
                             <div class="flex-fill">
                               <div class="font-weight-medium">
-                                <NuxtLink to="/profiles/1234" class="text-reset">{{item.name}}</NuxtLink>
+                                <NuxtLink :to="'/profiles/' + item.player_uuid" class="text-reset">{{item.name}}</NuxtLink>
                               </div>
                               <div class="text-muted"><NuxtLink :to="'/achievements?playername=' + item.name" class="text-reset">Achievements</NuxtLink></div>
                             </div>

@@ -268,11 +268,11 @@ export default {
 
     if (this.$route.query.playername !== undefined) {
       this.filters.compare = 'player'
-      this.filters.player.playername = this.$route.query.playername
       this.$refs.PlayerSearchInput.setPlayerData(
-        this.filters.player.playername,
+         this.$route.query.playername,
         null
       )
+      this.displayPlayerSearch = true
       this.$refs.PlayerSearchInput.disable(false)
     }
   },
