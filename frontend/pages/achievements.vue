@@ -184,10 +184,12 @@
                             the button below import the player.
                           </p>
                         </div>
-                        <div v-if="showImportProgressbar" class="w-100">
+                        <div class="w-100">
                           <div class="mb-2 text-center">
                             <div class="d-flex">
-                              <div v-if="importData.import_state == 'IMPORTING'">
+                              <div
+                                v-if="importData.import_state == 'IMPORTING'"
+                              >
                                 Import: Recent matches
                                 {{ importData.imported_games }} of
                                 {{ importData.total_games }}
@@ -196,8 +198,14 @@
                                 Start importing data...
                               </div>
                               <div class="ms-auto">
-                                <span v-if="importData.import_state == 'IMPORTING'"
-                                  class="text-green d-inline-flex align-items-center lh-1"
+                                <span
+                                  v-if="importData.import_state == 'IMPORTING'"
+                                  class="
+                                    text-green
+                                    d-inline-flex
+                                    align-items-center
+                                    lh-1
+                                  "
                                 >
                                   {{ importData.percentage }}%
                                 </span>
@@ -206,8 +214,15 @@
                           </div>
                           <div class="progress mb-2" v-if="importData">
                             <div
-                              v-if="['PENDING', 'FINISHED'].includes(importData.import_state)"
-                              class="progress-bar progress-bar-indeterminate bg-lime"
+                              v-if="
+                                ['PENDING', 'FINISHED'].includes(
+                                  importData.import_state
+                                )
+                              "
+                              class="
+                                progress-bar progress-bar-indeterminate
+                                bg-lime
+                              "
                             ></div>
                             <div
                               v-else-if="importData.import_state == 'IMPORTING'"
@@ -227,7 +242,9 @@
                             <svg
                               v-if="!isImportingData"
                               xmlns="http://www.w3.org/2000/svg"
-                              class="icon icon-tabler icon-tabler-database-import"
+                              class="
+                                icon icon-tabler icon-tabler-database-import
+                              "
                               width="24"
                               height="24"
                               viewBox="0 0 24 24"
@@ -252,7 +269,10 @@
                             </svg>
                             <span
                               v-else
-                              class="spinner-border spinner-border-sm icon icon-tabler"
+                              class="
+                                spinner-border spinner-border-sm
+                                icon icon-tabler
+                              "
                               role="status"
                               aria-hidden="true"
                             ></span>
@@ -268,14 +288,21 @@
                   <div id="tab-favorites" class="card tab-pane show active">
                     <div class="table-responsive">
                       <table
-                        class="table card-table table-vcenter text-nowrap datatable"
+                        class="
+                          table
+                          card-table
+                          table-vcenter
+                          text-nowrap
+                          datatable
+                        "
                       >
                         <thead>
                           <tr>
                             <th class="w-1">ID</th>
                             <th>Achievement</th>
-                            <th>You (Max/Average/Sum)</th>
-                            <th>Player (Max/Average/Sum)</th>
+                            <th>You (Max / Average / Sum)</th>
+                            <th>Other (Max / Average / Sum)</th>
+                            <th class="w-1"></th>
                           </tr>
                         </thead>
                         <tbody>
@@ -288,88 +315,14 @@
                             <td>
                               300 / 300 / <span class="text-red">300</span>
                             </td>
+                            <td>
+                              <FavoriteAchivementStar :userId="$auth.user.id" achivementId="1" :initState="true"/>
+                            </td>
                           </tr>
                         </tbody>
                       </table>
                     </div>
-                    <div class="card-footer d-flex align-items-center">
-                      <p class="m-0 text-muted">
-                        Showing <span>1</span> to <span>8</span> of
-                        <span>16</span> entries
-                      </p>
-                      <ul class="pagination m-0 ms-auto">
-                        <li class="page-item disabled">
-                          <a
-                            class="page-link"
-                            href="#"
-                            tabindex="-1"
-                            aria-disabled="true"
-                          >
-                            <!-- Download SVG icon from http://tabler-icons.io/i/chevron-left -->
-                            <svg
-                              xmlns="http://www.w3.org/2000/svg"
-                              class="icon"
-                              width="24"
-                              height="24"
-                              viewBox="0 0 24 24"
-                              stroke-width="2"
-                              stroke="currentColor"
-                              fill="none"
-                              stroke-linecap="round"
-                              stroke-linejoin="round"
-                            >
-                              <path
-                                stroke="none"
-                                d="M0 0h24v24H0z"
-                                fill="none"
-                              ></path>
-                              <polyline points="15 6 9 12 15 18"></polyline>
-                            </svg>
-                            prev
-                          </a>
-                        </li>
-                        <li class="page-item active">
-                          <a class="page-link" href="#">1</a>
-                        </li>
-                        <li class="page-item">
-                          <a class="page-link" href="#">2</a>
-                        </li>
-                        <li class="page-item">
-                          <a class="page-link" href="#">3</a>
-                        </li>
-                        <li class="page-item">
-                          <a class="page-link" href="#">4</a>
-                        </li>
-                        <li class="page-item">
-                          <a class="page-link" href="#">5</a>
-                        </li>
-                        <li class="page-item">
-                          <a class="page-link" href="#">
-                            next
-                            <!-- Download SVG icon from http://tabler-icons.io/i/chevron-right -->
-                            <svg
-                              xmlns="http://www.w3.org/2000/svg"
-                              class="icon"
-                              width="24"
-                              height="24"
-                              viewBox="0 0 24 24"
-                              stroke-width="2"
-                              stroke="currentColor"
-                              fill="none"
-                              stroke-linecap="round"
-                              stroke-linejoin="round"
-                            >
-                              <path
-                                stroke="none"
-                                d="M0 0h24v24H0z"
-                                fill="none"
-                              ></path>
-                              <polyline points="9 6 15 12 9 18"></polyline>
-                            </svg>
-                          </a>
-                        </li>
-                      </ul>
-                    </div>
+                    <div class="card-footer d-flex align-items-center"></div>
                   </div>
                   <!-- Content of card #2 -->
                   <div id="tab-kills" class="card tab-pane">
@@ -432,7 +385,6 @@ export default {
   data() {
     return {
       showImportPlayerModal: false,
-      showImportProgressbar: false,
       isImportingData: false,
       selectedPlayerUuid: null,
       requiresImport: false,
@@ -464,9 +416,23 @@ export default {
         console.log(err)
       }
     },
+    async toggleFavoriteAchivement(achivementId, state) {
+      try {
+        if (state) {
+          await this.$axios.post(`/users/${this.$auth.user.id}/achievements`, {
+            id: achivementId,
+          })
+        } else {
+          await this.$axios.delete(
+            `/users/${this.$auth.user.id}/achievements/${achivementId}`
+          )
+        }
+      } catch (err) {
+        console.log(err)
+      }
+    },
     triggerImportPlayer() {
       this.isImportingData = true
-      this.showImportProgressbar = true
 
       this.importPlayer()
       this.importInterval = setInterval((async) => {
@@ -482,7 +448,7 @@ export default {
 
         if (query.compare === 'global') {
           // keep puuids empty
-        } else if (query.compare === 'friends') {
+        } else if (query.compare === 'competitors') {
           puuids.push('123')
           puuids.push('123')
           puuids.push('123')
