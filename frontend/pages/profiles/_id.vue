@@ -10,7 +10,15 @@
             <div class="col">
               <!-- Page pre-title -->
               <div class="page-pretitle">Profile</div>
-              <h2 class="page-title">{{ playerData.name }}</h2>
+              <h2 v-if="playerData.name" class="page-title">
+                <span class="pt-1">{{ playerData.name }}</span>
+                <FavoriteCompetitorStar
+                  :userId="$auth.user.id"
+                  :competitorUuidId="playerData.id"
+                  :initState="isInCompetitorsList()"
+                />
+              </h2>
+              <div v-else class="placeholder col-3 mt-1"></div>
             </div>
             <div
               v-if="!playerData.imported"
@@ -90,9 +98,7 @@
                 </div>
                 <div class="card-body">
                   <h3 class="card-title">Player data is not imported!</h3>
-                  <p>
-                    Click the Import Button to import the player.
-                  </p>
+                  <p>Click the Import Button to import the player.</p>
                 </div>
               </div>
             </div>
@@ -125,13 +131,28 @@ export default {
   },
   methods: {
     async fetchPlayerData() {
-      const response = await this.$axios.get(
+      try {
+        const response = await this.$axios.get(
         `/players/${this.$route.params.id}`
-      )
-      this.playerData = response.data
+        )
+        this.playerData = response.data
+      } catch(e) {
+        if (e.response.status === 404) {
+          this.$router.push('/dashboard')
+        }
+      }
     },
     championIconPath(champion) {
       return `background-image: url("${champion.icon_path}");`
+    },
+    isInCompetitorsList() {
+      const competitors = this.$auth.user.competitors
+      const currentPlayerId = this.$route.params.id
+      return (
+        competitors.filter(function (e) {
+          return e.player_uuid === currentPlayerId
+        }).length > 0
+      )
     },
     async importPlayerData() {
       try {

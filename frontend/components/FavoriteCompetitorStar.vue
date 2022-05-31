@@ -1,13 +1,13 @@
 <template>
-  <a href="#" @click="toggleFavoriteAchivement()">
+  <a href="#" class="ms-1" @click="toggleFavoriteCompetitor()">
     <svg
       xmlns="http://www.w3.org/2000/svg"
       class="icon icon-tabler icon-tabler-star"
-      width="24"
-      height="24"
+      width="16"
+      height="16"
       viewBox="0 0 24 24"
       stroke-width="2"
-      stroke="#fff"
+      stroke="#f59f00"
       fill="none"
       stroke-linecap="round"
       stroke-linejoin="round"
@@ -23,24 +23,24 @@
 
 <script>
 export default {
-  name: 'FavoriteAchivementStar',
-  props: ['userId', 'achivementId', 'initState'],
+  name: 'FavoriteCompetitorStar',
+  props: ['userId', 'competitorUuidId', 'initState'],
   data() {
     return {
       currentState: this.initState,
     }
   },
   methods: {
-    async toggleFavoriteAchivement() {
+    async toggleFavoriteCompetitor() {
       try {
         this.currentState = !this.currentState
         if (this.currentState) {
-          await this.$axios.post(`/users/${this.userId}/achievements`, {
-            id: this.achivementId,
+          await this.$axios.post(`/users/${this.userId}/competitors/`, {
+            player_uuid: this.competitorUuidId,
           })
         } else {
           await this.$axios.delete(
-            `/users/${this.userId}/achievements/${this.achivementId}`
+            `/users/${this.userId}/competitors/${this.competitorUuidId}`
           )
         }
       } catch (err) {
@@ -54,6 +54,11 @@ export default {
 <style>
 .icon-tabler-star-active,
 .icon-tabler-star:hover {
-  fill: #fff;
+  fill: #f59f00;
+}
+
+.icon-tabler-star {
+  width: 1.2rem !important;
+  height: 1.2rem !important;
 }
 </style>
