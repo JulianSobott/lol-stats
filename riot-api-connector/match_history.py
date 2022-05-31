@@ -4,10 +4,16 @@ import traceback
 import cassiopeia as cass
 from cassiopeia import Summoner, Patch, MatchHistory, Match, GameType
 from cassiopeia.core.match import Participant, Side
+import riotwatcher
+from riotwatcher import LolWatcher, ApiError
+from riotwatcher._apis.league_of_legends import MatchApiV5
 
 from db_connector import db
 
 import challenges
+from riotwatcherWrapper import call_with_retry
+
+lol_watcher = LolWatcher('RGAPI-ba00cb63-7be0-4e50-8610-eb749b1ea70d')
 
 
 def get_match_history(summoner: Summoner) -> MatchHistory:
@@ -24,11 +30,28 @@ def get_match_history(summoner: Summoner) -> MatchHistory:
     return history
 
 
-def add_missing_games_to_db(db: db, match_history: MatchHistory, puuid: str):
+def get_match_ids(puuid: str, start_time: int):
+    start_index = 0
+    full_result = []
+    while result := _get_mh(region='euw1', puuid=puuid, start_time=start_time, count=100, start=start_index):
+        if len(result) == 0:
+            break
+        full_result.extend(result)
+        start_index += 100
+    return full_result
+
+
+@call_with_retry(max_retries=5)
+def _get_mh(region: str, puuid: str, start_time: int, count: int, start: int):
+    return lol_watcher.match.matchlist_by_puuid(region=region, puuid=puuid, start_time=start_time, count=count, start=start)
+
+
+def add_missing_games_to_db(db: db, match_ids, puuid: str):
     mh_start_time = time.time()
     c = challenges.Challenges()
     i = 0
-    for match in match_history:
+    for match_id in match_ids:
+        match: Match = cass.get_match(id=match_id, region='EUW')
         if match.game_type != GameType.matched:
             continue
         if db.has_game(match_id=match.id, summoner_id=puuid):
@@ -39,7 +62,7 @@ def add_missing_games_to_db(db: db, match_history: MatchHistory, puuid: str):
         except Exception as e:
             print(e, e.args)
             print(traceback.format_exc())
-        yield i, len(match_history)
+        yield i, len(match_ids)
         i += 1
         print(f'[INFO] Imported game in {time.time() - start_time}s')
     print(f'[INFO] Imported match history in {time.time() - mh_start_time}s')
@@ -54,7 +77,7 @@ def add_game_to_db(db: db, match: Match, puuid: str, c: challenges.Challenges):
         if not db.has_summoner(puuid=participant.summoner.puuid):
             summoner: Summoner = participant.summoner
             db.add_summoner(puuid=summoner.puuid, region_id=summoner.id, name=summoner.name, level=None,
-                            icon_path=None, tier=None, division=None, last_update_time=None)
+                            icon_path=None, tier=None, division=None, lp=None, last_update_time=None)
         if participant.side == Side.blue:
             win = match.blue_team.win
             side = 'blue'

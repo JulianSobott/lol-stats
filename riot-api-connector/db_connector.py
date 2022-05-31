@@ -31,16 +31,16 @@ class db:
         self.cursor.execute(open('db_init/schema.sql', 'r').read())
         self.connection.commit()
 
-    def add_summoner(self, puuid: str, region_id: str, name: str, level: int, icon_path: str, tier: str, division: str, last_update_time: int) -> None:
-        sql = """INSERT INTO summoners(puuid, region_id, name, level, icon_path, tier, division, last_update) VALUES(%s, %s, %s, %s, %s, %s, %s, %s);"""
+    def add_summoner(self, puuid: str, region_id: str, name: str, level: int, icon_path: str, tier: str, division: str, lp: int, last_update_time: int) -> None:
+        sql = """INSERT INTO summoners(puuid, region_id, name, level, icon_path, tier, division, last_update, league_points) VALUES(%s, %s, %s, %s, %s, %s, %s, %s, %s);"""
         self.cursor.execute(
-            sql, (puuid, region_id, name, level, icon_path, tier, division, last_update_time))
+            sql, (puuid, region_id, name, level, icon_path, tier, division, last_update_time, lp))
         self.connection.commit()
 
-    def update_summoner(self, puuid: str, name: str, level: int, icon_path: str, tier: str, division: str, last_update_time: int) -> None:
-        sql = """UPDATE summoners SET name = %s, level = %s, icon_path = %s, tier = %s, division = %s, last_update = %s WHERE puuid = %s;"""
+    def update_summoner(self, puuid: str, name: str, level: int, icon_path: str, tier: str, division: str, lp: int, last_update_time: int) -> None:
+        sql = """UPDATE summoners SET name = %s, level = %s, icon_path = %s, tier = %s, division = %s, last_update = %s, league_points = %s WHERE puuid = %s;"""
         self.cursor.execute(sql, (name, level, icon_path,
-                            tier, division, last_update_time, puuid))
+                            tier, division, last_update_time, lp, puuid))
         self.connection.commit()
 
     def get_summoner(self, puuid: str):
@@ -63,6 +63,11 @@ class db:
         sql = """INSERT INTO summonericons(id, icon_path) VALUES (%s, %s);"""
         self.cursor.execute(sql, (id, icon_path))
         self.connection.commit()
+
+    def get_summoner_icon_url(self, id: int) -> str:
+        sql = """SELECT icon_path FROM summonericons WHERE id = %s"""
+        self.cursor.execute(sql, (id,))
+        return self.cursor.fetchone()
 
     def clear_summoner_icons(self) -> None:
         sql = """DELETE FROM summonericons;"""
@@ -167,4 +172,26 @@ class db:
         return self.cursor.fetchone()
 
     def commit(self):
+        self.connection.commit()
+
+    def fix_games(self):
+        sql = """SELECT * FROM games;"""
+        self.cursor.execute(sql)
+        import cassiopeia
+        d = []
+        while x := self.cursor.fetchone():
+            game: cassiopeia.Match = cassiopeia.get_match(
+                id='EUW1_' + str(x[0]), region='EUW')
+            participant = game.participants[x[1]]
+            if participant.side == cassiopeia.core.match.Side.blue:
+                win = game.blue_team.win
+                side = 'blue'
+            else:
+                win = game.red_team.win
+                side = 'red'
+            d.append({'win': win, 'side': side, 's': x[1], 'g': x[0]})
+        sql = """UPDATE games SET win = %s, team = %s WHERE match_id = %s AND summoner_id = %s"""
+        for e in d:
+            print(e['win'], e['side'], e['g'], e['s'])
+            self.cursor.execute(sql, (e['win'], e['side'], e['g'], e['s']))
         self.connection.commit()

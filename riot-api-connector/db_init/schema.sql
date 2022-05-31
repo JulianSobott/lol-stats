@@ -6,7 +6,8 @@ CREATE TABLE IF NOT EXISTS Summoners (
    icon_path    TEXT                            ,
    tier         TEXT                            ,
    division     TEXT                            ,
-   last_update  INT                     
+   last_update  INT                             ,
+   league_points INT
 );
 
 CREATE TABLE IF NOT EXISTS SummonerSpells (
