@@ -84,6 +84,7 @@ def token_required(f):
             current_user = Users.query.filter_by(id=data['user_id']).first()
         except:
             return make_response(jsonify({"status": "error", 'message': 'Token is invalid'}), 400)
+            # TODO delete token
 
         return f(*(current_user, token) + args, **kwargs)
 
@@ -110,7 +111,7 @@ def get_own_data(current_user, access_token):
         data = {
             "id": competitor.id,
             "player_uuid": competitor.player_uuid,
-            "name": competitor.username,
+            "username": competitor.username,
             "region": "euw", # placeholder
         }
         competitor_output.append(data)
@@ -134,7 +135,7 @@ def get_own_data(current_user, access_token):
 def login():
     data = request.get_json()
     if not data:
-        return jsonify({"status": "error", "message": "No input data provided"}, 400)
+        return make_response(jsonify({"status": "error", "message": "No input data provided"}), 400)
     try:
         data = user_schema.load(data)
     except ValidationError as err:
@@ -195,7 +196,7 @@ def logout():
 def register():
     data = request.get_json()
     if not data:
-        return jsonify({"status": "error", "message": "No input data provided"}, 400)
+        return make_response(jsonify({"status": "error", "message": "No input data provided"}), 400)
     try:
         data = user_schema.load(data)
     except ValidationError as err:
@@ -252,7 +253,10 @@ def put_player_uuid(current_user, access_token, user_id):
             return make_response(jsonify({"status": "error", "message": err.messages}), 400)
 
         if "region" in data:
-            user.region = data["region"]
+            if not data["region"]:
+                user.region = "euw"
+            else:
+                user.region = data["region"]
         if "player_uuid" in data:
             user.player_uuid = data["player_uuid"]
 
@@ -281,11 +285,9 @@ def get_player(user_id: int):
 
 
 
-@app.route('/api/users/<user_id>/competitors/', methods=['GET', 'POST'])
+@app.route('/api/users/<user_id>/competitors/', methods=['GET'])
 @token_required
-def get_list_of_or_add_competitor(current_user, token, user_id):
-    if request.method == "GET":
-
+def get_list_of_competitor(current_user, token, user_id):
         competitors = Competitors.query.filter_by(user_id=user_id).all()
 
         competitor_output = []
@@ -295,24 +297,29 @@ def get_list_of_or_add_competitor(current_user, token, user_id):
             data = {
                 "id": competitor.id,
                 "player_uuid": competitor.player_uuid,
-                "name": competitor.username,
+                "player_name": competitor.username,
                 "player_stats": {}
             }
             competitor_output.append(data)
         return make_response(jsonify({"status": "success",
                                       "competitors": competitor_output}), 200)
 
-    elif request.method == "POST":
 
+@app.route('/api/users/<user_id>/competitors', methods=['POST'])
+@token_required
+def add_competitor(current_user, token, user_id):
         data = request.get_json()
         if not data:
-            return jsonify({"status": "error", "message": "No input data provided"}, 400)
+            return make_response(jsonify({"status": "error", "message": "No input data provided"}), 400)
         try:
             data = competitor_schema.load({"player_uuid": data["player_uuid"]})
         except ValidationError as err:
             return make_response(jsonify({"status": "error", "message": err.messages}), 400)
 
         if Competitors.query.filter_by(user_id=user_id, player_uuid=data["player_uuid"]).first() is None:
+            user = Users.query.filter_by(id=current_user.id).first()
+            if user.player_uuid == data["player_uuid"]:
+                return make_response(jsonify({"status": "error", "message": "You can not add yourself as a competitor!"}), 400)
             username = None
             # TODO get username of data["player_uuid"] from player endpoint
             username = "mockUsername"
@@ -332,32 +339,38 @@ def get_list_of_or_add_competitor(current_user, token, user_id):
                 409)
 
 
-@app.route('/api/users/<user_id>/competitors/<competitor_puuid>', methods=['GET', 'DELETE'])
+@app.route('/api/users/<user_id>/competitors/<competitor_puuid>', methods=['GET'])
 @token_required
-def get_or_delete_competitor(current_user, token, user_id, competitor_puuid):
+def get_competitor(current_user, token, user_id, competitor_puuid):
+    #TODO replace user_id with current_user.id and check both
     competitor = Competitors.query.filter_by(user_id=user_id, player_uuid=competitor_puuid).first()
     if competitor is None:
         return make_response(jsonify({"status": "error",
                                       "message": "Competitor not found in your competitorship"}), 404)
 
-    if request.method == "GET":
+    # TODO make request to player endpoint :get competitors ingame data
 
-        # TODO make request to player endpoint :get competitors ingame data
+    competitor_data = {
+        "id": competitor.id,
+        "player_uuid": competitor.player_uuid,
+        "username": competitor.username,
+        "player_stats": {}
+    }
 
-        competitor_data = {
-            "id": competitor.id,
-            "player_uuid": competitor.player_uuid,
-            "name": competitor.username,
-            "player_stats": {}
-        }
+    return make_response(jsonify({"status": "success",
+                                  "competitors": competitor_data}), 200)
 
-        return make_response(jsonify({"status": "success",
-                                      "competitors": competitor_data}), 200)
 
-    elif request.method == "DELETE":
+@app.route('/api/users/<user_id>/competitors/<competitor_puuid>', methods=['DELETE'])
+@token_required
+def delete_competitor(current_user, token, user_id, competitor_puuid):
+    competitor = Competitors.query.filter_by(user_id=user_id, player_uuid=competitor_puuid).first()
+    if competitor is None:
+        return make_response(jsonify({"status": "error",
+                                      "message": "Competitor not found in your competitorship"}), 404)
 
-        db.session.delete(competitor)
-        db.session.commit()
+    db.session.delete(competitor)
+    db.session.commit()
 
     return make_response(jsonify({"status": "success",
                                   "message": "No content",
