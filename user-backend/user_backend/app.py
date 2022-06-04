@@ -240,6 +240,7 @@ def delete_user(current_user, token):
 @app.route('/api/users/<user_id>', methods=['PUT'])
 @token_required
 def put_player_uuid(current_user, access_token, user_id):
+    if current_user.id == user_id:
     user = Users.query.filter_by(id=current_user.id).first()
     data = request.get_json()
 
@@ -271,6 +272,9 @@ def put_player_uuid(current_user, access_token, user_id):
             }), 200)
     else:
         return make_response(jsonify({"status": "error", "message": "User not found"}), 404)
+    else:
+        return make_response(jsonify({"status": "error",
+                                      "message": "Not authorized"}), 401)
 
 
 @app.route('/api/users/<user_id>', methods=['GET'])
@@ -309,6 +313,7 @@ def get_list_of_competitor(current_user, token, user_id):
 @app.route('/api/users/<user_id>/competitors', methods=['POST'])
 @token_required
 def add_competitor(current_user, token, user_id):
+    if current_user.id == user_id:
         data = request.get_json()
         if not data:
             return make_response(jsonify({"status": "error", "message": "No input data provided"}), 400)
@@ -344,13 +349,16 @@ def add_competitor(current_user, token, user_id):
                 jsonify(
                     {"status": "error", "message": "Competitorship already exists"}),
                 409)
+    else:
+        return make_response(jsonify({"status": "error",
+                                      "message": "Not authorized"}), 401)
 
 
 @app.route('/api/users/<user_id>/competitors/<competitor_puuid>', methods=['GET'])
 @token_required
 def get_competitor(current_user, token, user_id, competitor_puuid):
-    #TODO replace user_id with current_user.id and check both
-    competitor = Competitors.query.filter_by(user_id=user_id, player_uuid=competitor_puuid).first()
+    if current_user.id == user_id:
+        competitor = Competitors.query.filter_by(user_id=current_user.id, player_uuid=competitor_puuid).first()
     if competitor is None:
         return make_response(jsonify({"status": "error",
                                       "message": "Competitor not found in your competitorship"}), 404)
@@ -366,11 +374,15 @@ def get_competitor(current_user, token, user_id, competitor_puuid):
 
     return make_response(jsonify({"status": "success",
                                   "competitors": competitor_data}), 200)
+    else:
+        return make_response(jsonify({"status": "error",
+                                      "message": "Not authorized"}), 401)
 
 
 @app.route('/api/users/<user_id>/competitors/<competitor_puuid>', methods=['DELETE'])
 @token_required
 def delete_competitor(current_user, token, user_id, competitor_puuid):
+    if current_user.id == user_id:
     competitor = Competitors.query.filter_by(user_id=user_id, player_uuid=competitor_puuid).first()
     if competitor is None:
         return make_response(jsonify({"status": "error",
@@ -382,6 +394,9 @@ def delete_competitor(current_user, token, user_id, competitor_puuid):
     return make_response(jsonify({"status": "success",
                                   "message": "No content",
                                   }), 200)
+    else:
+        return make_response(jsonify({"status": "error",
+                                      "message": "Not authorized"}), 401)
 
 
 if __name__ == '__main__':
