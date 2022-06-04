@@ -292,12 +292,14 @@ def get_list_of_competitor(current_user, token, user_id):
 
         competitor_output = []
         for competitor in competitors:
-            # TODO make request to player endpoint :get competitors ingame data
+        if current_user.player_uuid is not None:
+            player_response = requests.get(f"https://lol-stats.de/api/players/{current_user.player_uuid}")
+            player_stats = player_response.json()
 
             data = {
                 "id": competitor.id,
                 "player_uuid": competitor.player_uuid,
-                "player_name": competitor.username,
+            "player_name": competitor.player_name,
                 "player_stats": {}
             }
             competitor_output.append(data)
@@ -319,10 +321,16 @@ def add_competitor(current_user, token, user_id):
         if Competitors.query.filter_by(user_id=user_id, player_uuid=data["player_uuid"]).first() is None:
             user = Users.query.filter_by(id=current_user.id).first()
             if user.player_uuid == data["player_uuid"]:
-                return make_response(jsonify({"status": "error", "message": "You can not add yourself as a competitor!"}), 400)
+            return make_response(jsonify({"status": "error", "message": "You can not add yourself as a competitor!"}),
+                                 400)
             username = None
-            # TODO get username of data["player_uuid"] from player endpoint
-            username = "mockUsername"
+
+        player_response = requests.get(f"https://lol-stats.de/api/players/{data['player_uuid']}")
+        player_stats = player_response.json()
+        if player_stats is not None:
+            if hasattr(player_stats, 'name'):
+                username = player_stats.name
+
             if username is not None:
                 competitor = Competitors(user_id=user_id, player_uuid=data["player_uuid"], username=username)
                 db.session.add(competitor)
