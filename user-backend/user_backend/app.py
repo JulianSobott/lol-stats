@@ -115,12 +115,14 @@ def get_own_data(current_user, access_token):
         }
         competitor_output.append(data)
 
+    user = Users.query.filter_by(id=current_user.id).first()
+
     user = {
-        "id": current_user.id,
-        "player_uuid": current_user.player_uuid,
-        "email": current_user.email,
+        "id": user.id,
+        "player_uuid": user.player_uuid,
+        "email": user.email,
         "token": access_token,
-        "region": "euw", # placeholder
+        "region": user.region,
         "player_stats": player_stats,
         "competitors": competitor_output
     }
