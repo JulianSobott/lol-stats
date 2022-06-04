@@ -48,7 +48,7 @@ class Competitors(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     player_uuid = db.Column(db.String(255), nullable=False)
-    username = db.Column(db.String(255), nullable=False)
+    player_name = db.Column(db.String(255), nullable=False)
 
 
 class AccessToken(db.Model):
@@ -111,8 +111,7 @@ def get_own_data(current_user, access_token):
         data = {
             "id": competitor.id,
             "player_uuid": competitor.player_uuid,
-            "username": competitor.username,
-            "region": "euw", # placeholder
+            "username": competitor.player_name,
         }
         competitor_output.append(data)
 
@@ -361,7 +360,7 @@ def get_competitor(current_user, token, user_id, competitor_puuid):
     competitor_data = {
         "id": competitor.id,
         "player_uuid": competitor.player_uuid,
-        "username": competitor.username,
+            "username": competitor.player_name,
         "player_stats": {}
     }
 
