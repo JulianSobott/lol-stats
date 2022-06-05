@@ -269,7 +269,7 @@ def delete_user(current_user, token):
 @app.route('/api/users/<user_id>', methods=['PUT'])
 @token_required
 def put_player_uuid(current_user, access_token, user_id):
-    if current_user.id == user_id:
+    if current_user.id == int(user_id):
         user = Users.query.filter_by(id=current_user.id).first()
         data = request.get_json()
 
@@ -331,7 +331,7 @@ def get_list_of_competitor(current_user, token, user_id):
                 data = {
                     "id": competitor.id,
                     "player_uuid": competitor.player_uuid,
-                "player_name": competitor.player_name,
+                    "player_name": competitor.player_name,
                     "player_stats": {}
                 }
                 competitor_output.append(data)
@@ -342,7 +342,7 @@ def get_list_of_competitor(current_user, token, user_id):
 @app.route('/api/users/<user_id>/competitors', methods=['POST'])
 @token_required
 def add_competitor(current_user, token, user_id):
-    if current_user.id == user_id:
+    if current_user.id == int(user_id):
         data = request.get_json()
         if not data:
             return make_response(jsonify({"status": "error", "message": "No input data provided"}), 400)
@@ -386,7 +386,7 @@ def add_competitor(current_user, token, user_id):
 @app.route('/api/users/<user_id>/competitors/<competitor_puuid>', methods=['GET'])
 @token_required
 def get_competitor(current_user, token, user_id, competitor_puuid):
-    if current_user.id == user_id:
+    if current_user.id == int(user_id):
         competitor = Competitors.query.filter_by(user_id=current_user.id, player_uuid=competitor_puuid).first()
         if competitor is None:
             return make_response(jsonify({"status": "error",
