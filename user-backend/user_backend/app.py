@@ -1,10 +1,13 @@
 import datetime
 import os
+import time
 from functools import wraps
 from urllib import response
 import requests
 
 import jwt
+import schedule
+from schedule import every, repeat, run_pending
 from flask_cors import CORS
 from flask import Flask, request, make_response, jsonify
 from flask_sqlalchemy import SQLAlchemy
@@ -83,19 +86,35 @@ def token_required(f):
             data = jwt.decode(api_key, app.config['JWT_SECRET_KEY'], algorithms=["HS256"])
             current_user = Users.query.filter_by(id=data['user_id']).first()
         except:
+            db_token = AccessToken.query.filter_by(token=token).first()
+            if db_token is not None:
+                db.session.delete(db_token)
+                db.session.commit()
             return make_response(jsonify({"status": "error", 'message': 'Token is invalid'}), 400)
-            # TODO delete token
 
         return f(*(current_user, token) + args, **kwargs)
 
     return decorator
 
 
+@repeat(every(5).seconds)
+def delete_expired_token():
+    token_query = AccessToken.query.order_by(AccessToken.created_at).all()
+    expired = True
+    for token in token_query:
+        if expired:
+            try:
+                data = jwt.decode(token, app.config['JWT_SECRET_KEY'], algorithms=["HS256"])
+                expired = False
+            except:
+                db.session.delete(token)
+                db.session.commit()
+                continue
+
+
 @app.route('/api/auth/me', methods=['GET'])
 @token_required
 def get_own_data(current_user, access_token):
-    
-    # TODO implement call to player endpoint and retrieve player data
     player_stats = {}
     
     try:
@@ -403,3 +422,8 @@ def delete_competitor(current_user, token, user_id, competitor_puuid):
 
 if __name__ == '__main__':
     app.run(debug=True)
+    while True:
+        # Checks whether a scheduled task
+        # is pending to run or not
+        schedule.run_pending()
+        time.sleep(1)
