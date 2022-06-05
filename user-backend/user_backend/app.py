@@ -262,37 +262,37 @@ def delete_user(current_user, token):
 @token_required
 def put_player_uuid(current_user, access_token, user_id):
     if current_user.id == user_id:
-    user = Users.query.filter_by(id=current_user.id).first()
-    data = request.get_json()
+        user = Users.query.filter_by(id=current_user.id).first()
+        data = request.get_json()
 
-    if user is not None:
-        if not data:
-            return make_response(jsonify({"status": "error", "message": "No input data provided"}), 400)
-        try:
-            data = user_setup_schema.load(data)
-        except ValidationError as err:
-            return make_response(jsonify({"status": "error", "message": err.messages}), 400)
+        if user is not None:
+            if not data:
+                return make_response(jsonify({"status": "error", "message": "No input data provided"}), 400)
+            try:
+                data = user_setup_schema.load(data)
+            except ValidationError as err:
+                return make_response(jsonify({"status": "error", "message": err.messages}), 400)
 
-        if "region" in data:
-            if not data["region"]:
-                user.region = "euw"
-            else:
-                user.region = data["region"]
-        if "player_uuid" in data:
-            user.player_uuid = data["player_uuid"]
+            if "region" in data:
+                if not data["region"]:
+                    user.region = "euw"
+                else:
+                    user.region = data["region"]
+            if "player_uuid" in data:
+                user.player_uuid = data["player_uuid"]
 
-        db.session.commit()
+            db.session.commit()
 
-        user = user_dump_schema.dump(user)
+            user = user_dump_schema.dump(user)
 
-        return make_response(
-            jsonify({
-                "user": user,
-                "token": access_token,
-                "status": "success"
-            }), 200)
-    else:
-        return make_response(jsonify({"status": "error", "message": "User not found"}), 404)
+            return make_response(
+                jsonify({
+                    "user": user,
+                    "token": access_token,
+                    "status": "success"
+                }), 200)
+        else:
+            return make_response(jsonify({"status": "error", "message": "User not found"}), 404)
     else:
         return make_response(jsonify({"status": "error",
                                       "message": "Not authorized"}), 401)
@@ -316,17 +316,17 @@ def get_list_of_competitor(current_user, token, user_id):
 
         competitor_output = []
         for competitor in competitors:
-        if current_user.player_uuid is not None:
-            player_response = requests.get(f"https://lol-stats.de/api/players/{current_user.player_uuid}")
-            player_stats = player_response.json()
+            if current_user.player_uuid is not None:
+                player_response = requests.get(f"https://lol-stats.de/api/players/{current_user.player_uuid}")
+                player_stats = player_response.json()
 
-            data = {
-                "id": competitor.id,
-                "player_uuid": competitor.player_uuid,
-            "player_name": competitor.player_name,
-                "player_stats": {}
-            }
-            competitor_output.append(data)
+                data = {
+                    "id": competitor.id,
+                    "player_uuid": competitor.player_uuid,
+                "player_name": competitor.player_name,
+                    "player_stats": {}
+                }
+                competitor_output.append(data)
         return make_response(jsonify({"status": "success",
                                       "competitors": competitor_output}), 200)
 
@@ -346,7 +346,7 @@ def add_competitor(current_user, token, user_id):
         if Competitors.query.filter_by(user_id=user_id, player_uuid=data["player_uuid"]).first() is None:
             user = Users.query.filter_by(id=current_user.id).first()
             if user.player_uuid == data["player_uuid"]:
-            return make_response(jsonify({"status": "error", "message": "You can not add yourself as a competitor!"}),
+                return make_response(jsonify({"status": "error", "message": "You can not add yourself as a competitor!"}),
                                  400)
             username = None
 
@@ -360,21 +360,6 @@ def add_competitor(current_user, token, user_id):
                 competitor = Competitors(user_id=user_id, player_uuid=data["player_uuid"], username=username)
                 db.session.add(competitor)
                 db.session.commit()
-
-                if data["player_uuid"] is not None:
-                    player_response = requests.get(f"https://lol-stats.de/api/players/{data['player_uuid']}")
-                    player_stats = player_response.json()
-
-                    userimported = None
-                    if player_stats is not None:
-                        if hasattr(player_stats, 'imported'):
-                            userimported = player_stats.imported
-
-                    if userimported is not None:
-                        if userimported is False:
-                            player_response = requests.post(
-                                f"https://lol-stats.de/api/players/{data['player_uuid']}/import")
-
                 return make_response(
                     jsonify({"status": "success",
                              "message": "No content"}), 200)
@@ -395,24 +380,24 @@ def add_competitor(current_user, token, user_id):
 def get_competitor(current_user, token, user_id, competitor_puuid):
     if current_user.id == user_id:
         competitor = Competitors.query.filter_by(user_id=current_user.id, player_uuid=competitor_puuid).first()
-    if competitor is None:
-        return make_response(jsonify({"status": "error",
-                                      "message": "Competitor not found in your competitorship"}), 404)
+        if competitor is None:
+            return make_response(jsonify({"status": "error",
+                                        "message": "Competitor not found in your competitorship"}), 404)
 
-        player_stats = {}
-        if competitor_puuid is not None:
-            player_response = requests.get(f"https://lol-stats.de/api/players/{competitor_puuid}")
-            player_stats = player_response.json()
+            player_stats = {}
+            if competitor_puuid is not None:
+                player_response = requests.get(f"https://lol-stats.de/api/players/{competitor_puuid}")
+                player_stats = player_response.json()
 
-    competitor_data = {
-        "id": competitor.id,
-        "player_uuid": competitor.player_uuid,
-            "username": competitor.player_name,
-            "player_stats": player_stats
-    }
+        competitor_data = {
+            "id": competitor.id,
+            "player_uuid": competitor.player_uuid,
+                "username": competitor.player_name,
+                "player_stats": player_stats
+        }
 
-    return make_response(jsonify({"status": "success",
-                                  "competitors": competitor_data}), 200)
+        return make_response(jsonify({"status": "success",
+                                    "competitors": competitor_data}), 200)
     else:
         return make_response(jsonify({"status": "error",
                                       "message": "Not authorized"}), 401)
@@ -422,17 +407,17 @@ def get_competitor(current_user, token, user_id, competitor_puuid):
 @token_required
 def delete_competitor(current_user, token, user_id, competitor_puuid):
     if current_user.id == user_id:
-    competitor = Competitors.query.filter_by(user_id=user_id, player_uuid=competitor_puuid).first()
-    if competitor is None:
-        return make_response(jsonify({"status": "error",
-                                      "message": "Competitor not found in your competitorship"}), 404)
+        competitor = Competitors.query.filter_by(user_id=user_id, player_uuid=competitor_puuid).first()
+        if competitor is None:
+            return make_response(jsonify({"status": "error",
+                                        "message": "Competitor not found in your competitorship"}), 404)
 
-    db.session.delete(competitor)
-    db.session.commit()
+        db.session.delete(competitor)
+        db.session.commit()
 
-    return make_response(jsonify({"status": "success",
-                                  "message": "No content",
-                                  }), 200)
+        return make_response(jsonify({"status": "success",
+                                    "message": "No content",
+                                    }), 200)
     else:
         return make_response(jsonify({"status": "error",
                                       "message": "Not authorized"}), 401)

@@ -22,7 +22,12 @@ class UserDumpSchema(Schema):
     player_uuid = fields.String()
 
 
+class AchievementSchema(Schema):
+    name = fields.String(required=True)
+
+
 user_schema = UserSchema()
 competitor_schema = CompetitorSchema()
 user_setup_schema = UserSetupSchema()
 user_dump_schema = UserDumpSchema()
+achievement_schema = AchievementSchema()
