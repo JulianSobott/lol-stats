@@ -384,13 +384,16 @@ def get_competitor(current_user, token, user_id, competitor_puuid):
         return make_response(jsonify({"status": "error",
                                       "message": "Competitor not found in your competitorship"}), 404)
 
-    # TODO make request to player endpoint :get competitors ingame data
+        player_stats = {}
+        if competitor_puuid is not None:
+            player_response = requests.get(f"https://lol-stats.de/api/players/{competitor_puuid}")
+            player_stats = player_response.json()
 
     competitor_data = {
         "id": competitor.id,
         "player_uuid": competitor.player_uuid,
             "username": competitor.player_name,
-        "player_stats": {}
+            "player_stats": player_stats
     }
 
     return make_response(jsonify({"status": "success",
