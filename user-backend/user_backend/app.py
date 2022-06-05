@@ -448,6 +448,38 @@ def get_achievements(current_user, token, user_id):
                                       }), 401)
 
 
+@app.route('/api/users/<user_id>/achievements', methods=['POST'])
+@token_required
+def add_achievements(current_user, token, user_id):
+    if current_user.id == int(user_id):
+        data = request.get_json()
+        if not data:
+            return make_response(jsonify({"status": "error", "message": "No input data provided"}), 400)
+        try:
+            data = achievement_schema.load({"achievement": data["name"]})
+        except ValidationError as err:
+            return make_response(jsonify({"status": "error", "message": err.messages}), 400)
+
+        db_achievement = FavouriteAchievement.query.filter_by(user_id=user_id, name=data["achievement"]).first()
+
+        if db_achievement is not None:
+            return make_response(jsonify({"status": "error",
+                                          "message": "Achievement already set as favourite"}), 400)
+
+        user = Users.query.filter_by(id=user_id).first()
+        if user is not None:
+            db_achievement = FavouriteAchievement(user_id=user_id, name=data["achievement"])
+            db.session.add(db_achievement)
+            db.session.commit()
+
+        return make_response(
+            jsonify({"status": "success",
+                     "message": "No Content"}), 200)
+    else:
+        return make_response(jsonify({"status": "error",
+                                      "message": "Not authorized"}), 401)
+
+
 if __name__ == '__main__':
     app.run(debug=True)
     while True:
