@@ -360,6 +360,21 @@ def add_competitor(current_user, token, user_id):
                 competitor = Competitors(user_id=user_id, player_uuid=data["player_uuid"], username=username)
                 db.session.add(competitor)
                 db.session.commit()
+
+                if data["player_uuid"] is not None:
+                    player_response = requests.get(f"https://lol-stats.de/api/players/{data['player_uuid']}")
+                    player_stats = player_response.json()
+
+                    userimported = None
+                    if player_stats is not None:
+                        if hasattr(player_stats, 'imported'):
+                            userimported = player_stats.imported
+
+                    if userimported is not None:
+                        if userimported is False:
+                            player_response = requests.post(
+                                f"https://lol-stats.de/api/players/{data['player_uuid']}/import")
+
                 return make_response(
                     jsonify({"status": "success",
                              "message": "No content"}), 200)
