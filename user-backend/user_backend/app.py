@@ -480,6 +480,26 @@ def add_achievements(current_user, token, user_id):
                                       "message": "Not authorized"}), 401)
 
 
+@app.route('/api/users/<user_id>/achievements/<achievement_name>', methods=['DELETE'])
+@token_required
+def delete_achievement(current_user, token, user_id, achievement_name):
+    if current_user.id == int(user_id):
+        achievement = FavouriteAchievement.query.filter_by(user_id=user_id, name=achievement_name).first()
+        if achievement is None:
+            return make_response(jsonify({"status": "error",
+                                          "message": "Achievement not found"}), 404)
+
+        db.session.delete(achievement)
+        db.session.commit()
+
+        return make_response(jsonify({"status": "success",
+                                      "message": "No content",
+                                      }), 200)
+    else:
+        return make_response(jsonify({"status": "error",
+                                      "message": "Not authorized"}), 401)
+
+
 if __name__ == '__main__':
     app.run(debug=True)
     while True:
