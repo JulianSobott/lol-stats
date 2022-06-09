@@ -5,8 +5,8 @@ from datetime import datetime, timedelta
 
 from sqlalchemy.orm import Session
 
-from player_api.models.player import Player
-from player_api.db import Champions, Summoners, Base, Games, datetime_to_db
+from player_api.models.player import Player, TierEnum
+from player_api.db import Champions, Summoners, Base, Games, datetime_to_db, Challenges
 from player_api.models.factories import PlayerModelFactory
 
 DEFAULT_GAME_LENGTH = 30
@@ -32,8 +32,8 @@ class PlayerFactory:
         objects = []
         for player in self.players:
             objects.append(player.summoner)
-            for game in player.games:
-                objects.append(game)
+            objects.extend(player.games)
+            objects.extend(player.challenges)
         self.db.bulk_save_objects(objects)
         self.db.commit()
 
@@ -50,11 +50,22 @@ class Testplayer:
         self.db = db
         self.player: Player = PlayerModelFactory.build(**kwargs)
         self.games_factories: list[GamesFactory] = []
+        self.elo = TierEnum.challenger
+        self._challenges = []
 
     def play_n_games(self, num_games: int) -> "GamesFactory":
         factory = GamesFactory(self.db, self).with_n_games(num_games)
         self.games_factories.append(factory)
         return factory
+
+    def with_elo(self, elo: TierEnum):
+        self.elo = elo
+        return self
+
+    def add_challenge(self, name: str, highscore: float, total: float, avg: float):
+        challenge = Challenges(name=name, summoner_id=self.player.id, total=total, average_per_game=avg, highscore=highscore)
+        self._challenges.append(challenge)
+        return self
 
     @property
     def summoner(self):
@@ -80,6 +91,9 @@ class Testplayer:
             objects.extend(factory.games)
         return objects
 
+    @property
+    def challenges(self):
+        return self._challenges
 
 class GamesFactory:
     def __init__(self, db: Session, player: Testplayer):
