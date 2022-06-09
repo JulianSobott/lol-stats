@@ -4,7 +4,7 @@ from db_connector import db
 import time
 from threading import Thread
 import os
-import cassiopeia as cass
+import cassiopeia
 
 
 cassiopeia.set_riot_api_key(os.environ["RIOT_API_KEY"])
