@@ -1,0 +1,475 @@
+openapi: 3.0.2
+info:
+  title: Player API
+  version: 1.0.0
+servers:
+- url: https://lol-stats.de/api
+paths:
+  /players/{player_id}:
+    get:
+      summary: Get Player
+      description: Get a player by riots puuid
+      operationId: get_player_players__player_id__get
+      parameters:
+      - required: true
+        schema:
+          title: Player Id
+          type: string
+        name: player_id
+        in: path
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Player'
+        '404':
+          description: Player not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionMessage'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /players:
+    get:
+      summary: Find Player
+      operationId: find_player_players_get
+      parameters:
+      - required: true
+        schema:
+          title: Player Name
+          type: string
+        name: player_name
+        in: query
+      - required: false
+        schema:
+          title: Region
+          type: string
+        name: region
+        in: query
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BasicPlayer'
+        '404':
+          description: Player not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionMessage'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /players/{player_id}/import:
+    post:
+      summary: Import Player
+      operationId: import_player_players__player_id__import_post
+      parameters:
+      - required: true
+        schema:
+          title: Player Id
+          type: string
+        name: player_id
+        in: path
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ImportProgress'
+        '404':
+          description: Player not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionMessage'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /players/{player_id}/recent-games:
+    get:
+      summary: Recent Games
+      operationId: recent_games_players__player_id__recent_games_get
+      parameters:
+      - required: true
+        schema:
+          title: Player Id
+          type: string
+        name: player_id
+        in: path
+      - required: false
+        schema:
+          title: Start Before
+          type: string
+          format: date-time
+        name: start_before
+        in: query
+      - required: false
+        schema:
+          title: Limit
+          type: integer
+          default: 5
+        name: limit
+        in: query
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Page_Game_'
+        '404':
+          description: Player not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionMessage'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+components:
+  schemas:
+    BasicPlayer:
+      title: BasicPlayer
+      required:
+      - id
+      - player_icon_path
+      - name
+      - level
+      - imported
+      type: object
+      properties:
+        id:
+          title: Id
+          type: string
+        player_icon_path:
+          title: Player Icon Path
+          type: string
+        name:
+          title: Name
+          type: string
+        level:
+          title: Level
+          type: integer
+        rank:
+          $ref: '#/components/schemas/Rank'
+        imported:
+          title: Imported
+          type: boolean
+    Champion:
+      title: Champion
+      required:
+      - name
+      - icon_path
+      type: object
+      properties:
+        name:
+          title: Name
+          type: string
+        icon_path:
+          title: Icon Path
+          type: string
+    ExceptionMessage:
+      title: ExceptionMessage
+      required:
+      - detail
+      type: object
+      properties:
+        detail:
+          title: Detail
+          type: string
+    Game:
+      title: Game
+      required:
+      - match_id
+      - victorious_team
+      - ally_team
+      - enemy_team
+      - self
+      - win
+      - duration
+      - timestamp
+      type: object
+      properties:
+        match_id:
+          title: Match Id
+          type: string
+        victorious_team:
+          $ref: '#/components/schemas/TeamSide'
+        ally_team:
+          title: Ally Team
+          type: array
+          items:
+            $ref: '#/components/schemas/TeamMember'
+        enemy_team:
+          title: Enemy Team
+          type: array
+          items:
+            $ref: '#/components/schemas/TeamMember'
+        self:
+          $ref: '#/components/schemas/TeamMember'
+        win:
+          title: Win
+          type: boolean
+        duration:
+          title: Duration
+          type: integer
+        timestamp:
+          title: Timestamp
+          type: string
+          format: date-time
+    GamePlayer:
+      title: GamePlayer
+      required:
+      - id
+      - name
+      type: object
+      properties:
+        id:
+          title: Id
+          type: string
+        name:
+          title: Name
+          type: string
+    HTTPValidationError:
+      title: HTTPValidationError
+      type: object
+      properties:
+        detail:
+          title: Detail
+          type: array
+          items:
+            $ref: '#/components/schemas/ValidationError'
+    ImportProgress:
+      title: ImportProgress
+      required:
+      - imported_games
+      - total_games
+      - imported
+      - import_state
+      - percentage
+      type: object
+      properties:
+        imported_games:
+          title: Imported Games
+          type: integer
+        total_games:
+          title: Total Games
+          type: integer
+        imported:
+          title: Imported
+          type: boolean
+        import_state:
+          $ref: '#/components/schemas/ImportState'
+        percentage:
+          title: Percentage
+          type: integer
+    ImportState:
+      title: ImportState
+      enum:
+      - PENDING
+      - IMPORTING
+      - FINISHED
+      - FAILED
+      type: string
+      description: An enumeration.
+    MostPlayed:
+      title: MostPlayed
+      required:
+      - champion_id
+      - champion_name
+      - icon_path
+      - games
+      - win_rate
+      type: object
+      properties:
+        champion_id:
+          title: Champion Id
+          type: integer
+        champion_name:
+          title: Champion Name
+          type: string
+        icon_path:
+          title: Icon Path
+          type: string
+        games:
+          title: Games
+          type: integer
+        win_rate:
+          title: Win Rate
+          maximum: 100.0
+          minimum: 0.0
+          type: integer
+    Page_Game_:
+      title: Page[Game]
+      required:
+      - items
+      - next
+      type: object
+      properties:
+        items:
+          title: Items
+          type: array
+          items:
+            $ref: '#/components/schemas/Game'
+        next:
+          title: Next
+          type: string
+    Player:
+      title: Player
+      required:
+      - id
+      - player_icon_path
+      - name
+      - level
+      - imported
+      type: object
+      properties:
+        id:
+          title: Id
+          type: string
+        player_icon_path:
+          title: Player Icon Path
+          type: string
+        name:
+          title: Name
+          type: string
+        win_rate:
+          title: Win Rate
+          maximum: 100.0
+          minimum: 0.0
+          type: integer
+        level:
+          title: Level
+          type: integer
+        rank:
+          $ref: '#/components/schemas/Rank'
+        most_played:
+          title: Most Played
+          type: array
+          items:
+            $ref: '#/components/schemas/MostPlayed'
+        imported:
+          title: Imported
+          type: boolean
+      description: Optional fields are only None, when player is not imported yet,
+        but exists.
+    PlayerStats:
+      title: PlayerStats
+      required:
+      - kills
+      - deaths
+      - assists
+      - creep_score
+      type: object
+      properties:
+        kills:
+          title: Kills
+          type: integer
+        deaths:
+          title: Deaths
+          type: integer
+        assists:
+          title: Assists
+          type: integer
+        creep_score:
+          title: Creep Score
+          type: integer
+    Rank:
+      title: Rank
+      required:
+      - division
+      - tier
+      - league_points
+      type: object
+      properties:
+        division:
+          title: Division
+          maximum: 4.0
+          minimum: 1.0
+          type: integer
+        tier:
+          $ref: '#/components/schemas/TierEnum'
+        league_points:
+          title: League Points
+          maximum: 100.0
+          minimum: 0.0
+          type: integer
+    TeamMember:
+      title: TeamMember
+      required:
+      - champion
+      - player
+      - stats
+      - team
+      type: object
+      properties:
+        champion:
+          $ref: '#/components/schemas/Champion'
+        player:
+          $ref: '#/components/schemas/GamePlayer'
+        stats:
+          $ref: '#/components/schemas/PlayerStats'
+        team:
+          $ref: '#/components/schemas/TeamSide'
+    TeamSide:
+      title: TeamSide
+      enum:
+      - red
+      - blue
+      type: string
+      description: An enumeration.
+    TierEnum:
+      title: TierEnum
+      enum:
+      - iron
+      - bronze
+      - silver
+      - gold
+      - platinum
+      - diamond
+      - master
+      - grandmaster
+      - challenger
+      type: string
+      description: An enumeration.
+    ValidationError:
+      title: ValidationError
+      required:
+      - loc
+      - msg
+      - type
+      type: object
+      properties:
+        loc:
+          title: Location
+          type: array
+          items:
+            anyOf:
+            - type: string
+            - type: integer
+        msg:
+          title: Message
+          type: string
+        type:
+          title: Error Type
+          type: string

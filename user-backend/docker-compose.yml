@@ -1,0 +1,44 @@
+version: "3.9"
+services:
+  user-management:
+    build: user_backend/
+    restart: unless-stopped
+    container_name: user-management-api
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=userBackend
+      - POSTGRES_HOST=db
+      - POSTGRES_PORT=5432
+      - JWT_SECRET_KEY=${JWT_SECRET_KEY}
+      - PYTHONPATH=.
+      - FLASK_ENV=production
+    depends_on:
+      - db
+    networks:
+      - user_management
+      - tracing
+      - services
+  db:
+    image: postgres:14
+    restart: unless-stopped
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=userBackend
+    ports:
+      - "5431:5432"
+    container_name: user-management-db
+    networks:
+      - user_management
+
+volumes:
+  postgres_data:
+networks:
+  tracing:
+    external: true
+  services:
+    external: true
+  user_management: {}

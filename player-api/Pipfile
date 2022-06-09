@@ -1,0 +1,29 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+fastapi = "*"
+uvicorn = {extras = ["standard"], version = "*"}
+pydantic = "*"
+sqlalchemy = "*"
+psycopg2-binary = "*"
+pydantic-factories = "*"
+opentelemetry-instrumentation-fastapi = "*"
+opentelemetry-exporter-otlp = "*"
+opentelemetry-distro = "*"
+opentelemetry-instrumentation-sqlalchemy = "*"
+requests = "*"
+starlette = "*"
+
+[dev-packages]
+pytest = "*"
+requests = "*"
+black = "*"
+locust = "*"
+pytest-mock = "*"
+requests-mock = "*"
+
+[requires]
+python_version = "3.10"

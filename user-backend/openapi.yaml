@@ -1,0 +1,446 @@
+openapi: "3.0.3"
+info:
+  title: League Challenges - User Management API
+  description: League Challenges - User Management API
+  version: 1.0.0
+servers:
+  - url: 'https'
+paths:
+  /api/auth/me:
+    get:
+      description: Get own data
+      tags:
+        - user
+      parameters:
+        - name: token
+          in: header
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Sucessfully returned user data
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  User:
+                    $ref: '#/components/schemas/User'
+                  player_stats:
+                    $ref: '#/components/schemas/Player'
+                  competitors:
+                    type: array
+                    items: 
+                      $ref: '#/components/schemas/Competitor'
+        '404':
+          description: Invalid token
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                  message:
+                    type: string
+  /api/auth/login:
+    post:
+      description: Login into website
+      tags:
+        - user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/login_data'
+      responses:
+        '200':
+          description: Sucessfully returned user data
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  User:
+                    $ref: '#/components/schemas/User'
+        '404':
+          description: User not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                  message:
+                    type: string
+        '400':
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                  message:
+                    type: string
+  /api/token/info:
+    get:
+      description: Verify token
+      tags:
+        - user
+      parameters:
+        - name: token
+          in: header
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Sucessfully updated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  User:
+                    $ref: '#/components/schemas/User'
+        '400':
+          description: Invalid token
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                  message:
+                    type: string
+  /api/auth/logout:
+    post:
+      description: Log out from website
+      tags:
+        - user
+      parameters:
+        - name: token
+          in: header
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successfully logged out
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                  message:
+                    type: string
+  /api/auth/register:
+    post:
+      description: Register new account
+      tags:
+        - user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/login_data'
+      responses:
+        '200':
+          description: Sucessfully returned mail of registered acc
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  User:
+                    $ref: '#/components/schemas/User'
+        '400':
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                  message:
+                    type: string
+        '409':
+          description: Account with given mail already exists
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                      type: string
+                  message:
+                    type: string
+  /api/users/{user_id}:
+    put:
+      tags:
+      - user
+      summary: Set new ingame user id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                region:
+                  type: string
+                player_uuid:
+                  type: string
+      parameters:
+        - name: token
+          in: header
+          required: true
+          schema:
+            type: string
+        - name: user_id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Sucessfully patched ingame user id
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  User:
+                    $ref: '#/components/schemas/User'
+        '404':
+          description: User not found or invalid 
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                  message:
+                    type: string
+  /api/users/{user_id}/competitors/:
+    get:
+      description: List of competitors of user
+      tags:
+        - competitor
+      parameters:
+        - name: token
+          in: header
+          required: true
+          schema:
+            type: string
+        - name: user_id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Sucessfully returned list of competitors
+          content:
+            application/json:
+              schema: 
+                type: array
+                items: 
+                  $ref: '#/components/schemas/Competitor'
+    post:
+      description: Add new competitor of user
+      tags:
+        - competitor
+      parameters:
+        - name: token
+          in: header
+          required: true
+          schema:
+            type: string
+        - name: user_id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                user_id:
+                  type: integer
+                player_uuid:
+                  type: string
+      responses:
+        '200':
+          description: No content
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                  message:
+                    type: string
+        '400':
+          description: Competitor not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                  message:
+                    type: string
+  /api/users/{user_id}/competitors/{competitor_puuid}:
+      get:
+        description: Get specific competitor
+        tags:
+          - competitor
+        parameters:
+          - name: token
+            in: header
+            required: true
+            schema:
+              type: string
+          - name: user_id
+            in: path
+            required: true
+            schema:
+              type: integer
+          - name: competitor_puuid
+            in: path
+            required: true
+            schema:
+              type: string
+        responses:
+          '200':
+            description: Sucessfully returned specific competitor
+            content:
+              application/json:
+                schema: 
+                  type: object
+                  properties: 
+                    Competitor:
+                      $ref: '#/components/schemas/Competitor'
+      delete:
+        description: Delete specific competitor of user
+        tags:
+          - competitor
+        parameters:
+          - name: token
+            in: header
+            required: true
+            schema:
+              type: string
+          - name: user_id
+            in: path
+            required: true
+            schema:
+              type: integer
+          - name: competitor_puuid
+            in: path
+            required: true
+            schema:
+              type: string
+        responses:
+          '200':
+            description: No content
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    status:
+                      type: string
+                    message:
+                      type: string
+          '400':
+            description: Competitor not found
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    status:
+                      type: string
+                    message:
+                      type: string
+components:
+  schemas:
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+        player_uuid:
+          type: string
+        username:
+          type: string
+        mail:
+          type: string
+        region:
+          type: string
+        token:
+          type: string
+    Competitor:
+      type: object
+      properties:
+        id:
+          type: integer
+        player_uuid: 
+          type: string
+        username: 
+          type: string
+        player_stats:
+          $ref: '#/components/schemas/Player'
+    Rank:
+      type: object
+      properties:
+        rank:
+          type: string
+        tier:
+          type: number
+        league_points:
+          type: number
+    ChampionID:
+      type: number
+      description: Same ID as in the Riot API
+    Player:
+      type: object
+      description: Retrieve from Player-Endpoint without Winrate and "Most Played"-Object 
+      properties:
+        id:
+          type: number
+        icon_path:
+          type: string
+        name:
+          type: string
+        avatar:
+          type: string
+          description: path
+        rank:
+          $ref: '#/components/schemas/Rank'
+    login_data:
+      type: object
+      properties:
+        email:
+          type: string
+        password:
+          type: string
+          description: encoded

@@ -16,90 +16,61 @@
           pe-0 pe-md-3
         "
       >
-        <a href=".">League of Legends</a>
+        <NuxtLink to="/">
+          <img src="~/assets/images/logo.png" height="20" />
+        </NuxtLink>
       </h1>
       <div class="navbar-nav flex-row order-md-last">
         <div class="nav-item d-none d-md-flex me-3"></div>
-        <div class="d-none d-md-flex">
-          <div class="nav-item dropdown d-none d-md-flex me-3">
-            <a
-              href="#"
-              class="nav-link px-0"
-              data-bs-toggle="dropdown"
-              tabindex="-1"
-              aria-label="Show notifications"
-            >
-              <!-- Download SVG icon from http://tabler-icons.io/i/bell -->
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                class="icon"
-                width="24"
-                height="24"
-                viewBox="0 0 24 24"
-                stroke-width="2"
-                stroke="currentColor"
-                fill="none"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              >
-                <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                <path
-                  d="M10 5a2 2 0 0 1 4 0a7 7 0 0 1 4 6v3a4 4 0 0 0 2 3h-16a4 4 0 0 0 2 -3v-3a7 7 0 0 1 4 -6"
-                />
-                <path d="M9 17v1a3 3 0 0 0 6 0v-1" />
-              </svg>
-              <span class="badge bg-red"></span>
-            </a>
-            <div
-              class="
-                dropdown-menu
-                dropdown-menu-arrow
-                dropdown-menu-end
-                dropdown-menu-card
-              "
-            >
-              <div class="card">
-                <div class="card-header">
-                  <h3 class="card-title">Notifications</h3>
-                </div>
-                <div class="list-group list-group-flush list-group-hoverable">
-                  <div class="list-group-item">
-                    <div class="row align-items-center">
-                      <div class="col text-truncate">
-                        <a href="#" class="text-body d-block">Test Notification</a>
-                        <div class="d-block text-muted text-truncate mt-n1">
-                          foo bar
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="nav-item dropdown">
+        <div v-if="$auth.loggedIn" class="nav-item dropdown">
           <a
             href="#"
             class="nav-link d-flex lh-1 text-reset p-0"
             data-bs-toggle="dropdown"
             aria-label="Open user menu"
           >
-            <span
-              class="avatar avatar-sm"
-              style="background-image: url(https://i.imgur.com/6lCL9uU.png)"
-            ></span>
+            <span class="avatar avatar-sm" :style="userIcon"></span>
             <div class="d-none d-xl-block ps-2">
-              <div>Player Name</div>
-              <div class="mt-1 small text-muted">Rank XYZ</div>
+              <div v-if="$auth.user.player_stats.name">{{ $auth.user.player_stats.name }}</div>
+              <div v-else>{{ $auth.user.email }}</div>
+              <div v-if="$auth.user.player_stats.rank !== undefined && $auth.user.player_stats.rank != null" class="mt-1 small text-muted">
+                {{ $auth.user.player_stats.rank.tier.toUpperCase() }} {{ $auth.user.player_stats.rank.division }}
+              </div>
+              <div v-else class="mt-1 small text-muted">
+                No Data
+              </div>
             </div>
           </a>
           <div class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
-            <a href="#" class="dropdown-item">Profile</a>
+            <NuxtLink to="/settings" class="dropdown-item">Settings</NuxtLink>
             <div class="dropdown-divider"></div>
-            <a href="#" class="dropdown-item">Settings</a>
-            <a href="#" class="dropdown-item">Logout</a>
+            <a href="#" class="dropdown-item" @click="logoutUser">Logout</a>
           </div>
+        </div>
+        <div v-else class="nav-item dropdown">
+          <NuxtLink to="/login" class="text-white"
+            ><svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="icon icon-tabler icon-tabler-login"
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              stroke-width="2"
+              stroke="currentColor"
+              fill="none"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <desc>
+                Download more icon variants from https://tabler-icons.io/i/login
+              </desc>
+              <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+              <path
+                d="M14 8v-2a2 2 0 0 0 -2 -2h-7a2 2 0 0 0 -2 2v12a2 2 0 0 0 2 2h7a2 2 0 0 0 2 -2v-2"
+              ></path>
+              <path d="M20 12h-13l3 -3m0 6l-3 -3"></path></svg
+            >Login</NuxtLink
+          >
         </div>
       </div>
     </div>
@@ -109,5 +80,23 @@
 <script>
 export default {
   name: 'PageHeader',
+  computed: {
+    userIcon() {
+      if (this.$auth.user.player_stats.player_icon_path === "") {
+        return "background-image: url('https://cdn.pixabay.com/photo/2016/08/08/09/17/avatar-1577909_1280.png')";
+      }
+      return `background-image: url("${this.$auth.user.player_stats.player_icon_path}");`
+    },
+  },
+  methods: {
+    async logoutUser() {
+      try {
+        await this.$auth.logout('local')
+        this.$router.push('/login?logout=true')
+      } catch (err) {
+        console.log(err)
+      }
+    },
+  },
 }
 </script>

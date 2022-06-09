@@ -1,69 +1,145 @@
 <template>
-<div class="page page-center">
-  <div class="container-tight py-4">
-    <div class="text-center mb-4">
-      <a href="." class="navbar-brand navbar-brand-autodark">LOL Stats</a>
-    </div>
-    <div class="card card-md">
-      <div class="card-body">
-        <h2 class="card-title text-center mb-4">Login to your account</h2>
-        <div class="mb-3">
-          <label class="form-label">Email address</label>
-          <input v-model="form.email" type="email" class="form-control" placeholder="Enter email">
-        </div>
-        <div class="mb-2">
-          <label class="form-label">
-            Password
-          </label>
-          <div class="input-group input-group-flat">
-            <input v-model="form.password" type="password" class="form-control"  placeholder="Password"  autocomplete="off">
-            <span class="input-group-text">
-              <a href="#" class="link-secondary" title="Show password" data-bs-toggle="tooltip"><!-- Download SVG icon from http://tabler-icons.io/i/eye -->
-                <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><circle cx="12" cy="12" r="2" /><path d="M22 12c-2.667 4.667 -6 7 -10 7s-7.333 -2.333 -10 -7c2.667 -4.667 6 -7 10 -7s7.333 2.333 10 7" /></svg>
-              </a>
-            </span>
+  <div class="page page-center">
+    <div class="container-tight py-4">
+      <div class="text-center mb-4">
+        <NuxtLink to="/login">
+          <img src="~/assets/images/logo.png" height="36" />
+        </NuxtLink>
+      </div>
+      <div class="card card-md">
+        <div v-if="error" class="card-status-top bg-danger"></div>
+        <div class="card-body">
+          <h2 class="card-title text-center mb-4">Login to your account</h2>
+          <p v-if="logoutSuccess" class="card-subtitle text-green text-center">
+            You have been logged out successfully.
+          </p>
+          <div class="mb-3">
+            <label class="form-label">Email address</label>
+            <input
+              v-model="form.email"
+              type="email"
+              class="form-control"
+              :class="{ 'is-invalid': submitted && error }"
+              placeholder="Enter email"
+            />
+            <div
+              v-if="submitted && !$v.form.email.required"
+              class="invalid-feedback d-block"
+            >
+              Email is required
+            </div>
+          </div>
+          <div class="mb-2">
+            <label class="form-label"> Password </label>
+            <div class="input-group input-group-flat">
+              <input
+                v-model="form.password"
+                type="password"
+                class="form-control"
+                :class="{ 'is-invalid': submitted && error }"
+                placeholder="Password"
+                autocomplete="off"
+              />
+              <div
+                v-if="submitted && !$v.form.password.required"
+                class="invalid-feedback d-block"
+              >
+                Password is required
+              </div>
+            </div>
+          </div>
+          <div v-if="submitted && error" class="invalid-feedback d-block mb-2">
+            E-Mail or password wrong
+          </div>
+          <div class="form-footer">
+            <button class="btn btn-primary w-100" @click="login()">
+              Sign in
+            </button>
           </div>
         </div>
-        <div class="mb-2">
-          <label class="form-check">
-            <input type="checkbox" class="form-check-input"/>
-            <span class="form-check-label">Remember me on this device</span>
-          </label>
-        </div>
-        <div class="form-footer">
-          <button class="btn btn-primary w-100" @click="login()">Sign in</button>
-        </div>
+      </div>
+      <div class="text-center text-muted mt-3">
+        Don't have account yet? <a href="sign-up" tabindex="-1">Sign up</a>
       </div>
     </div>
-    <div class="text-center text-muted mt-3">
-      Don't have account yet? <a href="sign-up" tabindex="-1">Sign up</a>
-    </div>
   </div>
-</div>
 </template>
 
 <script>
+import { required } from 'vuelidate/lib/validators'
+import { mapActions } from 'vuex'
+
 export default {
   name: 'LoginPage',
+  mounted() {
+    if (this.$route.query.logout !== undefined) {
+      this.logoutSuccess = this.$route.query.logout === 'true'
+    } else {
+      this.logoutSuccess = false
+    }
+  },
   data() {
     return {
       form: {
         email: '',
         password: '',
-        error: null
-      }
+      },
+      submitted: false,
+      error: null,
+      logoutSuccess: false,
     }
   },
   head: {
     bodyAttrs: {
-      class: 'theme-dark border-top-wide border-primary d-flex flex-column'
-    }
+      class: 'theme-dark border-top-wide border-primary d-flex flex-column',
+    },
+  },
+  validations: {
+    form: {
+      email: {
+        required,
+      },
+      password: {
+        required,
+      },
+    },
   },
   methods: {
-    login() {
-      this.$router.push('/');
-    }
-  }
+    ...mapActions({
+      clearStore: 'dashboard/clearStore',
+    }),
+    async login() {
+      this.submitted = true
+      this.error = false
 
+      this.$v.$touch()
+      if (this.$v.$invalid) {
+        this.error = true
+        return
+      }
+
+      this.clearStore()
+
+      try {
+        await this.$auth
+          .loginWith('local', {
+            data: {
+              email: this.form.email,
+              password: this.form.password,
+            },
+          })
+          .then(() => {
+            this.$auth.fetchUser()
+            if (this.$auth.user.player_uuid === null) {
+              this.$router.push('/settings?firstsetup=true')
+            } else {
+              this.$router.push('/dashboard?welcome=true')
+            }
+          })
+      } catch (err) {
+        this.error = true
+      }
+    },
+  },
 }
 </script>
