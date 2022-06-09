@@ -3,12 +3,11 @@ import summoner
 from db_connector import db
 import time
 from threading import Thread
-
+import os
 import cassiopeia as cass
 
 
-# cassiopeia.set_riot_api_key(os.environ["RIOT_API_KEY"])
-cass.set_riot_api_key('RGAPI-ba00cb63-7be0-4e50-8610-eb749b1ea70d')
+cassiopeia.set_riot_api_key(os.environ["RIOT_API_KEY"])
 
 
 class riot_api_connector:

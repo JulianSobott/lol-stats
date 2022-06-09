@@ -2,7 +2,7 @@ version: "3"
 services:
   riot-api-connector:
     build: riot-api-connector
-    #restart: unless-stopped TODO: Add when service runs in endless loop
+    restart: unless-stopped
     environment:
       POSTGRES_HOST: psql-achievements
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}

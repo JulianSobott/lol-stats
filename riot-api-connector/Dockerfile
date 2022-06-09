@@ -6,4 +6,6 @@ RUN pip install -r requirements.txt
 
 COPY . .
 
+COPY cass_match.py /usr/local/lib/python3.10/site-packages/cassiopeia/core/match.py
+
 ENTRYPOINT ["python", "app.py"]
