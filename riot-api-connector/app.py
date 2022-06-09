@@ -1,8 +1,11 @@
-import os
-
-import cassiopeia
+import playerImportRequest
+import summoner
 from db_connector import db
-from cassiopeia import Patch, Summoner
+import time
+from threading import Thread
+import os
+import cassiopeia as cass
+
 
 cassiopeia.set_riot_api_key(os.environ["RIOT_API_KEY"])
 
@@ -12,36 +15,29 @@ class riot_api_connector:
         self.db = db()
         self.db.connect()
 
-    def add_new_summoner(self, id: str, region: str):
-        summoner: Summoner = cassiopeia.get_summoner(id=id, region=region)
-        # check if summoner exists in database
-        # if not
-        match_history = summoner.match_history(
-            begin_time=Patch.from_str('10.12', region=region).start)
-        # store match history in db
-
-    def update_champions(self):
-        self.db.clear_champions()
-        champions = cassiopeia.get_champions(region='EUW')
-        for champ in champions:
-            self.db.add_champion(id=champ.id, name=champ.name, icon_path=champ.image.url)
-
-    def update_summoner_spells(self):
-        self.db.clear_summoner_spells()
-        summoner_spells = cassiopeia.get_summoner_spells(region='EUW')
-        for spell in summoner_spells:
-            self.db.add_summoner_spell(id=spell.id, name=spell.name, icon_path=spell.image.url)
-
-    def update_items(self):
-        self.db.clear_items()
-        items = cassiopeia.get_items(region='EUW')
-        for item in items:
-            self.db.add_item(id=item.id, name=item.name, icon_path=item.image.url)
+    def update_loop(self):
+        while True:
+            print("Updating ...")
+            summoner.update_all(db=self.db, region='EUW')
+            print("Finished updating")
+            time.sleep(300)
 
 
-print("Updating ...")
 x = riot_api_connector()
-x.update_champions()
-x.update_items()
-x.update_summoner_spells()
-print("Finished updating")
+grpc_thread = Thread(target=playerImportRequest.serve,
+                     args=(x.db, summoner.update_summoner_by_puuid))
+grpc_thread.start()
+x.update_loop()
+# x.update_summoner_by_name(name='LinkX20', region='EUW')
+# match_history.riot_watcher_mh(
+#    puuid='i6rhuj9rVlNXt0WRoGzMelbaGItog4yYs6mC8yZXQOY2rpuY68virbdeyvnoptwJ07u1cgZKW1tBPA', start_time=1627776000)
+# x.update_summoner_by_puuid(
+#     'i6rhuj9rVlNXt0WRoGzMelbaGItog4yYs6mC8yZXQOY2rpuY68virbdeyvnoptwJ07u1cgZKW1tBPA')
+# x.update_all(region='EUW')
+# playerImportRequest.serve(lambda y: x.update_summoner_by_region_id(id=y, region='EUW'))
+# x.update_all(region='EUW')
+# x.db.create_tables()
+#x.update_summoner_by_name('LinkX20', region='EUW')
+# x.get_summoner('gravitysuit', region='EUW')
+# x.get_summoner('LinkX20', 'EUW')
+# static_data.update_summoner_icons(x.db)

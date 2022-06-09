@@ -1,2 +1,5 @@
 cassiopeia==5.0.1
 psycopg2-binary==2.9.3
+riotwatcher==3.2.2
+grpcio==1.46.3
+grpcio-tools==1.46.3

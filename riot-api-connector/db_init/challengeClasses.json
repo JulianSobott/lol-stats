@@ -1,0 +1,916 @@
+{
+    "Damage": [
+        {
+            "name": "-damageSelfMitigated",
+            "description": "Damage self mitigated",
+            "operator": ">"
+        },
+        {
+            "name": "-largestCriticalStrike",
+            "description": "Largest critical strike",
+            "operator": ">"
+        },
+        {
+            "name": "-magicDamageDealt",
+            "description": "Magic damage dealt",
+            "operator": ">"
+        },
+        {
+            "name": "-magicDamageDealtToChampions",
+            "description": "Magic damage dealt to champions",
+            "operator": ">"
+        },
+        {
+            "name": "-magicDamageTaken",
+            "description": "Magic damage taken",
+            "operator": "<"
+        },
+        {
+            "name": "-physicalDamageDealt",
+            "description": "Physical damage dealt",
+            "operator": ">"
+        },
+        {
+            "name": "-physicalDamageDealtToChampions",
+            "description": "Physical damage dealt to champions",
+            "operator": ">"
+        },
+        {
+            "name": "-physicalDamageTaken",
+            "description": "Physical damage taken",
+            "operator": "<"
+        },
+        {
+            "name": "-totalDamageDealt",
+            "description": "Total damage dealt",
+            "operator": ">"
+        },
+        {
+            "name": "-totalDamageDealtToChampions",
+            "description": "Total damage dealt to champions",
+            "operator": ">"
+        },
+        {
+            "name": "-totalDamageTaken",
+            "description": "Total damage taken",
+            "operator": "<"
+        },
+        {
+            "name": "-trueDamageDealt",
+            "description": "True damage dealt",
+            "operator": ">"
+        },
+        {
+            "name": "-trueDamageDealtToChampions",
+            "description": "True damage dealt to champions",
+            "operator": ">"
+        },
+        {
+            "name": "-trueDamageTaken",
+            "description": "True damage taken",
+            "operator": "<"
+        },
+        {
+            "name": "damagePerMinute",
+            "description": "Damage per minute",
+            "operator": ">"
+        },
+        {
+            "name": "damageTakenOnTeamPercentage",
+            "description": "Percentage damage taken of team",
+            "operator": "<"
+        },
+        {
+            "name": "teamDamagePercentage",
+            "description": "Percentage damage dealt of team",
+            "operator": ">"
+        }
+    ],
+    "Multikills": [
+        {
+            "name": "-doubleKills",
+            "description": "Double kills",
+            "operator": ">"
+        },
+        {
+            "name": "-killingSprees",
+            "description": "Killing sprees",
+            "operator": ">"
+        },
+        {
+            "name": "-largestKillingSpree",
+            "description": "Largest killing spree",
+            "operator": ">"
+        },
+        {
+            "name": "-largestMultiKill",
+            "description": "Largest multikill",
+            "operator": ">"
+        },
+        {
+            "name": "-pentaKills",
+            "description": "Pentakills",
+            "operator": ">"
+        },
+        {
+            "name": "-quadraKills",
+            "description": "Quadrakills",
+            "operator": ">"
+        },
+        {
+            "name": "-tripleKills",
+            "description": "Triplekills",
+            "operator": ">"
+        },
+        {
+            "name": "12AssistStreakCount",
+            "description": "Assist streaks of 12 assists",
+            "operator": ">"
+        },
+        {
+            "name": "acesBefore15Minutes",
+            "description": "Aces before 15 minutes",
+            "operator": ">"
+        },
+        {
+            "name": "doubleAces",
+            "description": "Double aces",
+            "operator": ">"
+        },
+        {
+            "name": "flawlessAces",
+            "description": "Flawless aces",
+            "operator": ">"
+        },
+        {
+            "name": "fullTeamTakedown",
+            "description": "Full team takedowns",
+            "operator": ">"
+        },
+        {
+            "name": "legendaryCount",
+            "description": "Legendary count",
+            "operator": ">"
+        },
+        {
+            "name": "multiKillOneSpell",
+            "description": "Multikills with one spell",
+            "operator": ">"
+        },
+        {
+            "name": "multikills",
+            "description": "Multikills",
+            "operator": ">"
+        },
+        {
+            "name": "multikillsAfterAggressiveFlash",
+            "description": "Multikills after aggressive flash",
+            "operator": ">"
+        },
+        {
+            "name": "elderDragonMultikills",
+            "description": "Elder Dragon multikills",
+            "operator": ">"
+        }
+    ],
+    "Spells": [
+        {
+            "name": "-spell2Casts",
+            "description": "Spell 2 casts",
+            "operator": ">"
+        },
+        {
+            "name": "-spell1Casts",
+            "description": "Spell 1 casts",
+            "operator": ">"
+        },
+        {
+            "name": "-spell3Casts",
+            "description": "Spell 3 casts",
+            "operator": ">"
+        },
+        {
+            "name": "-spell4Casts",
+            "description": "Spell 4 casts",
+            "operator": ">"
+        },
+        {
+            "name": "-summoner1Casts",
+            "description": "Summoner 1 casts",
+            "operator": ">"
+        },
+        {
+            "name": "-summoner2Casts",
+            "description": "Summoner 2 casts",
+            "operator": ">"
+        },
+        {
+            "name": "abilityUses",
+            "description": "Ability uses",
+            "operator": ">"
+        },
+        {
+            "name": "dodgeSkillShotsSmallWindow",
+            "description": "Skillshots dodged with small window",
+            "operator": ">"
+        },
+        {
+            "name": "landSkillShotsEarlyGame",
+            "description": "Skillshots hit in early game",
+            "operator": ">"
+        },
+        {
+            "name": "quickCleanse",
+            "description": "CCs quick cleansed",
+            "operator": ">"
+        },
+        {
+            "name": "skillshotsDodged",
+            "description": "Skillshots dodged",
+            "operator": ">"
+        },
+        {
+            "name": "skillshotsHit",
+            "description": "Skillshtos hit",
+            "operator": ">"
+        },
+        {
+            "name": "snowballsHit",
+            "description": "Snowballs hit",
+            "operator": ">"
+        }
+    ],
+    "Utility": [
+        {
+            "name": "-timeCCingOthers",
+            "description": "Time CCing others",
+            "operator": ">"
+        },
+        {
+            "name": "-totalDamageShieldedOnTeammates",
+            "description": "Total damage shielded on teammates",
+            "operator": ">"
+        },
+        {
+            "name": "-totalHeal",
+            "description": "Total healed",
+            "operator": ">"
+        },
+        {
+            "name": "-totalHealsOnTeammates",
+            "description": "Total healed on teammates",
+            "operator": ">"
+        },
+        {
+            "name": "-totalTimeCCDealt",
+            "description": "Total time CC dealt",
+            "operator": ">"
+        },
+        {
+            "name": "-totalUnitsHealed",
+            "description": "Total units healed",
+            "operator": ">"
+        },
+        {
+            "name": "effectiveHealAndShielding",
+            "description": "Effective heal and shielding",
+            "operator": ">"
+        },
+        {
+            "name": "enemyChampionImmobilizations",
+            "description": "Enemy champ immobilizations",
+            "operator": ">"
+        },
+        {
+            "name": "immobilizeAndKillWithAlly",
+            "description": "Enemies immobilized and killed with ally",
+            "operator": ">"
+        },
+        {
+            "name": "knockEnemyIntoTeamAndKill",
+            "description": "Enemies knocked into team and killed",
+            "operator": ">"
+        },
+        {
+            "name": "saveAllyFromDeath",
+            "description": "Allies saved from death",
+            "operator": ">"
+        }
+    ],
+    "Special Kills": [
+        {
+            "name": "getTakedownsInAllLanesEarlyJungleAsLaner",
+            "description": "Early takedowns in all lanes as laner",
+            "operator": ">"
+        },
+        {
+            "name": "junglerTakedownsNearDamagedEpicMonster",
+            "description": "Jungler takedowns near damaged epic monster",
+            "operator": ">"
+        },
+        {
+            "name": "killAfterHiddenWithAlly",
+            "description": "Kills after hidden with ally",
+            "operator": ">"
+        },
+        {
+            "name": "killedChampTookFullTeamDamageSurvived",
+            "description": "Killed champ took full team damage survived",
+            "operator": ">"
+        },
+        {
+            "name": "killsNearEnemyTurret",
+            "description": "Kills near enemy turret",
+            "operator": ">"
+        },
+        {
+            "name": "killsOnLanersEarlyJungleAsJungler",
+            "description": "Early kills on laners as jungler",
+            "operator": ">"
+        },
+        {
+            "name": "killsOnOtherLanesEarlyJungleAsLaner",
+            "description": "Early kills on other lanes as laner",
+            "operator": ">"
+        },
+        {
+            "name": "killsOnRecentlyHealedByAramPack",
+            "description": "Kills on enemy recently healed by ARAM pack",
+            "operator": ">"
+        },
+        {
+            "name": "killsUnderOwnTurret",
+            "description": "Kills under own turret",
+            "operator": ">"
+        },
+        {
+            "name": "killsWithHelpFromEpicMonster",
+            "description": "Kills with help from epic monster",
+            "operator": ">"
+        },
+        {
+            "name": "-nexusKills",
+            "description": "Kills at nexus",
+            "operator": ">"
+        },
+        {
+            "name": "-nexusTakedowns",
+            "description": "Takedowns at nexus",
+            "operator": ">"
+        },
+        {
+            "name": "outnumberedKills",
+            "description": "Kills while outnumbered",
+            "operator": ">"
+        },
+        {
+            "name": "outnumberedNexusKill",
+            "description": "Kills at nexis while outnumbered",
+            "operator": ">"
+        },
+        {
+            "name": "pickKillWithAlly",
+            "description": "Picks on enemy with ally",
+            "operator": ">"
+        },
+        {
+            "name": "quickSoloKills",
+            "description": "Quick solo kills",
+            "operator": ">"
+        },
+        {
+            "name": "soloKills",
+            "description": "Solo kills",
+            "operator": ">"
+        },
+        {
+            "name": "takedowns",
+            "description": "Takedowns",
+            "operator": ">"
+        },
+        {
+            "name": "takedownsAfterGainingLevelAdvantage",
+            "description": "Takedowns with level advantage",
+            "operator": ">"
+        },
+        {
+            "name": "takedownsBeforeJungleMinionSpawn",
+            "description": "Takefowns before jungle minions spawn",
+            "operator": ">"
+        },
+        {
+            "name": "takedownsFirst25Minutes",
+            "description": "Takedowns during first 25 minutes",
+            "operator": ">"
+        },
+        {
+            "name": "takedownsInAlcove",
+            "description": "Takedowns in alcove",
+            "operator": ">"
+        },
+        {
+            "name": "takedownsInEnemyFountain",
+            "description": "Takedowns in enemy fountain",
+            "operator": ">"
+        },
+        {
+            "name": "junglerKillsEarlyJungle",
+            "description": "Early jungler kills",
+            "operator": ">"
+        }
+    ],
+    "Combat": [
+        {
+            "name": "-assists",
+            "description": "Assists",
+            "operator": ">"
+        },
+        {
+            "name": "-deaths",
+            "description": "Deaths",
+            "operator": "<"
+        },
+        {
+            "name": "-firstBloodAssist",
+            "description": "First Blood assists",
+            "operator": ">"
+        },
+        {
+            "name": "-firstBloodKill",
+            "description": "First Blood kills",
+            "operator": ">"
+        },
+        {
+            "name": "-kills",
+            "description": "Kills",
+            "operator": ">"
+        },
+        {
+            "name": "bountyGold",
+            "description": "Bounty Gold collected",
+            "operator": ">"
+        },
+        {
+            "name": "deathsByEnemyChamps",
+            "description": "Deaths by enemy champs",
+            "operator": "<"
+        },
+        {
+            "name": "kda",
+            "description": "KDA",
+            "operator": ">"
+        },
+        {
+            "name": "killParticipation",
+            "description": "Kill participation",
+            "operator": ">"
+        },
+        {
+            "name": "maxKillDeficit",
+            "description": "Maximum kill deficit",
+            "operator": ">"
+        },
+        {
+            "name": "maxLevelLeadLaneOpponent",
+            "description": "Maxmimum level lead over lane opponent",
+            "operator": ">"
+        },
+        {
+            "name": "outerTurretExecutesBefore10Minutes",
+            "description": "Executes from outer turrets before 10 minutes",
+            "operator": "<"
+        }
+    ],
+    "Survival": [
+        {
+            "name": "survivedSingleDigitHpCount",
+            "description": "Survived with single digit HP",
+            "operator": ">"
+        },
+        {
+            "name": "survivedThreeImmobilizesInFight",
+            "description": "Survived three immobilizations in fight",
+            "operator": ">"
+        },
+        {
+            "name": "tookLargeDamageSurvived",
+            "description": "Survived after taking large damage",
+            "operator": ">"
+        }
+    ],
+    "Objectives": [
+        {
+            "name": "-damageDealtToBuildings",
+            "description": "Damage dealt to buildings",
+            "operator": ">"
+        },
+        {
+            "name": "-damageDealtToObjectives",
+            "description": "Damage dealt to objectives",
+            "operator": ">"
+        },
+        {
+            "name": "-damageDealtToTurrets",
+            "description": "Damage dealt to turrets",
+            "operator": ">"
+        },
+        {
+            "name": "-firstTowerAssist",
+            "description": "First tower assists",
+            "operator": ">"
+        },
+        {
+            "name": "-firstTowerKill",
+            "description": "First tower kills",
+            "operator": ">"
+        },
+        {
+            "name": "-inhibitorKills",
+            "description": "Inhibitor kills",
+            "operator": ">"
+        },
+        {
+            "name": "-inhibitorTakedowns",
+            "description": "Inhibitor takedowns",
+            "operator": ">"
+        },
+        {
+            "name": "-inhibitorsLost",
+            "description": "Inhibitors lost",
+            "operator": "<"
+        },
+        {
+            "name": "-objectivesStolen",
+            "description": "Objectives stolen",
+            "operator": ">"
+        },
+        {
+            "name": "-objectivesStolenAssists",
+            "description": "Objectives stolen assists",
+            "operator": ">"
+        },
+        {
+            "name": "-turretKills",
+            "description": "Turret kills",
+            "operator": ">"
+        },
+        {
+            "name": "-turretTakedowns",
+            "description": "Turret takedowns",
+            "operator": ">"
+        },
+        {
+            "name": "-turretsLost",
+            "description": "Turrets lost",
+            "operator": "<"
+        },
+        {
+            "name": "baronTakedowns",
+            "description": "Baron takedowns",
+            "operator": ">"
+        },
+        {
+            "name": "dragonTakedowns",
+            "description": "Dragon takedowns",
+            "operator": ">"
+        },
+        {
+            "name": "elderDragonKillsWithOpposingSoul",
+            "description": "Elder Dragon kills with opposing soul",
+            "operator": ">"
+        },
+        {
+            "name": "epicMonsterKillsNearEnemyJungler",
+            "description": "Epic monster kills near enemy jungler",
+            "operator": ">"
+        },
+        {
+            "name": "epicMonsterKillsWithin30SecondsOfSpawn",
+            "description": "Epic monster kills withing 30 seconds of spawn",
+            "operator": ">"
+        },
+        {
+            "name": "epicMonsterSteals",
+            "description": "Epic monster steals",
+            "operator": ">"
+        },
+        {
+            "name": "epicMonsterStolenWithoutSmite",
+            "description": "Epic monsters stolen without smite",
+            "operator": ">"
+        },
+        {
+            "name": "kTurretsDestroyedBeforePlatesFall",
+            "description": "Turrets destroyed before plates fall",
+            "operator": ">"
+        },
+        {
+            "name": "multiTurretRiftHeraldCount",
+            "description": "Multi-Turret Rift Herald count",
+            "operator": ">"
+        },
+        {
+            "name": "perfectDragonSoulsTaken",
+            "description": "Perfect Dragon Souls Taken",
+            "operator": ">"
+        },
+        {
+            "name": "quickFirstTurret",
+            "description": "Quick first Turret",
+            "operator": ">"
+        },
+        {
+            "name": "riftHeraldTakedowns",
+            "description": "Rift Herald Takedowns",
+            "operator": ">"
+        },
+        {
+            "name": "soloBaronKills",
+            "description": "Solo Baron kills",
+            "operator": ">"
+        },
+        {
+            "name": "soloTurretsLategame",
+            "description": "Solo turrets in lategame",
+            "operator": ">"
+        },
+        {
+            "name": "takedownOnFirstTurret",
+            "description": "First turret takedowns",
+            "operator": ">"
+        },
+        {
+            "name": "teamBaronKills",
+            "description": "Team Baron kills",
+            "operator": ">"
+        },
+        {
+            "name": "teamElderDragonKills",
+            "description": "Team Elder Dragon kills",
+            "operator": ">"
+        },
+        {
+            "name": "teamRiftHeraldKills",
+            "description": "Team Rift Herald kills",
+            "operator": ">"
+        },
+        {
+            "name": "turretPlatesTaken",
+            "description": "Turret plates taken",
+            "operator": ">"
+        },
+        {
+            "name": "turretTakedowns",
+            "description": "Turret takedowns",
+            "operator": ">"
+        },
+        {
+            "name": "turretsTakenWithRiftHerald",
+            "description": "Turrets taken with Rift Herald",
+            "operator": ">"
+        }
+    ],
+    "General": [
+        {
+            "name": "-champLevel",
+            "description": "Champ level",
+            "operator": ">"
+        },
+        {
+            "name": "-gameEndedInEarlySurrender",
+            "description": "Games ended in early surrender",
+            "operator": ">"
+        },
+        {
+            "name": "-gameEndedInSurrender",
+            "description": "Games ended in surrender",
+            "operator": ">"
+        },
+        {
+            "name": "-longestTimeSpentLiving",
+            "description": "Longest time spent living",
+            "operator": ">"
+        },
+        {
+            "name": "-teamEarlySurrendered",
+            "description": "Team early surrendered",
+            "operator": "<"
+        },
+        {
+            "name": "-totalTimeSpentDead",
+            "description": "Total time spent dead",
+            "operator": "<"
+        },
+        {
+            "name": "gameLength",
+            "description": "Game length",
+            "operator": ">"
+        },
+        {
+            "name": "perfectGame",
+            "description": "Perfect games",
+            "operator": ">"
+        },
+        {
+            "name": "blastConeOppositeOpponentCount",
+            "description": "Blast cones opposite opponent count",
+            "operator": ">"
+        },
+        {
+            "name": "completeSupportQuestInTime",
+            "description": "Support item quest completion time",
+            "operator": "<"
+        },
+        {
+            "name": "dancedWithRiftHerald",
+            "description": "Danced with Rift Herald",
+            "operator": ">"
+        },
+        {
+            "name": "hadAfkTeammate",
+            "description": "Had AFK teammate",
+            "operator": ">"
+        },
+        {
+            "name": "hadOpenNexus",
+            "description": "Had open nexus",
+            "operator": ">"
+        },
+        {
+            "name": "moreEnemyJungleThanOpponent",
+            "description": "More enemy jungle than opponent",
+            "operator": ">"
+        },
+        {
+            "name": "poroExplosions",
+            "description": "Poro explosions",
+            "operator": ">"
+        },
+        {
+            "name": "unseenRecalls",
+            "description": "Unseen recalls",
+            "operator": ">"
+        }
+    ],
+    "Shop": [
+        {
+            "name": "-consumablesPurchased",
+            "description": "Consumables purchased",
+            "operator": ">"
+        },
+        {
+            "name": "-goldEarned",
+            "description": "Gold earned",
+            "operator": ">"
+        },
+        {
+            "name": "-goldSpent",
+            "description": "Gold spent",
+            "operator": ">"
+        },
+        {
+            "name": "-itemsPurchased",
+            "description": "Items purchased",
+            "operator": ">"
+        },
+        {
+            "name": "earlyLaningPhaseGoldExpAdvantage",
+            "description": "Early laning phase gold exp advantage",
+            "operator": ">"
+        },
+        {
+            "name": "goldPerMinute",
+            "description": "Gold per minute",
+            "operator": ">"
+        },
+        {
+            "name": "laningPhaseGoldExpAdvantage",
+            "description": "Laning phase gold exp advantage",
+            "operator": ">"
+        }
+    ],
+    "Vision": [
+        {
+            "name": "-visionScore",
+            "description": "Vision score",
+            "operator": ">"
+        },
+        {
+            "name": "-visionWardsBought",
+            "description": "Vision wards bought",
+            "operator": ">"
+        },
+        {
+            "name": "-wardsKilled",
+            "description": "Wards killed",
+            "operator": ">"
+        },
+        {
+            "name": "-wardsPlaced",
+            "description": "Wards placed",
+            "operator": ">"
+        },
+        {
+            "name": "controlWardsPlaced",
+            "description": "Control wards placed",
+            "operator": ">"
+        },
+        {
+            "name": "stealthWardsPlaced",
+            "description": "Stealth wards placed",
+            "operator": ">"
+        },
+        {
+            "name": "threeWardsOneSweeperCount",
+            "description": "Three wards revealed with one sweeper",
+            "operator": ">"
+        },
+        {
+            "name": "visionScoreAdvantageLaneOpponent",
+            "description": "Vision score advantage over lane opponent",
+            "operator": ">"
+        },
+        {
+            "name": "visionScorePerMinute",
+            "description": "Vision score per minute",
+            "operator": ">"
+        },
+        {
+            "name": "wardTakedowns",
+            "description": "Ward takedowns",
+            "operator": ">"
+        },
+        {
+            "name": "wardTakedownsBefore20M",
+            "description": "Ward takedowns before 20 minutes",
+            "operator": ">"
+        },
+        {
+            "name": "wardsGuarded",
+            "description": "Wards guarded",
+            "operator": ">"
+        }
+    ],
+    "Minions": [
+        {
+            "name": "-neutralMinionsKilled",
+            "description": "Neutral minions killed",
+            "operator": ">"
+        },
+        {
+            "name": "-totalMinionsKilled",
+            "description": "Total minions killed",
+            "operator": ">"
+        },
+        {
+            "name": "alliedJungleMonsterKills",
+            "description": "Allied jungle monsters killed",
+            "operator": ">"
+        },
+        {
+            "name": "buffsStolen",
+            "description": "Buffs stolen",
+            "operator": ">"
+        },
+        {
+            "name": "enemyJungleMonsterKills",
+            "description": "Enemy jungle monsters killed",
+            "operator": ">"
+        },
+        {
+            "name": "initialBuffCount",
+            "description": "Initial buff count",
+            "operator": ">"
+        },
+        {
+            "name": "initialCrabCount",
+            "description": "Initial crabs count",
+            "operator": ">"
+        },
+        {
+            "name": "jungleCsBefore10Minutes",
+            "description": "Jungle CS before 10 minutes",
+            "operator": ">"
+        },
+        {
+            "name": "laneMinionsFirst10Minutes",
+            "description": "Lane minions killed before 10 minutes",
+            "operator": ">"
+        },
+        {
+            "name": "maxCsAdvantageOnLaneOpponent",
+            "description": "Maximum CS advantage over lane opponent",
+            "operator": ">"
+        },
+        {
+            "name": "scuttleCrabKills",
+            "description": "Scuttle crab kills",
+            "operator": ">"
+        },
+        {
+            "name": "twentyMinionsIn3SecondsCount",
+            "description": "Twenty minions killed in 3 seconds count",
+            "operator": ">"
+        }
+    ]
+}
