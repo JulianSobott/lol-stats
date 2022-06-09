@@ -28,7 +28,7 @@ def update_summoner(db: db, summoner):
     else:
         add_summoner(db=db, summoner=summoner, rank=rank, icon_url=icon_url)
         mh = match_history.get_match_ids(
-            puuid=summoner['puuid'], start_time=1627776000)
+            puuid=summoner['puuid'], start_time=1643790000)
         yield from match_history.add_missing_games_to_db(
             db=db, match_ids=mh, puuid=summoner['puuid'])
 
@@ -54,7 +54,7 @@ def update_all(db: db, region: str) -> None:
         sys.stdout.write('\r')
         sys.stdout.write("[%-20s] %d%%\n" % ('='*int(20*j), 100*j))
         sys.stdout.flush()
-        for _ in update_summoner_by_region_id(id=row[1], region=region):
+        for _ in update_summoner_by_region_id(db=db, id=row[1], region=region):
             pass
         i += 1
 
