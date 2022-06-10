@@ -420,7 +420,7 @@ export default {
       try {
         if (state) {
           await this.$axios.post(`/users/${this.$auth.user.id}/achievements`, {
-            id: achivementId,
+            name: achivementId,
           })
         } else {
           await this.$axios.delete(
@@ -442,22 +442,25 @@ export default {
     async filterApplied(filters) {
       try {
         const query = { ...filters }
-        const puuids = []
+        let compareRequest = ""
         this.selectedPlayerUuid = null
         this.showImportPlayerModal = false
 
         if (query.compare === 'global') {
-          // keep puuids empty
+          compareRequest = "&global=true"
         } else if (query.compare === 'competitors') {
-          puuids.push('123')
-          puuids.push('123')
-          puuids.push('123')
+
+          const testIds = [1, 2, 3];
+          for (const id in testIds) {
+            compareRequest += `&competitor_id=${id}`
+          }
+
         } else if (query.compare === 'player') {
           // get id of player
           const response = await this.$axios.get(
             `/players?player_name=${query.player.playername}`
           )
-          puuids.push(response.data.id)
+          compareRequest = `&competitor=${response.data.id}`
           this.selectedPlayerUuid = response.data.id
 
           if (!response.data.imported) {
@@ -468,9 +471,7 @@ export default {
 
         if (!this.isImportingData && !this.requiresImport) {
           await this.$axios.get(
-            `/achievements?puuids=[${puuids.join()}]&champion=${
-              query.champion
-            }&rank=${query.rank}`
+            `/achievements?me=${this.$auth.user.id}&champion=${query.champion}&rank=${query.rank}${compareRequest}`
           )
         }
       } catch (err) {
