@@ -94,8 +94,12 @@ class ChallengeClasses(Base):
 class Challenges(Base):
     __tablename__ = "challenges"
 
-    name = Column(String, ForeignKey("challengeclasses.name"), nullable=False,primary_key=True)
-    summoner_id = Column(String, ForeignKey("summoners.puuid"), nullable=False, primary_key=True)
+    name = Column(
+        String, ForeignKey("challengeclasses.name"), nullable=False, primary_key=True
+    )
+    summoner_id = Column(
+        String, ForeignKey("summoners.puuid"), nullable=False, primary_key=True
+    )
     total = Column(Float)
     average_per_game = Column(Float)
     highscore = Column(Float)

@@ -63,7 +63,13 @@ class Testplayer:
         return self
 
     def add_challenge(self, name: str, highscore: float, total: float, avg: float):
-        challenge = Challenges(name=name, summoner_id=self.player.id, total=total, average_per_game=avg, highscore=highscore)
+        challenge = Challenges(
+            name=name,
+            summoner_id=self.player.id,
+            total=total,
+            average_per_game=avg,
+            highscore=highscore,
+        )
         self._challenges.append(challenge)
         return self
 
@@ -75,7 +81,7 @@ class Testplayer:
             level=self.player.level,
             icon_path=self.player.player_icon_path,
             last_update=datetime_to_db(datetime.now()),
-            tier=self.player.rank.tier,
+            tier=self.elo,
             division=self.player.rank.division_str,
             league_points=self.player.rank.league_points,
         )
@@ -94,6 +100,7 @@ class Testplayer:
     @property
     def challenges(self):
         return self._challenges
+
 
 class GamesFactory:
     def __init__(self, db: Session, player: Testplayer):
