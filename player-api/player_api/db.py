@@ -13,6 +13,7 @@ from sqlalchemy import (
     ForeignKey,
     Enum,
     CheckConstraint,
+    Float,
 )
 from sqlalchemy.orm import relationship, sessionmaker
 
@@ -86,7 +87,25 @@ class ChallengeClasses(Base):
 
     name = Column(String, primary_key=True)
     class_name = Column(String, nullable=False, name="class")
+    description = Column(String, nullable=False)
     comparison_operator = Column(String, nullable=False)
+
+
+class Challenges(Base):
+    __tablename__ = "challenges"
+
+    name = Column(
+        String, ForeignKey("challengeclasses.name"), nullable=False, primary_key=True
+    )
+    summoner_id = Column(
+        String, ForeignKey("summoners.puuid"), nullable=False, primary_key=True
+    )
+    total = Column(Float)
+    average_per_game = Column(Float)
+    highscore = Column(Float)
+
+    summoner = relationship("Summoners", foreign_keys=[summoner_id])
+    challenge_class = relationship("ChallengeClasses", foreign_keys=[name])
 
 
 class Games(Base):

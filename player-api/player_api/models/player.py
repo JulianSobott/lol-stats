@@ -91,3 +91,4 @@ class ImportProgress(BaseModel):
 
 PlayerId = str
 PlayerName = str
+UserId = str

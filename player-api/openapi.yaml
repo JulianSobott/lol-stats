@@ -146,8 +146,142 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/HTTPValidationError'
+  /achievements:
+    get:
+      summary: Get Achievements
+      operationId: get_achievements_achievements_get
+      parameters:
+      - required: true
+        schema:
+          title: Me
+          type: string
+        name: me
+        in: query
+      - required: false
+        schema:
+          title: Global
+          type: boolean
+          default: false
+        name: global
+        in: query
+      - required: false
+        schema:
+          title: Competitor Id
+          type: array
+          items:
+            type: string
+          default: []
+        name: competitor_id
+        in: query
+      - required: false
+        schema:
+          title: Competitor
+          type: string
+        name: competitor
+        in: query
+      - required: false
+        schema:
+          $ref: '#/components/schemas/TierEnum'
+        name: rank
+        in: query
+      - required: false
+        schema:
+          title: Champion
+          type: string
+        name: champion
+        in: query
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Achievements'
+        '204':
+          description: Filter didn't match any challenges
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
 components:
   schemas:
+    Achievement:
+      title: Achievement
+      required:
+      - fav
+      - name
+      - description
+      - you
+      - other
+      type: object
+      properties:
+        fav:
+          title: Fav
+          type: boolean
+        name:
+          title: Name
+          type: string
+        description:
+          title: Description
+          type: string
+        you:
+          $ref: '#/components/schemas/AchievementStats'
+        other:
+          $ref: '#/components/schemas/AchievementStats'
+    AchievementCategory:
+      title: AchievementCategory
+      required:
+      - category
+      - achievements
+      type: object
+      properties:
+        category:
+          title: Category
+          type: string
+        achievements:
+          title: Achievements
+          type: array
+          items:
+            $ref: '#/components/schemas/Achievement'
+    AchievementStat:
+      title: AchievementStat
+      required:
+      - value
+      - compare
+      type: object
+      properties:
+        value:
+          title: Value
+          type: number
+        compare:
+          $ref: '#/components/schemas/Comparison'
+    AchievementStats:
+      title: AchievementStats
+      required:
+      - max
+      - total
+      - avg
+      type: object
+      properties:
+        max:
+          $ref: '#/components/schemas/AchievementStat'
+        total:
+          $ref: '#/components/schemas/AchievementStat'
+        avg:
+          $ref: '#/components/schemas/AchievementStat'
+    Achievements:
+      title: Achievements
+      required:
+      - items
+      type: object
+      properties:
+        items:
+          title: Items
+          type: array
+          items:
+            $ref: '#/components/schemas/AchievementCategory'
     BasicPlayer:
       title: BasicPlayer
       required:
@@ -188,6 +322,14 @@ components:
         icon_path:
           title: Icon Path
           type: string
+    Comparison:
+      title: Comparison
+      enum:
+      - BETTER
+      - EQUAL
+      - WORSE
+      type: string
+      description: An enumeration.
     ExceptionMessage:
       title: ExceptionMessage
       required:
