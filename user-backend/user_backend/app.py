@@ -270,6 +270,17 @@ def put_player_uuid(current_user, access_token, user_id):
         return make_response(jsonify({"status": "error", "message": "User not found"}), 404)
 
 
+@app.route('/api/users/<user_id>', methods=['GET'])
+def get_player(user_id: int):
+    user = Users.query.filter_by(id=user_id).first()
+    if user is not None:
+        user_dump = user_dump_schema.dump(user)
+        return make_response(jsonify(user_dump), 200)
+    
+    return make_response(jsonify({"status": "error", "message": "User not found"}), 404)
+
+
+
 @app.route('/api/users/<user_id>/competitors/', methods=['GET', 'POST'])
 @token_required
 def get_list_of_or_add_competitor(current_user, token, user_id):
