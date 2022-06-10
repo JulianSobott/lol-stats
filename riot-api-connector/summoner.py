@@ -1,3 +1,5 @@
+import logging
+
 from riotwatcher import LolWatcher, ApiError
 from db_connector import db
 import time
@@ -54,8 +56,11 @@ def update_all(db: db, region: str) -> None:
         sys.stdout.write('\r')
         sys.stdout.write("[%-20s] %d%%\n" % ('='*int(20*j), 100*j))
         sys.stdout.flush()
-        for _ in update_summoner_by_region_id(db=db, id=row[1], region=region):
-            pass
+        try:
+            for _ in update_summoner_by_region_id(db=db, id=row[1], region=region):
+                pass
+        except Exception as exception:
+            logging.error(f"msg='Update summoner failed' {exception=} id={row[1]}")
         i += 1
 
 
@@ -80,11 +85,10 @@ def _get_rank(id: str):
         region='euw1', encrypted_summoner_id=id)
     if len(rank) == 0:
         return {'tier': 'UNRANKED', 'rank': '', 'leaguePoints': 0}
-    found = False
     for s in rank:
         if s['queueType'] == 'RANKED_SOLO_5x5':
             rank = s
-            found = True
-    if not found:
+            break
+    else:
         rank = rank[0]
     return rank

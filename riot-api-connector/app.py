@@ -1,3 +1,5 @@
+import logging
+
 import playerImportRequest
 import summoner
 from db_connector import db
@@ -18,7 +20,10 @@ class riot_api_connector:
     def update_loop(self):
         while True:
             print("Updating ...")
-            summoner.update_all(db=self.db, region='EUW')
+            try:
+                summoner.update_all(db=self.db, region='EUW')
+            except Exception as exception:
+                logging.error(f"msg='Update all failed' {exception=}")
             print("Finished updating")
             time.sleep(300)
 
