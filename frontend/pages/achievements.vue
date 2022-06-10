@@ -420,7 +420,7 @@ export default {
       try {
         if (state) {
           await this.$axios.post(`/users/${this.$auth.user.id}/achievements`, {
-            id: achivementId,
+            name: achivementId,
           })
         } else {
           await this.$axios.delete(
