@@ -13,9 +13,7 @@ class db:
             self.connection = psycopg2.connect(host=os.environ.get('POSTGRES_HOST', 'lol-stats.de'),
                                                database='postgres',
                                                user='postgres',
-                                               password='7iF5tCZ84KFW4CxtZAz0K21eLbYjUK8Tdiln4XIUImUszzdLWIj1tuuxcIWamEmD',
-                                               #    password=os.environ.get(
-                                               #    'POSTGRES_PASSWORD', 'admin'),
+                                               password=os.environ.get('POSTGRES_PASSWORD', 'admin'),
                                                port=5432)
             self.cursor = self.connection.cursor()
         except (Exception, psycopg2.DatabaseError) as error:
