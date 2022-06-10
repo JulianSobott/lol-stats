@@ -1,4 +1,5 @@
-import logging
+import logging.config
+from pathlib import Path
 
 import playerImportRequest
 import summoner
@@ -8,6 +9,11 @@ from threading import Thread
 import os
 import cassiopeia
 
+
+logging.config.fileConfig(
+        Path(__file__).parent.joinpath("logging.conf"), disable_existing_loggers=False
+    )
+logger = logging.getLogger(__name__)
 
 cassiopeia.set_riot_api_key(os.environ["RIOT_API_KEY"])
 
@@ -19,12 +25,12 @@ class riot_api_connector:
 
     def update_loop(self):
         while True:
-            print("Updating ...")
+            logger.info("Updating ...")
             try:
                 summoner.update_all(db=self.db, region='EUW')
             except Exception as exception:
-                logging.error(f"msg='Update all failed' {exception=}")
-            print("Finished updating")
+                logger.error(f"msg='Update all failed' {exception=}")
+            logger.info("Finished updating")
             time.sleep(300)
 
 

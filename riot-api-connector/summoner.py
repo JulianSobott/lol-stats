@@ -8,6 +8,8 @@ import sys
 import match_history
 from riotwatcherWrapper import call_with_retry
 
+logger = logging.getLogger(__name__)
+
 lol_watcher = LolWatcher('RGAPI-ba00cb63-7be0-4e50-8610-eb749b1ea70d')
 
 
@@ -17,6 +19,7 @@ def add_summoner(db: db, summoner, rank, icon_url):
 
 
 def update_summoner(db: db, summoner):
+    logger.debug(f"method=update_summoner {summoner=}")
     icon_url = db.get_summoner_icon_url(summoner['profileIconId'])
     rank = _get_rank(summoner['id'])
     if db_summoner := db.get_summoner(puuid=summoner['puuid']):
