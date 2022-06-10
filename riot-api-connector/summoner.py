@@ -1,4 +1,5 @@
 import logging
+import os
 
 from riotwatcher import LolWatcher, ApiError
 from db_connector import db
@@ -10,7 +11,7 @@ from riotwatcherWrapper import call_with_retry
 
 logger = logging.getLogger(__name__)
 
-lol_watcher = LolWatcher('RGAPI-ba00cb63-7be0-4e50-8610-eb749b1ea70d')
+lol_watcher = LolWatcher(os.environ["RIOT_API_KEY"])
 
 
 def add_summoner(db: db, summoner, rank, icon_url):
