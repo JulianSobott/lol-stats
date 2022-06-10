@@ -151,14 +151,33 @@ paths:
       summary: Get Achievements
       operationId: get_achievements_achievements_get
       parameters:
+      - required: true
+        schema:
+          title: Me
+          type: string
+        name: me
+        in: query
       - required: false
         schema:
-          title: Puuids
+          title: Global
+          type: boolean
+          default: false
+        name: global
+        in: query
+      - required: false
+        schema:
+          title: Competitor Id
           type: array
           items:
             type: string
           default: []
-        name: puuids
+        name: competitor_id
+        in: query
+      - required: false
+        schema:
+          title: Competitor
+          type: string
+        name: competitor
         in: query
       - required: false
         schema:
@@ -171,12 +190,6 @@ paths:
           type: string
         name: champion
         in: query
-      - required: false
-        schema:
-          title: Authentication
-          type: string
-        name: authentication
-        in: header
       responses:
         '200':
           description: Successful Response
