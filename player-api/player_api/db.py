@@ -54,7 +54,7 @@ class Summoners(Base):
     tier = Column(Enum(TierEnum))
     division = Column(Enum(DivisionEnum))
     league_points = Column(
-        Integer, CheckConstraint("league_points >= 0 AND league_points <= 100")
+        Integer, CheckConstraint("league_points >= 0")
     )
 
 

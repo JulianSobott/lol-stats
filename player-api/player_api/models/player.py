@@ -13,6 +13,7 @@ class TierEnum(str, Enum):
     MASTER = "master"
     GRANDMASTER = "grandmaster"
     CHALLENGER = "challenger"
+    UNRANKED = "unranked"
 
 
 class Rank(BaseModel):
