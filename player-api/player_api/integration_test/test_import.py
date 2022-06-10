@@ -113,8 +113,8 @@ def _finish_import(db_session: Session):
         level=1,
         icon_path="",
         last_update=1,
-        tier=TierEnum.silver,
-        division=DivisionEnum.one,
+        tier=TierEnum.SILVER,
+        division=DivisionEnum.I,
         league_points=1,
     )
     db_session.add(summoner)

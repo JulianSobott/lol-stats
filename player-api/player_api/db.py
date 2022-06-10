@@ -35,10 +35,10 @@ Base = declarative_base()
 
 
 class DivisionEnum(str, enum.Enum):
-    one = "one"
-    two = "two"
-    three = "three"
-    four = "four"
+    I = "I"
+    II = "II"
+    III = "III"
+    IV = "IV"
 
 
 class Summoners(Base):

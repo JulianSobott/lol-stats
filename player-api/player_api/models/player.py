@@ -4,15 +4,15 @@ from pydantic import BaseModel, Field
 
 
 class TierEnum(str, Enum):
-    iron = "iron"
-    bronze = "bronze"
-    silver = "silver"
-    gold = "gold"
-    platinum = "platinum"
-    diamond = "diamond"
-    master = "master"
-    grandmaster = "grandmaster"
-    challenger = "challenger"
+    IRON = "iron"
+    BRONZE = "bronze"
+    SILVER = "silver"
+    GOLD = "gold"
+    PLATINUM = "platinum"
+    DIAMOND = "diamond"
+    MASTER = "master"
+    GRANDMASTER = "grandmaster"
+    CHALLENGER = "challenger"
 
 
 class Rank(BaseModel):
@@ -23,15 +23,15 @@ class Rank(BaseModel):
     @property
     def division_str(self) -> str:
         return {
-            1: "one",
-            2: "two",
-            3: "three",
-            4: "four",
+            1: "I",
+            2: "II",
+            3: "III",
+            4: "IV",
         }[self.division]
 
     @staticmethod
     def division_from_str(division: str) -> int:
-        return {"one": 1, "two": 2, "three": 3, "four": 4}[division]
+        return {"I": 1, "II": 2, "III": 3, "IV": 4}[division]
 
 
 class MostPlayed(BaseModel):
