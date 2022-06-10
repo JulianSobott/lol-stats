@@ -66,16 +66,7 @@ def import_player_task(player_id: PlayerId):
                 logger.debug(
                     f"method=import_player_task {global_import_state.of(player_id)=}"
                 )
-            global_import_state.set_import_state(
-                player_id,
-                progress=ImportProgress(
-                    imported_games=0,
-                    total_games=0,
-                    imported=True,
-                    percentage=1,
-                    import_state=ImportState.FINISHED,
-                ),
-            )
+            global_import_state.import_successfully_finished(player_id)
             logger.debug(
                 f"method=import_player_task msg='finished importing' {global_import_state.of(player_id)=}"
             )
@@ -121,6 +112,9 @@ class GlobalImportState:
 
     def set_import_state(self, player_id: PlayerId, progress: ImportProgress):
         self.players[player_id] = progress
+
+    def import_successfully_finished(self, player_id: PlayerId):
+        self.players.pop(player_id)
 
 
 global_import_state = GlobalImportState()
