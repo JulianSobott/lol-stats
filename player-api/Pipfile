@@ -16,6 +16,7 @@ opentelemetry-distro = "*"
 opentelemetry-instrumentation-sqlalchemy = "*"
 requests = "*"
 starlette = "*"
+pyyaml = "*"
 
 [dev-packages]
 pytest = "*"

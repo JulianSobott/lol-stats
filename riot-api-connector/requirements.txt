@@ -3,3 +3,4 @@ psycopg2-binary==2.9.3
 riotwatcher==3.2.2
 grpcio==1.46.3
 grpcio-tools==1.46.3
+pyyaml==6.0

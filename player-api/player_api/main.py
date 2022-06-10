@@ -2,12 +2,9 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from opentelemetry.instrumentation.fastapi import FastAPIInstrumentor
 
-from player_api.log import setup_logging
 from player_api.middlewares import LogRequestsMiddleware
 from player_api.endpoints import import_player, find_player, get_player, recent_games
 
-
-setup_logging()
 
 app = FastAPI(
     title="Player API",

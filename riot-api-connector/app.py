@@ -1,6 +1,8 @@
 import logging.config
 from pathlib import Path
 
+import yaml
+
 import playerImportRequest
 import summoner
 from db_connector import db
@@ -9,10 +11,10 @@ from threading import Thread
 import os
 import cassiopeia
 
+with open(Path(__file__).parent.joinpath("logging.yml"), 'rt') as f:
+    config = yaml.safe_load(f.read())
+logging.config.dictConfig(config)
 
-logging.config.fileConfig(
-        Path(__file__).parent.joinpath("logging.conf"), disable_existing_loggers=False
-    )
 logger = logging.getLogger(__name__)
 
 cassiopeia.set_riot_api_key(os.environ["RIOT_API_KEY"])
