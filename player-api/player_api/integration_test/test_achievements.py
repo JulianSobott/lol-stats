@@ -43,6 +43,9 @@ category_2 = "category_2"
 PLAYER_UUID = "ABCDEFG"
 PLAYER_ID = "1"
 
+PLAYER_2_UUID = "PLAYER2"
+PLAYER_3_UUID = "PLAYER3"
+
 
 @pytest.fixture
 def setup_challenges(db_session: Session):
@@ -68,12 +71,20 @@ def setup_challenges(db_session: Session):
 def mock_user_api(requests_mock):
     requests_mock.real_http = True
     requests_mock.get(
-        f"https://lol-stats.de/api/token/info",
-        json={"status": "success", "id": PLAYER_ID, "player_uuid": PLAYER_UUID},
-    )
-    requests_mock.get(
         f"https://lol-stats.de/api/users/{PLAYER_ID}/achievements",
         json={"status": "success", "achievements": []},
+    )
+    requests_mock.get(
+        f"https://lol-stats.de/api/users/1",
+        json={"id": 1, "player_uuid": PLAYER_UUID, "region": "euw"},
+    )
+    requests_mock.get(
+        f"https://lol-stats.de/api/users/2",
+        json={"id": 2, "player_uuid": PLAYER_2_UUID, "region": "euw"},
+    )
+    requests_mock.get(
+        f"https://lol-stats.de/api/users/3",
+        json={"id": 3, "player_uuid": PLAYER_3_UUID, "region": "euw"},
     )
 
 
@@ -110,46 +121,30 @@ expected_res = Achievements(
 
 
 def test_all_players(db_session: Session, setup_challenges, mock_user_api):
-    players = PlayerFactory(db_session).n_players(3)
-    players[0].player.id = PLAYER_UUID
-    with players:
-        players[0].with_elo(TierEnum.BRONZE).add_challenge(
-            name=challenge_1, highscore=20, total=100, avg=10
-        )
-        players[1].with_elo(TierEnum.SILVER).add_challenge(
-            name=challenge_1, highscore=30, total=200, avg=5
-        )
-        players[2].with_elo(TierEnum.GRANDMASTER).add_challenge(
-            name=challenge_1, highscore=2, total=2, avg=2
-        )
+    players = _prepare_players(db_session, extra_challenger=False)
     res = _achievements_reqeust(players[0], query="")
     assert res == expected_res
 
 
 def test_one_elo(db_session: Session, setup_challenges, mock_user_api):
-    players = PlayerFactory(db_session).n_players(4)
-    players[0].player.id = PLAYER_UUID
-    with players:
-        players[0].with_elo(TierEnum.SILVER).add_challenge(
-            name=challenge_1, highscore=20, total=100, avg=10
-        )
-        players[1].with_elo(TierEnum.SILVER).add_challenge(
-            name=challenge_1, highscore=30, total=200, avg=5
-        )
-        players[2].with_elo(TierEnum.SILVER).add_challenge(
-            name=challenge_1, highscore=2, total=2, avg=2
-        )
-        players[3].with_elo(TierEnum.GRANDMASTER).add_challenge(
-            name=challenge_1, highscore=2000, total=40000, avg=100
-        )
+    players = _prepare_players(db_session)
     res = _achievements_reqeust(players[0], query=f"rank={TierEnum.SILVER}")
     assert res == expected_res
 
 
 def test_puuids(db_session: Session, setup_challenges, mock_user_api):
-    players = PlayerFactory(db_session).n_players(4)
-    players[0].player.id = PLAYER_UUID
+    players = _prepare_players(db_session)
+    res = _achievements_reqeust(
+        players[0], query=f"competitor_id=2&competitor_id=3"
+    )
+    assert res == expected_res
 
+
+def _prepare_players(db_session: Session, extra_challenger: bool = True):
+    players = PlayerFactory(db_session).n_players(4 if extra_challenger else 3)
+    players[0].player.id = PLAYER_UUID
+    players[1].player.id = PLAYER_2_UUID
+    players[2].player.id = PLAYER_3_UUID
     with players:
         players[0].with_elo(TierEnum.SILVER).add_challenge(
             name=challenge_1, highscore=20, total=100, avg=10
@@ -160,16 +155,14 @@ def test_puuids(db_session: Session, setup_challenges, mock_user_api):
         players[2].with_elo(TierEnum.SILVER).add_challenge(
             name=challenge_1, highscore=2, total=2, avg=2
         )
-        players[3].with_elo(TierEnum.GRANDMASTER).add_challenge(
-            name=challenge_1, highscore=2000, total=40000, avg=100
-        )
-    res = _achievements_reqeust(
-        players[0], query=f"puuids={players[1].player.id}&puuids={players[2].player.id}"
-    )
-    assert res == expected_res
+        if extra_challenger:
+            players[3].with_elo(TierEnum.GRANDMASTER).add_challenge(
+                name=challenge_1, highscore=2000, total=40000, avg=100
+            )
+    return players
 
 
 def _achievements_reqeust(player: Testplayer, query: str) -> Achievements:
-    response = client.get(f"/achievements?{query}")
+    response = client.get(f"/achievements?me={PLAYER_ID}&{query}")
     assert response.status_code == 200
     return Achievements(**response.json())

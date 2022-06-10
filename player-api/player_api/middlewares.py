@@ -25,7 +25,7 @@ class LogRequestsMiddleware(BaseHTTPMiddleware):
         self, request: Request, call_next: RequestResponseEndpoint
     ) -> Response:
         rid = "".join(random.choices(string.ascii_uppercase + string.digits, k=6))
-        logger.info(f"{rid=} path={request.url.path}")
+        logger.info(f"{rid=} path={request.url}")
         start_time = time.time()
 
         response = await call_next(request)

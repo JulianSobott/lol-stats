@@ -1,3 +1,5 @@
+from enum import Enum
+
 import requests
 from fastapi import APIRouter, Depends, Query, HTTPException, Header
 from pydantic import BaseModel
@@ -15,11 +17,17 @@ from player_api.models.achievements import (
     AchievementStat,
     Comparison,
 )
-from player_api.models.player import PlayerId, TierEnum
+from player_api.models.player import PlayerId, TierEnum, UserId
 
 router = APIRouter()
 EPSILON = 0.00001
 logger = get_logger(__name__)
+
+
+class CompareGroup(str, Enum):
+    FRIEND = "friend"
+    PLAYER = "player"
+    GLOBAL = "global"
 
 
 @router.get(
@@ -28,13 +36,15 @@ logger = get_logger(__name__)
     responses={204: {"description": "Filter didn't match any challenges"}},
 )
 def get_achievements(
-    puuids: list[PlayerId] = Query(default=[]),
-    rank: TierEnum | None = None,
+    me: str,
+    is_gloabal: bool = Query(default=False, alias="global"),
+    competitor_id: list[UserId] = Query(default=[]),
+    competitor: PlayerId | None = None,
+    rank: TierEnum | str | None = None,
     champion: str | None = None,
     db: Session = Depends(get_db),
-    authentication: str | None = Header(default=None),
 ):
-    user = _get_user_data(authentication)
+    user = _get_user_data(me)
     user_challenges = _query_achievements(
         db, [Challenges.summoner_id == user.player_uuid]
     )
@@ -42,8 +52,17 @@ def get_achievements(
     criterion = [
         Challenges.summoner_id != user.player_uuid,
     ]
-    if puuids:
-        criterion.append(Challenges.summoner_id.in_(puuids))
+    if is_gloabal:  # global
+        pass
+    elif competitor_id:     # friends
+        friends_puuids = []
+        for competitor in competitor_id:
+            res = _get_user_data(competitor)
+            friends_puuids.append(res.player_uuid)
+        criterion.append(Challenges.summoner_id.in_(friends_puuids))
+    elif competitor:    # player
+        criterion.append(Challenges.summoner_id == competitor)
+
     if rank and rank != "*":
         criterion.append(Summoners.tier == rank)
     if champion and champion != "*":
@@ -130,6 +149,7 @@ class _CompareResult(BaseModel):
 class _UserInfo(BaseModel):
     id: str
     player_uuid: str
+    region: str
 
 
 def _compare(*, user: float, other: float, operator: str) -> _CompareResult:
@@ -164,6 +184,7 @@ def _query_challenge_classes(db: Session) -> list[ChallengeClasses]:
 
 
 def _get_favourite_challenges(user: _UserInfo) -> set[str]:
+    return set()    # TODO: remove when endpoint is deployed
     res = requests.get(f"https://lol-stats.de/api/users/{user.id}/achievements")
     if not res.ok:
         logger.warn(
@@ -174,14 +195,12 @@ def _get_favourite_challenges(user: _UserInfo) -> set[str]:
     return set(res.json()["achievements"])
 
 
-def _get_user_data(auth_token: str):
-    res = requests.get(
-        "https://lol-stats.de/api/token/info", headers={"Authentication": auth_token}
-    )
+def _get_user_data(user_id: str):
+    res = requests.get(f"https://lol-stats.de/api/users/{user_id}")
     if not res.ok:
         logger.warn(
             f"method=_get_user_data msg='request returned error code' "
-            f"{res.status_code=} {res.text} {auth_token[:4]=}"
+            f"{res.status_code=} {res.text} {user_id=}"
         )
         raise HTTPException(res.status_code, detail=res.text)
     return _UserInfo(**res.json())
