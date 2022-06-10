@@ -1,9 +1,11 @@
-from fastapi import APIRouter, Depends, Query, HTTPException
+import requests
+from fastapi import APIRouter, Depends, Query, HTTPException, Header
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
 from sqlalchemy import func
 
 from player_api.db import Challenges, ChallengeClasses, Summoners
+from player_api.log import get_logger
 from player_api.middlewares import get_db
 from player_api.models.achievements import (
     Achievements,
@@ -17,6 +19,7 @@ from player_api.models.player import PlayerId, TierEnum
 
 router = APIRouter()
 EPSILON = 0.00001
+logger = get_logger(__name__)
 
 
 @router.get(
@@ -25,17 +28,19 @@ EPSILON = 0.00001
     responses={204: {"description": "Filter didn't match any challenges"}},
 )
 def get_achievements(
-    user: str,
     puuids: list[PlayerId] = Query(default=[]),
     rank: TierEnum | None = None,
     champion: str | None = None,
     db: Session = Depends(get_db),
+    authentication: str | None = Header(default=None),
 ):
-    user_puuid = user
-    user_challenges = _query_achievements(db, [Challenges.summoner_id == user_puuid])
+    user = _get_user_data(authentication)
+    user_challenges = _query_achievements(
+        db, [Challenges.summoner_id == user.player_uuid]
+    )
 
     criterion = [
-        Challenges.summoner_id != user_puuid,
+        Challenges.summoner_id != user.player_uuid,
     ]
     if puuids:
         criterion.append(Challenges.summoner_id.in_(puuids))
@@ -122,6 +127,11 @@ class _CompareResult(BaseModel):
     other: Comparison
 
 
+class _UserInfo(BaseModel):
+    id: str
+    player_uuid: str
+
+
 def _compare(*, user: float, other: float, operator: str) -> _CompareResult:
     cmp_funcs = {"<": float.__lt__, ">": float.__gt__}
     if abs(user - other) < EPSILON:
@@ -153,5 +163,25 @@ def _query_challenge_classes(db: Session) -> list[ChallengeClasses]:
     return db.query(ChallengeClasses).all()
 
 
-def _get_favourite_challenges(user: str) -> set[str]:
-    return set()  # TODO: request from user API
+def _get_favourite_challenges(user: _UserInfo) -> set[str]:
+    res = requests.get(f"https://lol-stats.de/api/users/{user.id}/achievements")
+    if not res.ok:
+        logger.warn(
+            f"method=_get_user_data msg='request returned error code' "
+            f"{res.status_code=} {res.text} {user=}"
+        )
+        raise HTTPException(res.status_code, detail=res.text)
+    return set(res.json()["achievements"])
+
+
+def _get_user_data(auth_token: str):
+    res = requests.get(
+        "https://lol-stats.de/api/token/info", headers={"Authentication": auth_token}
+    )
+    if not res.ok:
+        logger.warn(
+            f"method=_get_user_data msg='request returned error code' "
+            f"{res.status_code=} {res.text} {auth_token[:4]=}"
+        )
+        raise HTTPException(res.status_code, detail=res.text)
+    return _UserInfo(**res.json())
