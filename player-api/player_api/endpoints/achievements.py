@@ -5,6 +5,7 @@ from fastapi import APIRouter, Depends, Query, HTTPException, Header
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
 from sqlalchemy import func
+from starlette.responses import Response
 
 from player_api.db import Challenges, ChallengeClasses, Summoners
 from player_api.log import get_logger
@@ -64,7 +65,10 @@ def get_achievements(
         criterion.append(Challenges.summoner_id == competitor)
 
     if rank and rank != "*":
-        criterion.append(Summoners.tier == rank)
+        if competitor:
+            logger.debug("msg='competitor and ranked both set. ignoring rank'")
+        else:
+            criterion.append(Summoners.tier == rank)
     if champion and champion != "*":
         pass  # TODO: filter for champions. Currently all games had to be loaded
     other_challenges = _query_achievements(db, criterion)

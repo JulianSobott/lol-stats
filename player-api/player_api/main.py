@@ -1,5 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.middleware.gzip import GZipMiddleware
 from opentelemetry.instrumentation.fastapi import FastAPIInstrumentor
 
 from player_api.middlewares import LogRequestsMiddleware
@@ -25,6 +26,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 app.add_middleware(LogRequestsMiddleware)
+app.add_middleware(GZipMiddleware)
 
 
 app.include_router(get_player.router)

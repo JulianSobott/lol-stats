@@ -25,9 +25,10 @@ db_pw = os.environ.get("POSTGRES_PASSWORD", "postgres")
 db_host = os.environ.get("POSTGRES_HOST", "localhost")
 db_type = os.environ.get("DB_TYPE", "postgresql")
 db_database = os.environ.get("DB_DATABASE", "postgres")
+db_port = os.environ.get("DB_PORT", "5432")
 
 engine = create_engine(
-    f"{db_type}://{db_user}:{db_pw}@{db_host}/{db_database}",
+    f"{db_type}://{db_user}:{db_pw}@{db_host}:{db_port}/{db_database}",
 )
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
