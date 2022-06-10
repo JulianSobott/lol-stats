@@ -274,7 +274,7 @@ def put_player_uuid(current_user, access_token, user_id):
 def get_player(user_id: int):
     user = Users.query.filter_by(id=user_id).first()
     if user is not None:
-        user_dump = user_dump_schema.dump(user)
+        user_dump = user_dump_schema.dump(user, exclude="email")
         return make_response(jsonify(user_dump), 200)
     
     return make_response(jsonify({"status": "error", "message": "User not found"}), 404)
