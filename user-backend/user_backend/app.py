@@ -12,7 +12,7 @@ from marshmallow import ValidationError
 from werkzeug import security
 
 import config
-from validation import user_schema, competitor_schema, user_setup_schema, user_dump_schema
+from validation import user_schema, competitor_schema, user_setup_schema, user_dump_schema, UserDumpSchema
 
 
 def create_app():
@@ -274,7 +274,7 @@ def put_player_uuid(current_user, access_token, user_id):
 def get_player(user_id: int):
     user = Users.query.filter_by(id=user_id).first()
     if user is not None:
-        user_dump = user_dump_schema.dump(user, exclude="email")
+        user_dump = UserDumpSchema(exclude="email").dump(user)
         return make_response(jsonify(user_dump), 200)
     
     return make_response(jsonify({"status": "error", "message": "User not found"}), 404)
