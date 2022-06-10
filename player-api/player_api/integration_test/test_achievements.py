@@ -45,10 +45,16 @@ category_2 = "category_2"
 def setup_challenges(db_session: Session):
     challenges = [
         ChallengeClasses(
-            name=challenge_1, class_name=category_1, comparison_operator=">", description=challenge_1
+            name=challenge_1,
+            class_name=category_1,
+            comparison_operator=">",
+            description=challenge_1,
         ),
         ChallengeClasses(
-            name=challenge_2, class_name=category_2, comparison_operator="<", description=challenge_2
+            name=challenge_2,
+            class_name=category_2,
+            comparison_operator="<",
+            description=challenge_2,
         ),
     ]
     db_session.bulk_save_objects(challenges)
@@ -56,35 +62,36 @@ def setup_challenges(db_session: Session):
 
 
 expected_res = Achievements(
-        items=[
-            AchievementCategory(
-                category=category_1,
-                achievements=[
-                    Achievement(
-                        fav=False,
-                        name=challenge_1,
-                        description=challenge_1,
-                        you=AchievementStats(
-                            max=AchievementStat(value=20, compare=Comparison.BETTER),
-                            total=AchievementStat(value=100, compare=Comparison.WORSE),
-                            avg=AchievementStat(value=10, compare=Comparison.BETTER),
+    items=[
+        AchievementCategory(
+            category=category_1,
+            achievements=[
+                Achievement(
+                    fav=False,
+                    name=challenge_1,
+                    description=challenge_1,
+                    you=AchievementStats(
+                        max=AchievementStat(value=20, compare=Comparison.BETTER),
+                        total=AchievementStat(value=100, compare=Comparison.WORSE),
+                        avg=AchievementStat(value=10, compare=Comparison.BETTER),
+                    ),
+                    other=AchievementStats(
+                        max=AchievementStat(
+                            value=(30 + 2) / 2, compare=Comparison.WORSE
                         ),
-                        other=AchievementStats(
-                            max=AchievementStat(
-                                value=(30 + 2) / 2, compare=Comparison.WORSE
-                            ),
-                            total=AchievementStat(
-                                value=(200 + 2) / 2, compare=Comparison.BETTER
-                            ),
-                            avg=AchievementStat(
-                                value=(5 + 2) / 2, compare=Comparison.WORSE
-                            ),
+                        total=AchievementStat(
+                            value=(200 + 2) / 2, compare=Comparison.BETTER
                         ),
-                    )
-                ],
-            )
-        ]
-    )
+                        avg=AchievementStat(
+                            value=(5 + 2) / 2, compare=Comparison.WORSE
+                        ),
+                    ),
+                )
+            ],
+        )
+    ]
+)
+
 
 def test_all_players(db_session: Session, setup_challenges):
     players = PlayerFactory(db_session).n_players(3)
@@ -136,7 +143,9 @@ def test_puuids(db_session: Session, setup_challenges):
         players[3].with_elo(TierEnum.grandmaster).add_challenge(
             name=challenge_1, highscore=2000, total=40000, avg=100
         )
-    res = _achievements_reqeust(players[0], query=f"puuids={players[1].player.id}&puuids={players[2].player.id}")
+    res = _achievements_reqeust(
+        players[0], query=f"puuids={players[1].player.id}&puuids={players[2].player.id}"
+    )
     assert res == expected_res
 
 

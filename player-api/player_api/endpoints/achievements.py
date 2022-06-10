@@ -10,13 +10,14 @@ from player_api.models.achievements import (
     AchievementCategory,
     Achievement,
     AchievementStats,
-    AchievementStat, Comparison,
+    AchievementStat,
+    Comparison,
 )
 from player_api.models.player import PlayerId, TierEnum
-from player_api.models.responses import ExceptionMessage
 
 router = APIRouter()
 EPSILON = 0.00001
+
 
 @router.get(
     "/achievements",
@@ -24,19 +25,15 @@ EPSILON = 0.00001
     responses={204: {"description": "Filter didn't match any challenges"}},
 )
 def get_achievements(
+    user: str,
     puuids: list[PlayerId] = Query(default=[]),
     rank: TierEnum | None = None,
     champion: str | None = None,
-    user: str | None = None,
     db: Session = Depends(get_db),
 ):
     user_puuid = user
-    user_challenges: list[Challenges] = (
-        db.query(Challenges)
-        .where(Challenges.summoner_id == user_puuid)
-        .order_by(Challenges.name)
-        .all()
-    )
+    user_challenges = _query_achievements(db, [Challenges.summoner_id == user_puuid])
+
     criterion = [
         Challenges.summoner_id != user_puuid,
     ]
@@ -46,20 +43,7 @@ def get_achievements(
         criterion.append(Summoners.tier == rank)
     if champion and champion != "*":
         pass  # TODO: filter for champions. Currently all games had to be loaded
-
-    other_challenges: list[Challenges] = (
-        db.query(
-            Challenges.name,
-            func.avg(Challenges.total).label("total"),
-            func.avg(Challenges.highscore).label("highscore"),
-            func.avg(Challenges.average_per_game).label("average_per_game"),
-        )
-        .join(Summoners)
-        .where(*criterion)
-        .group_by(Challenges.name)
-        .order_by(Challenges.name)
-        .all()
-    )
+    other_challenges = _query_achievements(db, criterion)
 
     if len(other_challenges) == 0:
         raise HTTPException(status_code=204)
@@ -69,10 +53,9 @@ def get_achievements(
         f"{len(other_challenges)=} {len(user_challenges)=}"
     )
 
-    challenge_classes: list[ChallengeClasses] = db.query(ChallengeClasses).all()
-    classes_lookup: dict[str, ChallengeClasses] = {
-        c.name: c for c in challenge_classes
-    }
+    challenge_classes = _query_challenge_classes(db)
+    classes_lookup: dict[str, ChallengeClasses] = {c.name: c for c in challenge_classes}
+    fav_challenges = _get_favourite_challenges(user)
 
     challenge_categories: dict[str, list[Achievement]] = {}
     for i in range(len(user_challenges)):
@@ -98,7 +81,7 @@ def get_achievements(
         )
         challenge_categories[challenge_class.class_name].append(
             Achievement(
-                fav=False,
+                fav=challenge_class.name in fav_challenges,
                 name=challenge_class.name,
                 description=challenge_class.description,
                 you=AchievementStats(
@@ -148,3 +131,27 @@ def _compare(*, user: float, other: float, operator: str) -> _CompareResult:
         return _CompareResult(user=Comparison.BETTER, other=Comparison.WORSE)
     else:
         return _CompareResult(user=Comparison.WORSE, other=Comparison.BETTER)
+
+
+def _query_achievements(db: Session, criterion: list) -> list[Challenges]:
+    return (
+        db.query(
+            Challenges.name,
+            func.avg(Challenges.total).label("total"),
+            func.avg(Challenges.highscore).label("highscore"),
+            func.avg(Challenges.average_per_game).label("average_per_game"),
+        )
+        .join(Summoners)
+        .where(*criterion)
+        .group_by(Challenges.name)
+        .order_by(Challenges.name)
+        .all()
+    )
+
+
+def _query_challenge_classes(db: Session) -> list[ChallengeClasses]:
+    return db.query(ChallengeClasses).all()
+
+
+def _get_favourite_challenges(user: str) -> set[str]:
+    return set()  # TODO: request from user API
