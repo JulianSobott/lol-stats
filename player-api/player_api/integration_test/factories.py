@@ -50,7 +50,7 @@ class Testplayer:
         self.db = db
         self.player: Player = PlayerModelFactory.build(**kwargs)
         self.games_factories: list[GamesFactory] = []
-        self.elo = TierEnum.challenger
+        self.elo = TierEnum.CHALLENGER
         self._challenges = []
 
     def play_n_games(self, num_games: int) -> "GamesFactory":

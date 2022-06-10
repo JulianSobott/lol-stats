@@ -96,13 +96,13 @@ expected_res = Achievements(
 def test_all_players(db_session: Session, setup_challenges):
     players = PlayerFactory(db_session).n_players(3)
     with players:
-        players[0].with_elo(TierEnum.bronze).add_challenge(
+        players[0].with_elo(TierEnum.BRONZE).add_challenge(
             name=challenge_1, highscore=20, total=100, avg=10
         )
-        players[1].with_elo(TierEnum.silver).add_challenge(
+        players[1].with_elo(TierEnum.SILVER).add_challenge(
             name=challenge_1, highscore=30, total=200, avg=5
         )
-        players[2].with_elo(TierEnum.grandmaster).add_challenge(
+        players[2].with_elo(TierEnum.GRANDMASTER).add_challenge(
             name=challenge_1, highscore=2, total=2, avg=2
         )
     res = _achievements_reqeust(players[0], query="")
@@ -112,35 +112,35 @@ def test_all_players(db_session: Session, setup_challenges):
 def test_one_elo(db_session: Session, setup_challenges):
     players = PlayerFactory(db_session).n_players(4)
     with players:
-        players[0].with_elo(TierEnum.silver).add_challenge(
+        players[0].with_elo(TierEnum.SILVER).add_challenge(
             name=challenge_1, highscore=20, total=100, avg=10
         )
-        players[1].with_elo(TierEnum.silver).add_challenge(
+        players[1].with_elo(TierEnum.SILVER).add_challenge(
             name=challenge_1, highscore=30, total=200, avg=5
         )
-        players[2].with_elo(TierEnum.silver).add_challenge(
+        players[2].with_elo(TierEnum.SILVER).add_challenge(
             name=challenge_1, highscore=2, total=2, avg=2
         )
-        players[3].with_elo(TierEnum.grandmaster).add_challenge(
+        players[3].with_elo(TierEnum.GRANDMASTER).add_challenge(
             name=challenge_1, highscore=2000, total=40000, avg=100
         )
-    res = _achievements_reqeust(players[0], query=f"rank={TierEnum.silver}")
+    res = _achievements_reqeust(players[0], query=f"rank={TierEnum.SILVER}")
     assert res == expected_res
 
 
 def test_puuids(db_session: Session, setup_challenges):
     players = PlayerFactory(db_session).n_players(4)
     with players:
-        players[0].with_elo(TierEnum.silver).add_challenge(
+        players[0].with_elo(TierEnum.SILVER).add_challenge(
             name=challenge_1, highscore=20, total=100, avg=10
         )
-        players[1].with_elo(TierEnum.silver).add_challenge(
+        players[1].with_elo(TierEnum.SILVER).add_challenge(
             name=challenge_1, highscore=30, total=200, avg=5
         )
-        players[2].with_elo(TierEnum.silver).add_challenge(
+        players[2].with_elo(TierEnum.SILVER).add_challenge(
             name=challenge_1, highscore=2, total=2, avg=2
         )
-        players[3].with_elo(TierEnum.grandmaster).add_challenge(
+        players[3].with_elo(TierEnum.GRANDMASTER).add_challenge(
             name=challenge_1, highscore=2000, total=40000, avg=100
         )
     res = _achievements_reqeust(
