@@ -18,6 +18,7 @@ root:
     propagate: yes
 
 loggers:
+
     __main__: &module_config
         level: DEBUG
         handlers: [console]
@@ -37,3 +38,8 @@ loggers:
         *module_config
     db_connector:
         *module_config
+
+    # external logger that is very verbose on INFO level
+    datapipelines:
+        level: WARNING
+        handlers: [ console ]

@@ -1,3 +1,5 @@
+import logging
+
 import time
 import traceback
 
@@ -12,6 +14,8 @@ from db_connector import db
 
 import challenges
 from riotwatcherWrapper import call_with_retry
+
+logger = logging.getLogger(__name__)
 
 lol_watcher = LolWatcher('RGAPI-ba00cb63-7be0-4e50-8610-eb749b1ea70d')
 
@@ -84,7 +88,17 @@ def add_game_to_db(db: db, match: Match, puuid: str, c: challenges.Challenges):
         else:
             win = match.red_team.win
             side = 'red'
+        try:
+            lane = participant.individual_position.value
+        except KeyError:
+            logger.warning(f"msg='participant with invalid position' {participant.summoner.puuid=} {match.id=}")
+            lane = "UNKNOWN"
         db.add_game(match_id=match.id, summoner_id=participant.summoner.puuid, champ_id=participant.champion.id, start_time=match.start.int_timestamp,
-                    duration=match.duration.seconds, team=side, win=win, lane=participant.individual_position.value, challenges=c.get_json_string(participant.stats))
-        c.store_challenges(db=db, stats=participant.stats,
-                           puuid=participant.summoner.puuid)
+                    duration=match.duration.seconds, team=side, win=win, lane=lane, challenges=c.get_json_string(participant.stats))
+        if participant.stats:
+            if participant.stats.challenges is None:
+                logger.warning(f"msg='no challenges for participant. Importing only stats' {participant.summoner.puuid=} {match.id=}")
+            c.store_challenges(db=db, stats=participant.stats,
+                               puuid=participant.summoner.puuid)
+        else:
+            logger.warning(f"msg='no stats for participant' {participant.summoner.puuid=} {match.id=}")
