@@ -6,7 +6,7 @@ from starlette.middleware.base import BaseHTTPMiddleware, RequestResponseEndpoin
 from starlette.requests import Request
 from starlette.responses import Response
 
-from player_api.db import SessionLocal
+from player_api.db import SessionLocal, AsyncSessionLocal
 from player_api.log import get_logger
 
 logger = get_logger(__name__)
@@ -18,6 +18,14 @@ def get_db():
         yield db
     finally:
         db.close()
+
+
+async def get_async_db():
+    async with AsyncSessionLocal() as db:
+        try:
+            yield db
+        finally:
+            await db.close()
 
 
 class LogRequestsMiddleware(BaseHTTPMiddleware):

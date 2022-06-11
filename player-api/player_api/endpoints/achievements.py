@@ -1,15 +1,17 @@
+import asyncio
 from enum import Enum
+from typing import Iterable
 
 import requests
-from fastapi import APIRouter, Depends, Query, HTTPException, Header
+from fastapi import APIRouter, Depends, Query, HTTPException
 from pydantic import BaseModel
-from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import func
-from starlette.responses import Response
+from sqlalchemy.future import select
 
 from player_api.db import Challenges, ChallengeClasses, Summoners
 from player_api.log import get_logger
-from player_api.middlewares import get_db
+from player_api.middlewares import get_async_db
 from player_api.models.achievements import (
     Achievements,
     AchievementCategory,
@@ -36,32 +38,29 @@ class CompareGroup(str, Enum):
     response_model=Achievements,
     responses={204: {"description": "Filter didn't match any challenges"}},
 )
-def get_achievements(
+async def get_achievements(
     me: str,
     is_gloabal: bool = Query(default=False, alias="global"),
     competitor_id: list[UserId] = Query(default=[]),
     competitor: PlayerId | None = None,
     rank: TierEnum | str | None = None,
     champion: str | None = None,
-    db: Session = Depends(get_db),
+    db: AsyncSession = Depends(get_async_db),
 ):
-    user = _get_user_data(me)
-    user_challenges = _query_achievements(
-        db, [Challenges.summoner_id == user.player_uuid]
-    )
+    user = await _get_user_data(me)
 
     criterion = [
         Challenges.summoner_id != user.player_uuid,
     ]
     if is_gloabal:  # global
         pass
-    elif competitor_id:     # friends
+    elif competitor_id:  # friends
         friends_puuids = []
         for competitor in competitor_id:
-            res = _get_user_data(competitor)
+            res = await _get_user_data(competitor)
             friends_puuids.append(res.player_uuid)
         criterion.append(Challenges.summoner_id.in_(friends_puuids))
-    elif competitor:    # player
+    elif competitor:  # player
         criterion.append(Challenges.summoner_id == competitor)
 
     if rank and rank != "*":
@@ -71,24 +70,25 @@ def get_achievements(
             criterion.append(Summoners.tier == rank)
     if champion and champion != "*":
         pass  # TODO: filter for champions. Currently all games had to be loaded
-    other_challenges = _query_achievements(db, criterion)
 
-    if len(other_challenges) == 0:
-        raise HTTPException(status_code=204)
-
-    assert len(other_challenges) == len(user_challenges), (
-        f"For comparison, both need to have same number of challenges. "
-        f"{len(other_challenges)=} {len(user_challenges)=}"
+    (
+        user_challenges,
+        other_challenges,
+        challenge_classes,
+        fav_challenges,
+    ) = await asyncio.gather(
+        _query_my_achievements(db, user),
+        _query_achievements(db, criterion),
+        _query_challenge_classes(db),
+        _get_favourite_challenges(user),
     )
 
-    challenge_classes = _query_challenge_classes(db)
     classes_lookup: dict[str, ChallengeClasses] = {c.name: c for c in challenge_classes}
-    fav_challenges = _get_favourite_challenges(user)
 
     challenge_categories: dict[str, list[Achievement]] = {}
-    for i in range(len(user_challenges)):
-        user_challenge = user_challenges[i]
-        other_challenge = other_challenges[i]
+    for user_challenge, other_challenge in zip(
+        user_challenges, other_challenges, strict=True
+    ):
         challenge_class = classes_lookup[other_challenge.name]
         if challenge_class.class_name not in challenge_categories:
             challenge_categories[challenge_class.class_name] = []
@@ -167,9 +167,9 @@ def _compare(*, user: float, other: float, operator: str) -> _CompareResult:
         return _CompareResult(user=Comparison.WORSE, other=Comparison.BETTER)
 
 
-def _query_achievements(db: Session, criterion: list) -> list[Challenges]:
-    return (
-        db.query(
+async def _query_achievements(db: AsyncSession, criterion: list) -> Iterable[Challenges]:
+    q = (
+        select(
             Challenges.name,
             func.avg(Challenges.total).label("total"),
             func.avg(Challenges.highscore).label("highscore"),
@@ -179,16 +179,25 @@ def _query_achievements(db: Session, criterion: list) -> list[Challenges]:
         .where(*criterion)
         .group_by(Challenges.name)
         .order_by(Challenges.name)
-        .all()
     )
+    return await db.execute(q)
 
 
-def _query_challenge_classes(db: Session) -> list[ChallengeClasses]:
-    return db.query(ChallengeClasses).all()
+async def _query_my_achievements(db: AsyncSession, user: _UserInfo) -> Iterable[Challenges]:
+    q = (
+        select(Challenges)
+        .where(Challenges.summoner_id == user.player_uuid)
+        .order_by(Challenges.name)
+    )
+    return (await db.execute(q)).scalars()
 
 
-def _get_favourite_challenges(user: _UserInfo) -> set[str]:
-    return set()    # TODO: remove when endpoint is deployed
+async def _query_challenge_classes(db: AsyncSession) -> Iterable[ChallengeClasses]:
+    return (await db.execute(select(ChallengeClasses))).scalars()
+
+
+async def _get_favourite_challenges(user: _UserInfo) -> set[str]:
+    return set()  # TODO: remove when endpoint is deployed
     res = requests.get(f"https://lol-stats.de/api/users/{user.id}/achievements")
     if not res.ok:
         logger.warn(
@@ -199,7 +208,7 @@ def _get_favourite_challenges(user: _UserInfo) -> set[str]:
     return set(res.json()["achievements"])
 
 
-def _get_user_data(user_id: str):
+async def _get_user_data(user_id: str):
     res = requests.get(f"https://lol-stats.de/api/users/{user_id}")
     if not res.ok:
         logger.warn(
