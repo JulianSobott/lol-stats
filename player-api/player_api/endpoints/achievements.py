@@ -167,7 +167,9 @@ def _compare(*, user: float, other: float, operator: str) -> _CompareResult:
         return _CompareResult(user=Comparison.WORSE, other=Comparison.BETTER)
 
 
-async def _query_achievements(db: AsyncSession, criterion: list) -> Iterable[Challenges]:
+async def _query_achievements(
+    db: AsyncSession, criterion: list
+) -> Iterable[Challenges]:
     q = (
         select(
             Challenges.name,
@@ -183,7 +185,9 @@ async def _query_achievements(db: AsyncSession, criterion: list) -> Iterable[Cha
     return await db.execute(q)
 
 
-async def _query_my_achievements(db: AsyncSession, user: _UserInfo) -> Iterable[Challenges]:
+async def _query_my_achievements(
+    db: AsyncSession, user: _UserInfo
+) -> Iterable[Challenges]:
     q = (
         select(Challenges)
         .where(Challenges.summoner_id == user.player_uuid)
