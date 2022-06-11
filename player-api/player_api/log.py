@@ -5,7 +5,7 @@ import yaml
 
 
 def setup_logging():
-    with open(Path(__file__).parent.joinpath("logging.yml"), 'rt') as f:
+    with open(Path(__file__).parent.joinpath("logging.yml"), "rt") as f:
         config = yaml.safe_load(f.read())
     logging.config.dictConfig(config)
 

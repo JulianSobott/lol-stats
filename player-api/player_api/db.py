@@ -2,6 +2,7 @@ import os
 import time
 from datetime import datetime
 
+from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
 from sqlalchemy.ext.declarative import declarative_base
 import enum
 from sqlalchemy import (
@@ -32,6 +33,12 @@ engine = create_engine(
 )
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
+async_engine = create_async_engine(
+    f"{db_type}+asyncpg://{db_user}:{db_pw}@{db_host}:{db_port}/{db_database}",
+)
+AsyncSessionLocal = sessionmaker(
+    autocommit=False, autoflush=False, bind=async_engine, class_=AsyncSession
+)
 
 Base = declarative_base()
 
@@ -54,9 +61,7 @@ class Summoners(Base):
     last_update = Column(Integer, nullable=True)
     tier = Column(Enum(TierEnum))
     division = Column(Enum(DivisionEnum))
-    league_points = Column(
-        Integer, CheckConstraint("league_points >= 0")
-    )
+    league_points = Column(Integer, CheckConstraint("league_points >= 0"))
 
 
 class SummonerSpells(Base):

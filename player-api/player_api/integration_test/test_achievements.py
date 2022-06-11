@@ -134,9 +134,7 @@ def test_one_elo(db_session: Session, setup_challenges, mock_user_api):
 
 def test_puuids(db_session: Session, setup_challenges, mock_user_api):
     players = _prepare_players(db_session)
-    res = _achievements_reqeust(
-        players[0], query=f"competitor_id=2&competitor_id=3"
-    )
+    res = _achievements_reqeust(players[0], query=f"competitor_id=2&competitor_id=3")
     assert res == expected_res
 
 

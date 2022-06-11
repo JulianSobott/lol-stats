@@ -181,7 +181,10 @@ paths:
         in: query
       - required: false
         schema:
-          $ref: '#/components/schemas/TierEnum'
+          title: Rank
+          anyOf:
+          - $ref: '#/components/schemas/TierEnum'
+          - type: string
         name: rank
         in: query
       - required: false
@@ -592,6 +595,7 @@ components:
       - master
       - grandmaster
       - challenger
+      - unranked
       type: string
       description: An enumeration.
     ValidationError:
