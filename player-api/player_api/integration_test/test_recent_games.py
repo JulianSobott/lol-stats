@@ -96,6 +96,21 @@ def test_contains_team_members(db_session):
     )
 
 
+def test_correct_team_colors(db_session):
+    players = PlayerFactory(db_session).player()
+    player = players[0]
+    with players:
+        player.play_n_games(1)
+    res = _recent_game_request(player)
+    ally_color = set(map(lambda m: m.team, res.items[0].ally_team))
+    enemy_color = set(map(lambda m: m.team, res.items[0].enemy_team))
+    assert len(ally_color) == 1
+    assert len(enemy_color) == 1
+    assert ally_color.isdisjoint(
+        enemy_color
+    ), f"should not equal: {ally_color=}, {enemy_color=}"
+
+
 def _recent_game_request(player: Testplayer) -> Page[Game]:
     response = client.get(f"/players/{player.player.id}/recent-games")
     assert response.status_code == 200
