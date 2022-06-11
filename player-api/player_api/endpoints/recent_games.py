@@ -117,7 +117,7 @@ async def compute_game(db: Session, game: Games, player_id: PlayerId) -> Game | 
                 id=player_game.summoner.puuid, name=player_game.summoner.name
             ),
             stats=stats,
-            team=TeamSide.red if game.team == TeamSide.red.value else TeamSide.blue,
+            team=player_game.team,
         )
         if player_game.team == game.team:
             ally_team.append(team_member)
@@ -131,7 +131,8 @@ async def compute_game(db: Session, game: Games, player_id: PlayerId) -> Game | 
     return Game(
         match_id=game.match_id,
         victorious_team=TeamSide.red
-        if self.team == TeamSide.red and win
+        if (self.team == TeamSide.red and win)
+        or (self.team == TeamSide.blue and not win)
         else TeamSide.blue,
         ally_team=ally_team,
         enemy_team=enemy_team,
