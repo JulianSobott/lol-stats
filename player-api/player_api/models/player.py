@@ -19,7 +19,7 @@ class TierEnum(str, Enum):
 class Rank(BaseModel):
     division: int = Field(ge=1, le=4)
     tier: TierEnum
-    league_points: int = Field(ge=0, le=100)
+    league_points: int = Field(ge=0)
 
     @property
     def division_str(self) -> str:
