@@ -556,7 +556,6 @@ components:
           $ref: '#/components/schemas/TierEnum'
         league_points:
           title: League Points
-          maximum: 100.0
           minimum: 0.0
           type: integer
     TeamMember:
