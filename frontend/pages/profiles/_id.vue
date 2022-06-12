@@ -182,7 +182,7 @@ export default {
         if (this.importData.imported) {
           clearInterval(this.importInterval)
           this.isImportingData = false
-          window.location.reload(true)
+          this.$router.go(this.$router.currentRoute)
         }
       } catch (err) {
         console.log(err)
