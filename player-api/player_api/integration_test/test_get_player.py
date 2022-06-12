@@ -2,7 +2,7 @@ from fastapi.testclient import TestClient
 
 from player_api.db import Summoners
 from player_api.main import app
-from player_api.models.player import Player, PlayerId
+from player_api.models.player import Player, PlayerId, TierEnum, Rank
 
 PLAYER_ID = "TEST_PUUID"
 
@@ -22,6 +22,28 @@ def test_get_incomplete_db_player(db_session, requests_mock):
     response_player = _player_reqeust(PLAYER_ID)
     assert response_player.id == PLAYER_ID
     assert response_player.imported is False
+
+
+def test_get_unranked_player(db_session):
+    player = Summoners(
+        puuid=PLAYER_ID,
+        region_id=PLAYER_ID,
+        name="xyz",
+        level=1,
+        icon_path="/icon.png",
+        last_update=160000,
+        tier=TierEnum.UNRANKED,
+        division=None,
+        league_points=None,
+    )
+    db_session.add(player)
+    db_session.commit()
+    response_player = _player_reqeust(PLAYER_ID)
+    assert response_player.id == PLAYER_ID
+    assert response_player.imported is True
+    assert response_player.rank == Rank(
+        division=1, tier=TierEnum.UNRANKED, league_points=0
+    )
 
 
 def _player_reqeust(player_id: PlayerId) -> Player:

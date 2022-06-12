@@ -9,7 +9,7 @@ from player_api.get_player import get_player_by_id
 from player_api.import_state import is_player_imported
 from player_api.log import get_logger
 from player_api.middlewares import get_db
-from player_api.models.player import Player, PlayerId, MostPlayed, Rank
+from player_api.models.player import Player, PlayerId, MostPlayed, Rank, TierEnum
 from player_api.models.responses import ExceptionMessage
 from player_api.riot_api import find_player_in_riot_api_by, SearchTerm
 
@@ -56,7 +56,9 @@ async def get_player(player_id: PlayerId, db: Session = Depends(get_db)):
     logger.debug(f"method=get_player {most_played=}")
     logger.debug(f"method=get_player {win_rate=}")
 
-    if player.division is None or player.tier is None or player.league_points is None:
+    if player.tier == TierEnum.UNRANKED:
+        rank = Rank(division=1, tier=player.tier, league_points=0)
+    elif player.division is None or player.tier is None or player.league_points is None:
         rank = None
     else:
         rank = Rank(
