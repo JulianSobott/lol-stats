@@ -417,19 +417,14 @@ def delete_competitor(current_user, token, user_id, competitor_puuid):
 
 
 @app.route('/api/users/<user_id>/achievements', methods=['GET'])
-def get_achievements(current_user, token, user_id):
-    if current_user.id == int(user_id):
-        db_achievement = FavouriteAchievement.query.filter_by(user_id=user_id).all()
-        achievements = []
-        for item in db_achievement:
-            if item.name is not None:
-                achievements.append(item.name)
-        return make_response(jsonify({"status": "success",
-                                      "achievements": achievements}), 200)
-    else:
-        return make_response(jsonify({"status": "error",
-                                      "message": "Not authorized"
-                                      }), 401)
+def get_achievements(user_id):
+    db_achievement = FavouriteAchievement.query.filter_by(user_id=user_id).all()
+    achievements = []
+    for item in db_achievement:
+        if item.name is not None:
+            achievements.append(item.name)
+    return make_response(jsonify({"status": "success",
+                                    "achievements": achievements}), 200)
 
 
 @app.route('/api/users/<user_id>/achievements', methods=['POST'])
