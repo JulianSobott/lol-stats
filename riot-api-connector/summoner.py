@@ -88,7 +88,7 @@ def _get_rank(id: str):
     rank = lol_watcher.league.by_summoner(
         region='euw1', encrypted_summoner_id=id)
     if len(rank) == 0:
-        return {'tier': 'UNRANKED', 'rank': '', 'leaguePoints': 0}
+        return {'tier': 'UNRANKED', 'rank': None, 'leaguePoints': None}
     for s in rank:
         if s['queueType'] == 'RANKED_SOLO_5x5':
             rank = s
