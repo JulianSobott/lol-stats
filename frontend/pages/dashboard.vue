@@ -127,6 +127,10 @@ export default {
       }, 5000)
     }
   },
+  beforeRouteUpdate(to, from, next) {
+    clearInterval(this.importInterval)
+    next()
+  },
   destroyed() {
     clearInterval(this.importInterval)
   },
@@ -163,7 +167,6 @@ export default {
           clearInterval(this.importInterval)
           this.isImportingData = false
           this.$router.go(this.$router.currentRoute)
-          // send request to show all data
         }
       } catch (err) {
         console.log(err)

@@ -316,7 +316,7 @@
                               300 / 300 / <span class="text-red">300</span>
                             </td>
                             <td>
-                              <FavoriteAchivementStar :userId="$auth.user.id" achivementId="1" :initState="true"/>
+                              <FavoriteAchivementStar :userId="$auth.user.id" achivementId="1" :initState="false"/>
                             </td>
                           </tr>
                         </tbody>
@@ -378,6 +378,10 @@ export default {
     } else {
       this.showImportPlayerModal = false
     }
+  },
+  beforeRouteUpdate(to, from, next) {
+    clearInterval(this.importInterval)
+    next()
   },
   destroyed() {
     clearInterval(this.importInterval)

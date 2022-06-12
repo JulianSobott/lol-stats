@@ -11,10 +11,24 @@
           :style="championIconPath(player.champion)"
         ></span>
       </div>
-      <div class="col d-none d-md-block" :class="{ 'text-red': player.team === 'red',  'text-blue': player.team === 'blue'}">
-        <span v-if="match.self.player.name === player.player.name">You</span>
+      <div class="col d-none d-md-block">
+        <span
+          v-if="match.self.player.name === player.player.name"
+          :class="{
+            'text-red': player.team === 'red',
+            'text-blue': player.team === 'blue',
+          }"
+          >You</span
+        >
         <span v-else
-          ><NuxtLink :to="'/profiles/' + player.player.id">{{ player.player.name }}</NuxtLink>
+          ><NuxtLink
+            :to="'/profiles/' + player.player.id"
+            :class="{
+              'text-red': player.team === 'red',
+              'text-blue': player.team === 'blue',
+            }"
+            >{{ player.player.name }}</NuxtLink
+          >
           <span class="text-muted"
             >({{ player.stats.kills }}/{{ player.stats.deaths }}/{{
               player.stats.assists
