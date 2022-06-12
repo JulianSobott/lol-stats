@@ -127,6 +127,10 @@ export default {
       }, 5000)
     }
   },
+  beforeRouteUpdate(to, from, next) {
+    clearInterval(this.importInterval)
+    next()
+  },
   destroyed() {
     clearInterval(this.importInterval)
   },

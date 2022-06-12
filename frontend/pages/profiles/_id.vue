@@ -28,7 +28,7 @@
                 <button
                   href="#"
                   class="btn btn-danger"
-                  @click="importPlayerData"
+                  @click="triggerImportPlayer"
                   :disabled="isImportingData"
                 >
                   <svg
@@ -123,20 +123,28 @@ export default {
     this.fetchPlayerData()
     this.$refs.recentGames.fetchPlayerData()
   },
+  beforeRouteUpdate(to, from, next) {
+    clearInterval(this.importInterval)
+    next()
+  },
+  destroyed() {
+    clearInterval(this.importInterval)
+  },
   data() {
     return {
       playerData: {},
       isImportingData: false,
+      importInterval: null,
     }
   },
   methods: {
     async fetchPlayerData() {
       try {
         const response = await this.$axios.get(
-        `/players/${this.$route.params.id}`
+          `/players/${this.$route.params.id}`
         )
         this.playerData = response.data
-      } catch(e) {
+      } catch (e) {
         if (e.response.status === 404) {
           this.$router.push('/dashboard')
         }
@@ -154,7 +162,15 @@ export default {
         }).length > 0
       )
     },
-    async importPlayerData() {
+    triggerImportPlayer() {
+      this.isImportingData = true
+
+      this.importPlayer()
+      this.importInterval = setInterval((async) => {
+        this.importPlayer()
+      }, 5000)
+    },
+    async importPlayer() {
       try {
         const response = await this.$axios.post(
           `/players/${this.$route.params.id}/import`,
@@ -164,8 +180,9 @@ export default {
         this.importData = response.data
 
         if (this.importData.imported) {
+          clearInterval(this.importInterval)
           this.isImportingData = false
-          // send request to show all data
+          window.location.reload(true)
         }
       } catch (err) {
         console.log(err)
