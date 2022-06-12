@@ -15,7 +15,7 @@ from marshmallow import ValidationError
 from werkzeug import security
 
 import config
-from validation import user_schema, competitor_schema, user_setup_schema, user_dump_schema, UserDumpSchema
+from validation import user_schema, competitor_schema, user_setup_schema, user_dump_schema, UserDumpSchema, achievement_schema
 
 
 def create_app():
@@ -52,7 +52,6 @@ class Competitors(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     player_uuid = db.Column(db.String(255), nullable=False)
-    player_name = db.Column(db.String(255), nullable=False)
 
 
 class AccessToken(db.Model):
@@ -131,17 +130,6 @@ def get_own_data(current_user, access_token):
     except Exception as exc:
         print(f"Error: {exc}")
 
-    competitors = Competitors.query.filter_by(user_id=current_user.id).all()
-    competitor_output = []
-
-    for competitor in competitors:
-        data = {
-            "id": competitor.id,
-            "player_uuid": competitor.player_uuid,
-            "username": competitor.player_name,
-        }
-        competitor_output.append(data)
-
     user = Users.query.filter_by(id=current_user.id).first()
 
     user = {
@@ -151,7 +139,6 @@ def get_own_data(current_user, access_token):
         "token": access_token,
         "region": user.region,
         "player_stats": player_stats,
-        "competitors": competitor_output
     }
 
     return make_response(
@@ -316,7 +303,6 @@ def get_player(user_id: int):
     return make_response(jsonify({"status": "error", "message": "User not found"}), 404)
 
 
-
 @app.route('/api/users/<user_id>/competitors/', methods=['GET'])
 @token_required
 def get_list_of_competitor(current_user, token, user_id):
@@ -325,13 +311,13 @@ def get_list_of_competitor(current_user, token, user_id):
         competitor_output = []
         for competitor in competitors:
             if current_user.player_uuid is not None:
-                player_response = requests.get(f"https://lol-stats.de/api/players/{current_user.player_uuid}")
+                player_response = requests.get(f"https://lol-stats.de/api/players/{competitor.player_uuid}")
                 player_stats = player_response.json()
 
                 data = {
                     "id": competitor.id,
                     "player_uuid": competitor.player_uuid,
-                    "player_name": competitor.player_name,
+                    "player_name": player_stats.player_name,
                     "player_stats": {}
                 }
                 competitor_output.append(data)
@@ -358,21 +344,20 @@ def add_competitor(current_user, token, user_id):
                                  400)
             username = None
 
-        player_response = requests.get(f"https://lol-stats.de/api/players/{data['player_uuid']}")
-        player_stats = player_response.json()
-        if player_stats is not None:
-            if hasattr(player_stats, 'name'):
-                username = player_stats.name
-
-            if username is not None:
-                competitor = Competitors(user_id=user_id, player_uuid=data["player_uuid"], username=username)
+            player_response = requests.get(f"https://lol-stats.de/api/players/{data['player_uuid']}")
+            player_stats = player_response.json()
+            if player_stats is not None:
+                competitor = Competitors(user_id=user_id, player_uuid=data["player_uuid"])
                 db.session.add(competitor)
                 db.session.commit()
                 return make_response(
                     jsonify({"status": "success",
                              "message": "No content"}), 200)
             else:
-                return make_response(jsonify({"status": "error", "message": "Competitor not found"}), 404)
+                return make_response(
+                    jsonify(
+                        {"status": "error", "message": "No such competitor found"}),
+                    400)
         else:
             return make_response(
                 jsonify(
@@ -392,15 +377,15 @@ def get_competitor(current_user, token, user_id, competitor_puuid):
             return make_response(jsonify({"status": "error",
                                         "message": "Competitor not found in your competitorship"}), 404)
 
-            player_stats = {}
-            if competitor_puuid is not None:
-                player_response = requests.get(f"https://lol-stats.de/api/players/{competitor_puuid}")
-                player_stats = player_response.json()
+        player_stats = {}
+        if competitor_puuid is not None:
+            player_response = requests.get(f"https://lol-stats.de/api/players/{competitor_puuid}")
+            player_stats = player_response.json()
 
         competitor_data = {
             "id": competitor.id,
             "player_uuid": competitor.player_uuid,
-                "username": competitor.player_name,
+                "username": player_stats.name,
                 "player_stats": player_stats
         }
 
