@@ -59,9 +59,11 @@ class Summoners(Base):
     level = Column(Integer, nullable=True)
     icon_path = Column(String, nullable=True)
     last_update = Column(Integer, nullable=True)
-    tier = Column(Enum(TierEnum))
-    division = Column(Enum(DivisionEnum))
-    league_points = Column(Integer, CheckConstraint("league_points >= 0"))
+    tier = Column(Enum(TierEnum), nullable=True)
+    division = Column(Enum(DivisionEnum), nullable=True)
+    league_points = Column(
+        Integer, CheckConstraint("league_points >= 0"), nullable=True
+    )
 
 
 class SummonerSpells(Base):

@@ -22,6 +22,7 @@ from player_api.models.game import (
 )
 from player_api.models.player import PlayerId
 from player_api.models.responses import ExceptionMessage
+from player_api.riot_api import find_player_in_riot_api_by, SearchTerm
 
 DEFAULT_GAMES_PER_PAGE = 5
 
@@ -45,6 +46,12 @@ async def recent_games(
     logger.debug(f"method=recent_games {player_id=}")
     player = get_player_by_id(db, player_id)
     if player is None:
+        riot_player = find_player_in_riot_api_by(player_id, SearchTerm.id)
+        if riot_player:
+            logger.debug(
+                f"method=recent_games {player_id=} msg='player not in DB, but found in Riot API'"
+            )
+            return Page[Game](items=[], next="")
         raise HTTPException(status_code=404, detail="player not found")
     logger.debug(f"method=recent_games {player_id=} {player.name=}")
     if start_before is None:
