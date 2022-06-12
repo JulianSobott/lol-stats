@@ -417,7 +417,6 @@ def delete_competitor(current_user, token, user_id, competitor_puuid):
 
 
 @app.route('/api/users/<user_id>/achievements', methods=['GET'])
-@token_required
 def get_achievements(current_user, token, user_id):
     if current_user.id == int(user_id):
         db_achievement = FavouriteAchievement.query.filter_by(user_id=user_id).all()

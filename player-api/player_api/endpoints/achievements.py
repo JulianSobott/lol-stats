@@ -201,7 +201,6 @@ async def _query_challenge_classes(db: AsyncSession) -> Iterable[ChallengeClasse
 
 
 async def _get_favourite_challenges(user: _UserInfo) -> set[str]:
-    return set()  # TODO: remove when endpoint is deployed
     res = requests.get(f"https://lol-stats.de/api/users/{user.id}/achievements")
     if not res.ok:
         logger.warn(
