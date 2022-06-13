@@ -34,6 +34,20 @@ class Rank(BaseModel):
     def division_from_str(division: str) -> int:
         return {"I": 1, "II": 2, "III": 3, "IV": 4}[division]
 
+    @staticmethod
+    def from_summoner(player: "Summoners"):
+        if player.tier == TierEnum.UNRANKED:
+            rank = Rank(division=1, tier=player.tier, league_points=0)
+        elif player.division is None or player.tier is None or player.league_points is None:
+            rank = None
+        else:
+            rank = Rank(
+                division=Rank.division_from_str(player.division),
+                tier=player.tier,
+                league_points=player.league_points,
+            )
+        return rank
+
 
 class MostPlayed(BaseModel):
     champion_id: int

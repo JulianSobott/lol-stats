@@ -56,16 +56,7 @@ async def get_player(player_id: PlayerId, db: Session = Depends(get_db)):
     logger.debug(f"method=get_player {most_played=}")
     logger.debug(f"method=get_player {win_rate=}")
 
-    if player.tier == TierEnum.UNRANKED:
-        rank = Rank(division=1, tier=player.tier, league_points=0)
-    elif player.division is None or player.tier is None or player.league_points is None:
-        rank = None
-    else:
-        rank = Rank(
-            division=Rank.division_from_str(player.division),
-            tier=player.tier,
-            league_points=player.league_points,
-        )
+    rank = Rank.from_summoner(player)
     return Player(
         id=player.puuid,
         player_icon_path=player.icon_path,

@@ -30,11 +30,7 @@ def find_player(player_name: str, region: str = None, db: Session = Depends(get_
                 player_icon_path=player.icon_path,
                 name=player.name,
                 level=player.level,
-                rank=Rank(
-                    division=Rank.division_from_str(player.division),
-                    tier=player.tier,
-                    league_points=player.league_points,
-                ),
+                rank=Rank.from_summoner(player),
                 imported=imported,
             )
         else:
