@@ -50,9 +50,7 @@
                           <div class="d-flex py-1 align-items-center">
                             <span
                               class="avatar me-2"
-                              style="
-                                background-image: url(https://placekitten.com/48/48);
-                              "
+                              :style="championIconPath(item.player_stats.player_icon_path)"
                             ></span>
                             <div class="flex-fill">
                               <div class="font-weight-medium">
@@ -147,6 +145,9 @@ export default {
     }
   },
   methods: {
+    championIconPath(path) {
+      return `background-image: url("${path}");`
+    },
     loadRankIcon(rankIcon) {
       const path = require(`../assets/images/ranks/${rankIcon}.png`)
       return `background-image: url("${path}"); background-size: 75%`
