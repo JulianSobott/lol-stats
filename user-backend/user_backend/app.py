@@ -399,7 +399,7 @@ def get_competitor(current_user, token, user_id, competitor_puuid):
 @app.route('/api/users/<user_id>/competitors/<competitor_puuid>', methods=['DELETE'])
 @token_required
 def delete_competitor(current_user, token, user_id, competitor_puuid):
-    if current_user.id == user_id:
+    if current_user.id == int(user_id):
         competitor = Competitors.query.filter_by(user_id=user_id, player_uuid=competitor_puuid).first()
         if competitor is None:
             return make_response(jsonify({"status": "error",
