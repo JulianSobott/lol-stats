@@ -125,6 +125,7 @@ async def compute_game(db: Session, game: Games, player_id: PlayerId) -> Game | 
             ),
             stats=stats,
             team=player_game.team,
+            lane=player_game.lane,
         )
         if player_game.team == game.team:
             ally_team.append(team_member)
@@ -141,10 +142,21 @@ async def compute_game(db: Session, game: Games, player_id: PlayerId) -> Game | 
         if (self.team == TeamSide.red and win)
         or (self.team == TeamSide.blue and not win)
         else TeamSide.blue,
-        ally_team=ally_team,
-        enemy_team=enemy_team,
+        ally_team=_order_members(ally_team),
+        enemy_team=_order_members(enemy_team),
         duration=game.duration,
         timestamp=db_to_datetime(game.start_time),
         self=self,
         win=win,
     )
+
+
+def _order_members(members: list[TeamMember]) -> list[TeamMember]:
+    position_order = {
+        "TOP_LANE": 0,
+        "JUNGLE": 1,
+        "MID_LANE": 2,
+        "BOT_LANE": 3,
+        "UTILITY": 4,
+    }
+    return sorted(members, key=lambda m: position_order.get(m.lane, 5))
