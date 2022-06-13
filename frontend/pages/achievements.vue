@@ -239,6 +239,7 @@
                   <div v-if="loadingAchiements" class="text-center">
                     <div class="spinner-border text-light" role="status">
                     </div>
+                    <p class="card-title mt-1">Loading Achievements...</p>
                   </div>
                   <div
                     :id="getTabId(item.category)"
