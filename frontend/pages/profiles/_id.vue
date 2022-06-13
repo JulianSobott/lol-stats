@@ -15,7 +15,6 @@
                 <FavoriteCompetitorStar
                   :userId="$auth.user.id"
                   :competitorUuidId="playerData.id"
-                  :initState="isInCompetitorsList()"
                 />
               </h2>
               <div v-else class="placeholder col-3 mt-1"></div>
@@ -152,15 +151,6 @@ export default {
     },
     championIconPath(champion) {
       return `background-image: url("${champion.icon_path}");`
-    },
-    isInCompetitorsList() {
-      const competitors = this.$auth.user.competitors
-      const currentPlayerId = this.$route.params.id
-      return (
-        competitors.filter(function (e) {
-          return e.player_uuid === currentPlayerId
-        }).length > 0
-      )
     },
     triggerImportPlayer() {
       this.isImportingData = true
