@@ -104,7 +104,7 @@ def token_required(f):
     return decorator
 
 
-@repeat(every(5).seconds)
+@repeat(every(60).minutes)
 def delete_expired_token():
     token_query = AccessToken.query.order_by(AccessToken.created_at).all()
     expired = True
