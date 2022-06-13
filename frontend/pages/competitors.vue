@@ -75,8 +75,8 @@
                         </td>
                         <td>
                           <div
-                            class="d-flex py-1 align-items-center"
                             v-if="item.player_stats.imported"
+                            class="d-flex py-1 align-items-center"
                           >
                             <span
                               class="avatar avatar-rounded me-2"
@@ -89,7 +89,7 @@
                               </div>
                             </div>
                           </div>
-                          <div class="d-flex py-1 align-items-center" v-else>
+                          <div v-else class="d-flex py-1 align-items-center">
                             <span class="text-muted"
                               >Player not imported yet.</span
                             >
@@ -133,9 +133,6 @@
 export default {
   name: 'CompetitorsPage',
   middleware: ['auth', 'settings'],
-  mounted() {
-    this.getCompetitors()
-  },
   data() {
     return {
       competitors: [],
@@ -143,6 +140,9 @@ export default {
       error: null,
       loadingCompetitors: false
     }
+  },
+  mounted() {
+    this.getCompetitors()
   },
   methods: {
     championIconPath(path) {

@@ -27,8 +27,8 @@
                 <button
                   href="#"
                   class="btn btn-danger"
-                  @click="triggerImportPlayer"
                   :disabled="isImportingData"
+                  @click="triggerImportPlayer"
                 >
                   <svg
                     v-if="!isImportingData"
@@ -68,7 +68,10 @@
       <div class="page-body">
         <div class="container-xl">
           <div class="row row-cards">
-            <div v-if="!playerData.imported && !isFetchingData" class="col-md-12 col-lg-12">
+            <div
+              v-if="!playerData.imported && !isFetchingData"
+              class="col-md-12 col-lg-12"
+            >
               <div class="card bg-danger mb-3">
                 <div class="card-stamp">
                   <div class="card-stamp-icon bg-white text-primary">
@@ -106,7 +109,7 @@
             <PlayerStatsMostPlayed :playerData="playerData" />
             <PlayerStatsRecentGames
               ref="recentGames"
-              :playerUuid="this.$route.params.id"
+              :playerUuid="$route.params.id"
             />
           </div>
         </div>
@@ -118,24 +121,24 @@
 <script>
 export default {
   name: 'ProfilePage',
-  mounted() {
-    this.fetchPlayerData()
-    this.$refs.recentGames.fetchPlayerData()
-  },
   beforeRouteUpdate(to, from, next) {
     clearInterval(this.importInterval)
     next()
-  },
-  destroyed() {
-    clearInterval(this.importInterval)
   },
   data() {
     return {
       playerData: {},
       isImportingData: false,
       importInterval: null,
-      isFetchingData: false
+      isFetchingData: false,
     }
+  },
+  mounted() {
+    this.fetchPlayerData()
+    this.$refs.recentGames.fetchPlayerData()
+  },
+  destroyed() {
+    clearInterval(this.importInterval)
   },
   methods: {
     async fetchPlayerData() {
