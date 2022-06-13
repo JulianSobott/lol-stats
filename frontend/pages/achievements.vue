@@ -432,12 +432,8 @@ export default {
         if (query.compare === 'global') {
           compareRequest = '&global=true'
         } else if (query.compare === 'competitors') {
-          const ids = await this.getCompetitors(this.$auth.user.id)
-          for (const id in ids) {
-            compareRequest += `&competitor_id=${id}`
-          }
+          compareRequest = '&competitors=true'
         } else if (query.compare === 'player') {
-          // get id of player
           const response = await this.$axios.get(
             `/players?player_name=${query.player.playername}`
           )
