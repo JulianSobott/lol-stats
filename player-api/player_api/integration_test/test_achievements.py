@@ -79,21 +79,8 @@ def mock_user_api(requests_mock):
         json={"id": 1, "player_uuid": PLAYER_UUID, "region": "euw"},
     )
     requests_mock.get(
-        f"https://lol-stats.de/api/users/{PLAYER_ID}/competitors",
-        json=[
-            {
-                "id": 1,
-                "player_uuid": PLAYER_2_UUID,
-                "player_name": "",
-                "player_stats": None,
-            },
-            {
-                "id": 2,
-                "player_uuid": PLAYER_3_UUID,
-                "player_name": "",
-                "player_stats": None,
-            },
-        ],
+        f"https://lol-stats.de/api/users/{PLAYER_ID}/competitors/puuids",
+        json={"status": "success", "competitors": [PLAYER_2_UUID, PLAYER_3_UUID]},
     )
 
 

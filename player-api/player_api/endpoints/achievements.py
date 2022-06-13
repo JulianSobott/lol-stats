@@ -83,7 +83,9 @@ async def get_achievements(
     classes_lookup: dict[str, ChallengeClasses] = {c.name: c for c in challenge_classes}
 
     try:
-        challenge_categories = await _compare_achievements(classes_lookup, fav_challenges, other_challenges, user_challenges)
+        challenge_categories = await _compare_achievements(
+            classes_lookup, fav_challenges, other_challenges, user_challenges
+        )
     except ValueError:
         return Achievements(items=[])
     favourites = list(
@@ -100,10 +102,15 @@ async def get_achievements(
     return Achievements(items=achievements)
 
 
-async def _compare_achievements(classes_lookup: dict[str, ChallengeClasses], fav_challenges: list[str], other_challenges: Iterable[Challenges], user_challenges: Iterable[Challenges]):
+async def _compare_achievements(
+    classes_lookup: dict[str, ChallengeClasses],
+    fav_challenges: list[str],
+    other_challenges: Iterable[Challenges],
+    user_challenges: Iterable[Challenges],
+):
     challenge_categories: dict[str, list[Achievement]] = {}
     for user_challenge, other_challenge in zip(
-            user_challenges, other_challenges, strict=True
+        user_challenges, other_challenges, strict=True
     ):
         challenge_class = classes_lookup[other_challenge.name]
         if challenge_class.class_name not in challenge_categories:
@@ -166,15 +173,9 @@ class _UserInfo(BaseModel):
     region: str
 
 
-class _Competitor(BaseModel):
-    id: str
-    player_uuid: str
-    player_name: str
-    player_stats: Player | None
-
-
 class _CompetitorsList(BaseModel):
-    __root__: list[_Competitor]
+    status: str
+    competitors: list[PlayerId]
 
 
 def _flatten_challenges(
@@ -252,12 +253,11 @@ async def _get_user_data(user_id: str):
 
 
 async def _get_competitors(user_id: str) -> list[PlayerId]:
-    res = requests.get(f"https://lol-stats.de/api/users/{user_id}/competitors")
+    res = requests.get(f"https://lol-stats.de/api/users/{user_id}/competitors/puuids")
     if not res.ok:
         logger.warn(
             f"method=_get_competitors msg='request returned error code' "
             f"{res.status_code=} {res.text=} {user_id=}"
         )
         raise HTTPException(res.status_code, detail=res.text)
-    competitors = _CompetitorsList(__root__=res.json()).__root__
-    return list(map(lambda p: p.player_uuid, competitors))
+    return _CompetitorsList(**res.json()).competitors

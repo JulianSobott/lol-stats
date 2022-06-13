@@ -321,6 +321,13 @@ def get_list_of_competitor(user_id):
                                       "competitors": competitor_output}), 200)
 
 
+@app.route('/api/users/<user_id>/competitors/puuids', methods=['GET'])
+def get_list_of_competitor_puuids(user_id):
+    competitors = Competitors.query.filter_by(user_id=user_id).all()
+    competitor_output = list(map(lambda c: c.player_uuid, competitors))
+    return make_response(jsonify({"status": "success", "competitors": competitor_output}), 200)
+
+
 @app.route('/api/users/<user_id>/competitors', methods=['POST'])
 @token_required
 def add_competitor(current_user, token, user_id):
