@@ -167,8 +167,7 @@ def test_invalid_compare(
 ):
     players = _prepare_players(db_session)
     res = _achievements_reqeust(players[0], query=f"competitor={PLAYER_UUID}")
-    assert len(res.items) == 1
-    assert len(res.items[0].achievements) == 0
+    assert len(res.items) == 0
 
 
 def _prepare_players(db_session: Session, extra_challenger: bool = True):

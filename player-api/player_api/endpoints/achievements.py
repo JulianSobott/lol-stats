@@ -85,7 +85,7 @@ async def get_achievements(
     try:
         challenge_categories = await _compare_achievements(classes_lookup, fav_challenges, other_challenges, user_challenges)
     except ValueError:
-        challenge_categories = {}
+        return Achievements(items=[])
     favourites = list(
         filter(
             lambda challenge: challenge.fav, _flatten_challenges(challenge_categories)
