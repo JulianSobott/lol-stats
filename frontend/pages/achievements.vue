@@ -58,52 +58,17 @@
               <div class="card-tabs">
                 <!-- Cards navigation -->
                 <ul class="nav nav-tabs">
-                  <li class="nav-item">
+                  <li
+                    class="nav-item"
+                    v-for="item in achievements"
+                    :key="item.category"
+                  >
                     <a
-                      href="#tab-favorites"
-                      class="nav-link active"
+                      :href="getTabIdRef(item.category)"
+                      class="nav-link"
+                      :class="{ active: item.category === 'Multikills' }"
                       data-bs-toggle="tab"
-                      >Favorites</a
-                    >
-                  </li>
-                  <li class="nav-item">
-                    <a href="#tab-kills" class="nav-link" data-bs-toggle="tab"
-                      >Kills</a
-                    >
-                  </li>
-                  <li class="nav-item">
-                    <a href="#tab-gold" class="nav-link" data-bs-toggle="tab"
-                      >Gold</a
-                    >
-                  </li>
-                  <li class="nav-item">
-                    <a href="#tab-gold" class="nav-link" data-bs-toggle="tab"
-                      >Multikills</a
-                    >
-                  </li>
-                  <li class="nav-item">
-                    <a href="#tab-gold" class="nav-link" data-bs-toggle="tab"
-                      >Utility</a
-                    >
-                  </li>
-                  <li class="nav-item">
-                    <a href="#tab-gold" class="nav-link" data-bs-toggle="tab"
-                      >Special Kills</a
-                    >
-                  </li>
-                  <li class="nav-item">
-                    <a href="#tab-gold" class="nav-link" data-bs-toggle="tab"
-                      >Combat</a
-                    >
-                  </li>
-                  <li class="nav-item">
-                    <a href="#tab-gold" class="nav-link" data-bs-toggle="tab"
-                      >Survival</a
-                    >
-                  </li>
-                  <li class="nav-item">
-                    <a href="#tab-gold" class="nav-link" data-bs-toggle="tab"
-                      >Objectives</a
+                      >{{ item.category }}</a
                     >
                   </li>
                 </ul>
@@ -271,15 +236,23 @@
                   </div>
                 </div>
                 <div v-else class="tab-content">
-                  <!-- Content of card #1 -->
-                  <div id="tab-favorites" class="card tab-pane show active">
+                  <div v-if="loadingAchiements" class="text-center">
+                    <div class="spinner-border text-light" role="status">
+                    </div>
+                  </div>
+                  <div
+                    :id="getTabId(item.category)"
+                    class="card tab-pane"
+                    :class="{ 'show active': item.category === 'Multikills' }"
+                    v-for="item in achievements"
+                    :key="item.category"
+                  >
                     <div class="table-responsive">
                       <table
                         class="table card-table table-vcenter text-nowrap datatable"
                       >
                         <thead>
                           <tr>
-                            <th class="w-1">ID</th>
                             <th>Achievement</th>
                             <th>You (Max / Average / Sum)</th>
                             <th>Other (Max / Average / Sum)</th>
@@ -287,20 +260,30 @@
                           </tr>
                         </thead>
                         <tbody>
-                          <tr v-for="index in 10" :key="index">
-                            <td><span class="text-muted">321</span></td>
-                            <td>Lorem Ipsum</td>
+                          <tr
+                            v-for="achievement in item.achievements"
+                            :key="achievement.name"
+                          >
+                            <td><strong>{{ achievement.description }}</strong></td>
                             <td>
-                              300 / <span class="text-green">300</span> / 300
+                              <span :class="getCompareColor(achievement.you.max.compare)">{{ formatFloat(achievement.you.max.value) }}</span>
+                              <span class="text-muted">/</span>
+                              <span :class="getCompareColor(achievement.you.avg.compare)">{{ formatFloat(achievement.you.avg.value) }}</span>
+                              <span class="text-muted">/</span>
+                              <span :class="getCompareColor(achievement.you.total.compare)">{{ formatFloat(achievement.you.total.value) }}</span>
                             </td>
                             <td>
-                              300 / 300 / <span class="text-red">300</span>
+                              <span :class="getCompareColor(achievement.other.max.compare)">{{ formatFloat(achievement.other.max.value) }}</span>
+                              <span class="text-muted">/</span>
+                              <span :class="getCompareColor(achievement.other.avg.compare)">{{ formatFloat(achievement.other.avg.value) }}</span>
+                              <span class="text-muted">/</span>
+                              <span :class="getCompareColor(achievement.other.total.compare)">{{ formatFloat(achievement.other.total.value) }}</span>
                             </td>
                             <td>
                               <FavoriteAchivementStar
                                 :userId="$auth.user.id"
-                                achivementId="1"
-                                :initState="false"
+                                :achivementId="achievement.name"
+                                :initState="achievement.fav"
                               />
                             </td>
                           </tr>
@@ -308,39 +291,6 @@
                       </table>
                     </div>
                     <div class="card-footer d-flex align-items-center"></div>
-                  </div>
-                  <!-- Content of card #2 -->
-                  <div id="tab-kills" class="card tab-pane">
-                    <div class="card-body">
-                      <div class="card-title">Content of tab #2</div>
-                      <p class="text-muted">
-                        Lorem ipsum dolor sit amet, consectetur adipisicing
-                        elit. Adipisci, alias aliquid distinctio dolorem
-                        expedita, fugiat hic magni molestiae molestias odit.
-                      </p>
-                    </div>
-                  </div>
-                  <!-- Content of card #3 -->
-                  <div id="tab-gold" class="card tab-pane">
-                    <div class="card-body">
-                      <div class="card-title">Content of tab #3</div>
-                      <p class="text-muted">
-                        Lorem ipsum dolor sit amet, consectetur adipisicing
-                        elit. Adipisci, alias aliquid distinctio dolorem
-                        expedita, fugiat hic magni molestiae molestias odit.
-                      </p>
-                    </div>
-                  </div>
-                  <!-- Content of card #4 -->
-                  <div id="tab-top-4" class="card tab-pane">
-                    <div class="card-body">
-                      <div class="card-title">Content of tab #4</div>
-                      <p class="text-muted">
-                        Lorem ipsum dolor sit amet, consectetur adipisicing
-                        elit. Adipisci, alias aliquid distinctio dolorem
-                        expedita, fugiat hic magni molestiae molestias odit.
-                      </p>
-                    </div>
                   </div>
                 </div>
               </div>
@@ -363,6 +313,7 @@ export default {
     } else {
       this.showImportPlayerModal = false
     }
+    this.fetchAchievements()
   },
   beforeRouteUpdate(to, from, next) {
     clearInterval(this.importInterval)
@@ -384,19 +335,41 @@ export default {
         percentage: 100,
       },
       importInterval: null,
-    }
-  },
-  async fetchAchievements() {
-    try {
-      await this.$axios.post(
-        `/achievements?me=${this.$auth.user.id}`,
-        {}
-      )
-    } catch (err) {
-      console.log(err)
+      achievements: [],
+      loadingAchiements: false
     }
   },
   methods: {
+    getCompareColor(key){
+      if (key === 'WORSE') {
+        return 'text-red'
+      }
+      if (key === 'BETTER') {
+        return 'text-green'
+      }
+      return ''
+    },
+    formatFloat(value) {
+      return Math.trunc(value * 1000) / 1000
+    },
+    getTabId(name) {
+      return `tab-${name}`
+    },
+    getTabIdRef(name) {
+      return `#tab-${name}`
+    },
+    async fetchAchievements() {
+      this.loadingAchiements = true
+      try {
+        const response = await this.$axios.get(
+          `/achievements?me=${this.$auth.user.id}`
+        )
+        this.achievements = response.data.items
+      } catch (err) {
+        console.log(err)
+      }
+      this.loadingAchiements = false
+    },
     async importPlayer() {
       try {
         const response = await this.$axios.post(
