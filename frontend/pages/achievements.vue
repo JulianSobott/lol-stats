@@ -388,7 +388,7 @@ export default {
   },
   async fetchAchievements() {
     try {
-      const response = await this.$axios.post(
+      await this.$axios.post(
         `/achievements?me=${this.$auth.user.id}`,
         {}
       )
