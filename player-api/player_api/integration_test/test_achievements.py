@@ -162,6 +162,15 @@ def test_favourites(
     assert res.items[1].achievements[0].name == challenge_1
 
 
+def test_invalid_compare(
+    db_session: Session, setup_challenges, mock_user_api, requests_mock
+):
+    players = _prepare_players(db_session)
+    res = _achievements_reqeust(players[0], query=f"competitor={PLAYER_UUID}")
+    assert len(res.items) == 1
+    assert len(res.items[0].achievements) == 0
+
+
 def _prepare_players(db_session: Session, extra_challenger: bool = True):
     players = PlayerFactory(db_session).n_players(4 if extra_challenger else 3)
     players[0].player.id = PLAYER_UUID

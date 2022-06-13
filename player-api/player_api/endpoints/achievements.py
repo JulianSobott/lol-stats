@@ -82,9 +82,28 @@ async def get_achievements(
 
     classes_lookup: dict[str, ChallengeClasses] = {c.name: c for c in challenge_classes}
 
+    try:
+        challenge_categories = await _compare_achievements(classes_lookup, fav_challenges, other_challenges, user_challenges)
+    except ValueError:
+        challenge_categories = {}
+    favourites = list(
+        filter(
+            lambda challenge: challenge.fav, _flatten_challenges(challenge_categories)
+        )
+    )
+    achievements = [
+        AchievementCategory(category="Favourites", achievements=favourites)
+    ] + [
+        AchievementCategory(category=cat_name, achievements=cat_value)
+        for cat_name, cat_value in challenge_categories.items()
+    ]
+    return Achievements(items=achievements)
+
+
+async def _compare_achievements(classes_lookup: dict[str, ChallengeClasses], fav_challenges: list[str], other_challenges: Iterable[Challenges], user_challenges: Iterable[Challenges]):
     challenge_categories: dict[str, list[Achievement]] = {}
     for user_challenge, other_challenge in zip(
-        user_challenges, other_challenges, strict=True
+            user_challenges, other_challenges, strict=True
     ):
         challenge_class = classes_lookup[other_challenge.name]
         if challenge_class.class_name not in challenge_categories:
@@ -133,18 +152,7 @@ async def get_achievements(
                 ),
             )
         )
-    favourites = list(
-        filter(
-            lambda challenge: challenge.fav, _flatten_challenges(challenge_categories)
-        )
-    )
-    achievements = [
-        AchievementCategory(category="Favourites", achievements=favourites)
-    ] + [
-        AchievementCategory(category=cat_name, achievements=cat_value)
-        for cat_name, cat_value in challenge_categories.items()
-    ]
-    return Achievements(items=achievements)
+    return challenge_categories
 
 
 class _CompareResult(BaseModel):
