@@ -42,7 +42,15 @@ def test_get_incomplete_db_player(db_session):
 
 
 def test_get_unranked(db_session):
-    player = Summoners(puuid=PLAYER_ID, region_id=PLAYER_ID, name="xyz", level=1, tier=TierEnum.UNRANKED, last_update=16000, icon_path="test.png")
+    player = Summoners(
+        puuid=PLAYER_ID,
+        region_id=PLAYER_ID,
+        name="xyz",
+        level=1,
+        tier=TierEnum.UNRANKED,
+        last_update=16000,
+        icon_path="test.png",
+    )
     db_session.add(player)
     db_session.commit()
     response_player = _player_reqeust_by_name("xyz")

@@ -166,12 +166,10 @@ paths:
         in: query
       - required: false
         schema:
-          title: Competitor Id
-          type: array
-          items:
-            type: string
-          default: []
-        name: competitor_id
+          title: Competitors
+          type: boolean
+          default: false
+        name: competitors
         in: query
       - required: false
         schema:
