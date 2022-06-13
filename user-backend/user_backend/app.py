@@ -302,23 +302,21 @@ def get_player(user_id: int):
 
 
 @app.route('/api/users/<user_id>/competitors/', methods=['GET'])
-@token_required
-def get_list_of_competitor(current_user, token, user_id):
+def get_list_of_competitor(user_id):
         competitors = Competitors.query.filter_by(user_id=user_id).all()
 
         competitor_output = []
         for competitor in competitors:
-            if current_user.player_uuid is not None:
-                player_response = requests.get(f"https://lol-stats.de/api/players/{competitor.player_uuid}")
-                player_stats = player_response.json()
+            player_response = requests.get(f"https://lol-stats.de/api/players/{competitor.player_uuid}")
+            player_stats = player_response.json()
 
-                data = {
-                    "id": competitor.id,
-                    "player_uuid": competitor.player_uuid,
-                    "player_name": player_stats["name"],
-                    "player_stats": player_stats
-                }
-                competitor_output.append(data)
+            data = {
+                "id": competitor.id,
+                "player_uuid": competitor.player_uuid,
+                "player_name": player_stats["name"],
+                "player_stats": player_stats
+            }
+            competitor_output.append(data)
         return make_response(jsonify({"status": "success",
                                       "competitors": competitor_output}), 200)
 

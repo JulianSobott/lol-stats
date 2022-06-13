@@ -79,12 +79,20 @@ def mock_user_api(requests_mock):
         json={"id": 1, "player_uuid": PLAYER_UUID, "region": "euw"},
     )
     requests_mock.get(
-        f"https://lol-stats.de/api/users/2",
-        json={"id": 2, "player_uuid": PLAYER_2_UUID, "region": "euw"},
-    )
-    requests_mock.get(
-        f"https://lol-stats.de/api/users/3",
-        json={"id": 3, "player_uuid": PLAYER_3_UUID, "region": "euw"},
+        f"https://lol-stats.de/api/users/{PLAYER_ID}/competitors",
+        json=[{
+            "id": 1,
+            "player_uuid": PLAYER_2_UUID,
+            "player_name": "",
+            "player_stats": None
+        },
+            {
+                "id": 2,
+                "player_uuid": PLAYER_3_UUID,
+                "player_name": "",
+                "player_stats": None
+            }
+        ],
     )
 
 
@@ -132,9 +140,9 @@ def test_one_elo(db_session: Session, setup_challenges, mock_user_api):
     assert res == expected_res
 
 
-def test_puuids(db_session: Session, setup_challenges, mock_user_api):
+def test_competitors(db_session: Session, setup_challenges, mock_user_api):
     players = _prepare_players(db_session)
-    res = _achievements_reqeust(players[0], query=f"competitor_id=2&competitor_id=3")
+    res = _achievements_reqeust(players[0], query=f"competitors=true")
     assert res == expected_res
 
 

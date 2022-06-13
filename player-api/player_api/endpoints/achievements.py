@@ -20,7 +20,7 @@ from player_api.models.achievements import (
     AchievementStat,
     Comparison,
 )
-from player_api.models.player import PlayerId, TierEnum, UserId
+from player_api.models.player import PlayerId, TierEnum, Player
 
 router = APIRouter()
 EPSILON = 0.00001
@@ -41,7 +41,7 @@ class CompareGroup(str, Enum):
 async def get_achievements(
     me: str,
     is_gloabal: bool = Query(default=False, alias="global"),
-    competitor_id: list[UserId] = Query(default=[]),
+    is_competitors: bool | None = Query(default=False, alias="competitors"),
     competitor: PlayerId | None = None,
     rank: TierEnum | str | None = None,
     champion: str | None = None,
@@ -54,11 +54,8 @@ async def get_achievements(
     ]
     if is_gloabal:  # global
         pass
-    elif competitor_id:  # friends
-        friends_puuids = []
-        for competitor in competitor_id:
-            res = await _get_user_data(competitor)
-            friends_puuids.append(res.player_uuid)
+    elif is_competitors:  # friends
+        friends_puuids = await _get_competitors(me)
         criterion.append(Challenges.summoner_id.in_(friends_puuids))
     elif competitor:  # player
         criterion.append(Challenges.summoner_id == competitor)
@@ -156,6 +153,17 @@ class _UserInfo(BaseModel):
     region: str
 
 
+class _Competitor(BaseModel):
+    id: str
+    player_uuid: str
+    player_name: str
+    player_stats: Player | None
+
+
+class _CompetitorsList(BaseModel):
+    __root__: list[_Competitor]
+
+
 def _compare(*, user: float, other: float, operator: str) -> _CompareResult:
     cmp_funcs = {"<": float.__lt__, ">": float.__gt__}
     if abs(user - other) < EPSILON:
@@ -220,3 +228,15 @@ async def _get_user_data(user_id: str):
         )
         raise HTTPException(res.status_code, detail=res.text)
     return _UserInfo(**res.json())
+
+
+async def _get_competitors(user_id: str) -> list[PlayerId]:
+    res = requests.get(f"https://lol-stats.de/api/users/{user_id}/competitors")
+    if not res.ok:
+        logger.warn(
+            f"method=_get_user_data msg='request returned error code' "
+            f"{res.status_code=} {res.text} {user_id=}"
+        )
+        raise HTTPException(res.status_code, detail=res.text)
+    competitors = _CompetitorsList(__root__=res.json()).__root__
+    return list(map(lambda p: p.player_uuid, competitors))
