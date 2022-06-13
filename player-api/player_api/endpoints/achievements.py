@@ -133,13 +133,18 @@ async def get_achievements(
                 ),
             )
         )
-
-    return Achievements(
-        items=[
-            AchievementCategory(category=cat_name, achievements=cat_value)
-            for cat_name, cat_value in challenge_categories.items()
-        ]
+    favourites = list(
+        filter(
+            lambda challenge: challenge.fav, _flatten_challenges(challenge_categories)
+        )
     )
+    achievements = [
+        AchievementCategory(category="Favourites", achievements=favourites)
+    ] + [
+        AchievementCategory(category=cat_name, achievements=cat_value)
+        for cat_name, cat_value in challenge_categories.items()
+    ]
+    return Achievements(items=achievements)
 
 
 class _CompareResult(BaseModel):
@@ -162,6 +167,14 @@ class _Competitor(BaseModel):
 
 class _CompetitorsList(BaseModel):
     __root__: list[_Competitor]
+
+
+def _flatten_challenges(
+    challenge_categories: dict[str, list[Achievement]]
+) -> Iterable[Achievement]:
+    for challenges in challenge_categories.values():
+        for challenge in challenges:
+            yield challenge
 
 
 def _compare(*, user: float, other: float, operator: str) -> _CompareResult:

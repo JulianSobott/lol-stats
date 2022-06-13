@@ -80,24 +80,26 @@ def mock_user_api(requests_mock):
     )
     requests_mock.get(
         f"https://lol-stats.de/api/users/{PLAYER_ID}/competitors",
-        json=[{
-            "id": 1,
-            "player_uuid": PLAYER_2_UUID,
-            "player_name": "",
-            "player_stats": None
-        },
+        json=[
+            {
+                "id": 1,
+                "player_uuid": PLAYER_2_UUID,
+                "player_name": "",
+                "player_stats": None,
+            },
             {
                 "id": 2,
                 "player_uuid": PLAYER_3_UUID,
                 "player_name": "",
-                "player_stats": None
-            }
+                "player_stats": None,
+            },
         ],
     )
 
 
 expected_res = Achievements(
     items=[
+        AchievementCategory(category="Favourites", achievements=[]),
         AchievementCategory(
             category=category_1,
             achievements=[
@@ -123,7 +125,7 @@ expected_res = Achievements(
                     ),
                 )
             ],
-        )
+        ),
     ]
 )
 
@@ -144,6 +146,20 @@ def test_competitors(db_session: Session, setup_challenges, mock_user_api):
     players = _prepare_players(db_session)
     res = _achievements_reqeust(players[0], query=f"competitors=true")
     assert res == expected_res
+
+
+def test_favourites(
+    db_session: Session, setup_challenges, mock_user_api, requests_mock
+):
+    requests_mock.get(
+        f"https://lol-stats.de/api/users/{PLAYER_ID}/achievements",
+        json={"status": "success", "achievements": [challenge_1]},
+    )
+    players = _prepare_players(db_session)
+    res = _achievements_reqeust(players[0], query="")
+    assert res.items[0].category == "Favourites"
+    assert res.items[0].achievements[0].name == challenge_1
+    assert res.items[1].achievements[0].name == challenge_1
 
 
 def _prepare_players(db_session: Session, extra_challenger: bool = True):
