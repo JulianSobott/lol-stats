@@ -95,7 +95,7 @@
                             >
                           </div>
                         </td>
-                        <td>{{ item.winrate }}</td>
+                        <td>{{ item.player_stats.win_rate }}%</td>
                         <td>
                           <a
                             href="#"

@@ -11,6 +11,11 @@
               <!-- Page pre-title -->
               <h2 class="page-title">Achievements</h2>
             </div>
+            <div class="col-12 col-md-auto ms-auto d-print-none">
+              <button class="btn btn-primary d-sm-inline-block" @click="fetchAchievements()">
+                Refresh
+              </button>
+            </div>
             <!-- Page title actions -->
             <div class="col-auto col-md-auto ms-auto d-print-none">
               <div class="btn-list">
@@ -58,14 +63,14 @@
                 <!-- Cards navigation -->
                 <ul class="nav nav-tabs">
                   <li
-                    class="nav-item"
+                    class="nav-item nav-item-tab"
                     v-for="item in achievements"
                     :key="item.category"
                   >
                     <a
                       :href="getTabIdRef(item.category)"
                       class="nav-link"
-                      :class="{ active: item.category === 'Multikills' }"
+                      :class="{ active: item.category === 'Favourites' }"
                       data-bs-toggle="tab"
                       >{{ item.category }}</a
                     >
@@ -238,7 +243,7 @@
                   <div
                     :id="getTabId(item.category)"
                     class="card tab-pane"
-                    :class="{ 'show active': item.category === 'Multikills' }"
+                    :class="{ 'show active': item.category === 'Favourites' }"
                     v-for="item in achievements"
                     :key="item.category"
                   >
@@ -339,7 +344,7 @@ export default {
       },
       importInterval: null,
       achievements: [],
-      loadingAchiements: false
+      loadingAchiements: false,
     }
   },
   methods: {
@@ -463,6 +468,16 @@ export default {
 </script>
 
 <style>
+.nav-item-tab a {
+  padding: 10px;
+}
+
+.nav-item-tab .active,
+.nav-item-tab:hover a{
+  color: #fff !important;
+  background-color: #206bc4  !important;
+}
+
 @media screen and (max-width: 575px) {
   .col-achievements-filter {
     display: none;

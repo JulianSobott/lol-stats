@@ -20,7 +20,7 @@
               <div v-else class="placeholder col-3 mt-1"></div>
             </div>
             <div
-              v-if="!playerData.imported"
+              v-if="!playerData.imported && !isFetchingData"
               class="col-12 col-md-auto ms-auto d-print-none"
             >
               <div class="d-flex">
@@ -68,7 +68,7 @@
       <div class="page-body">
         <div class="container-xl">
           <div class="row row-cards">
-            <div v-if="!playerData.imported" class="col-md-12 col-lg-12">
+            <div v-if="!playerData.imported && !isFetchingData" class="col-md-12 col-lg-12">
               <div class="card bg-danger mb-3">
                 <div class="card-stamp">
                   <div class="card-stamp-icon bg-white text-primary">
@@ -134,10 +134,12 @@ export default {
       playerData: {},
       isImportingData: false,
       importInterval: null,
+      isFetchingData: false
     }
   },
   methods: {
     async fetchPlayerData() {
+      this.isFetchingData = true
       try {
         const response = await this.$axios.get(
           `/players/${this.$route.params.id}`
@@ -148,6 +150,7 @@ export default {
           this.$router.push('/dashboard')
         }
       }
+      this.isFetchingData = false
     },
     championIconPath(champion) {
       return `background-image: url("${champion.icon_path}");`
