@@ -317,7 +317,7 @@ def get_list_of_competitor(current_user, token, user_id):
                 data = {
                     "id": competitor.id,
                     "player_uuid": competitor.player_uuid,
-                    "player_name": player_stats.name,
+                    "player_name": player_stats["name"],
                     "player_stats": player_stats
                 }
                 competitor_output.append(data)
