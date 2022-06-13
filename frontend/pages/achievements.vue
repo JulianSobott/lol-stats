@@ -10,7 +10,6 @@
             <div class="col">
               <!-- Page pre-title -->
               <h2 class="page-title">Achievements</h2>
-              <div class="text-muted mt-1">99999 results</div>
             </div>
             <!-- Page title actions -->
             <div class="col-auto col-md-auto ms-auto d-print-none">

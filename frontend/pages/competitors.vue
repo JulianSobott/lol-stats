@@ -86,7 +86,7 @@
                             ></span>
                             <div class="flex-fill">
                               <div class="font-weight-medium">
-                                {{ item.player_stats.rank.tier }}
+                                {{ item.player_stats.rank.tier.toUpperCase() }}
                                 {{ item.player_stats.rank.division }}
                               </div>
                             </div>
