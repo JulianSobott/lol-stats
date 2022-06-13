@@ -92,7 +92,7 @@ def token_required(f):
             api_key = token.replace("Bearer ", "")
             data = jwt.decode(api_key, app.config['JWT_SECRET_KEY'], algorithms=["HS256"])
             current_user = Users.query.filter_by(id=data['user_id']).first()
-        except:
+        except jwt.ExpiredSignatureError:
             db_token = AccessToken.query.filter_by(token=token).first()
             if db_token is not None:
                 db.session.delete(db_token)
@@ -107,16 +107,14 @@ def token_required(f):
 @repeat(every(60).minutes)
 def delete_expired_token():
     token_query = AccessToken.query.order_by(AccessToken.created_at).all()
-    expired = True
     for token in token_query:
-        if expired:
-            try:
-                data = jwt.decode(token, app.config['JWT_SECRET_KEY'], algorithms=["HS256"])
-                expired = False
-            except:
-                db.session.delete(token)
-                db.session.commit()
-                continue
+        try:
+            jwt.decode(token, app.config['JWT_SECRET_KEY'], algorithms=["HS256"])
+            break
+        except jwt.ExpiredSignatureError:
+            db.session.delete(token)
+            db.session.commit()
+            continue
 
 
 @app.route('/api/auth/me', methods=['GET'])
@@ -162,10 +160,10 @@ def login():
         if user.password is not None:
             if security.check_password_hash(user.password, data["password"]):
                 access_token = jwt.encode(
-                    {'user_id': user.id, 'exp': datetime.datetime.utcnow() + datetime.timedelta(minutes=45)},
+                    {'user_id': user.id, 'exp': datetime.datetime.utcnow() + datetime.timedelta(minutes=60)},
                     app.config['JWT_SECRET_KEY'], "HS256")
                 db_token = AccessToken(user_id=user.id, token=access_token, created_at=datetime.datetime.utcnow(),
-                                       updated_at=datetime.datetime.utcnow() + datetime.timedelta(minutes=45))
+                                       updated_at=datetime.datetime.utcnow() + datetime.timedelta(minutes=60))
                 db.session.add(db_token)
                 db.session.commit()
 
