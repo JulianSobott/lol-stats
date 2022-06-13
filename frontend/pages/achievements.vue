@@ -200,12 +200,7 @@
                               <div class="ms-auto">
                                 <span
                                   v-if="importData.import_state == 'IMPORTING'"
-                                  class="
-                                    text-green
-                                    d-inline-flex
-                                    align-items-center
-                                    lh-1
-                                  "
+                                  class="text-green d-inline-flex align-items-center lh-1"
                                 >
                                   {{ importData.percentage }}%
                                 </span>
@@ -219,10 +214,7 @@
                                   importData.import_state
                                 )
                               "
-                              class="
-                                progress-bar progress-bar-indeterminate
-                                bg-lime
-                              "
+                              class="progress-bar progress-bar-indeterminate bg-lime"
                             ></div>
                             <div
                               v-else-if="importData.import_state == 'IMPORTING'"
@@ -242,9 +234,7 @@
                             <svg
                               v-if="!isImportingData"
                               xmlns="http://www.w3.org/2000/svg"
-                              class="
-                                icon icon-tabler icon-tabler-database-import
-                              "
+                              class="icon icon-tabler icon-tabler-database-import"
                               width="24"
                               height="24"
                               viewBox="0 0 24 24"
@@ -269,10 +259,7 @@
                             </svg>
                             <span
                               v-else
-                              class="
-                                spinner-border spinner-border-sm
-                                icon icon-tabler
-                              "
+                              class="spinner-border spinner-border-sm icon icon-tabler"
                               role="status"
                               aria-hidden="true"
                             ></span>
@@ -288,13 +275,7 @@
                   <div id="tab-favorites" class="card tab-pane show active">
                     <div class="table-responsive">
                       <table
-                        class="
-                          table
-                          card-table
-                          table-vcenter
-                          text-nowrap
-                          datatable
-                        "
+                        class="table card-table table-vcenter text-nowrap datatable"
                       >
                         <thead>
                           <tr>
@@ -316,7 +297,11 @@
                               300 / 300 / <span class="text-red">300</span>
                             </td>
                             <td>
-                              <FavoriteAchivementStar :userId="$auth.user.id" achivementId="1" :initState="false"/>
+                              <FavoriteAchivementStar
+                                :userId="$auth.user.id"
+                                achivementId="1"
+                                :initState="false"
+                              />
                             </td>
                           </tr>
                         </tbody>
@@ -401,6 +386,16 @@ export default {
       importInterval: null,
     }
   },
+  async fetchAchievements() {
+    try {
+      const response = await this.$axios.post(
+        `/achievements?me=${this.$auth.user.id}`,
+        {}
+      )
+    } catch (err) {
+      console.log(err)
+    }
+  },
   methods: {
     async importPlayer() {
       try {
@@ -446,19 +441,17 @@ export default {
     async filterApplied(filters) {
       try {
         const query = { ...filters }
-        let compareRequest = ""
+        let compareRequest = ''
         this.selectedPlayerUuid = null
         this.showImportPlayerModal = false
 
         if (query.compare === 'global') {
-          compareRequest = "&global=true"
+          compareRequest = '&global=true'
         } else if (query.compare === 'competitors') {
-
-          const testIds = [1, 2, 3];
+          const testIds = [1, 2, 3]
           for (const id in testIds) {
             compareRequest += `&competitor_id=${id}`
           }
-
         } else if (query.compare === 'player') {
           // get id of player
           const response = await this.$axios.get(
