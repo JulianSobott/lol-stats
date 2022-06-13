@@ -233,7 +233,7 @@ async def _get_favourite_challenges(user: _UserInfo) -> set[str]:
     res = requests.get(f"https://lol-stats.de/api/users/{user.id}/achievements")
     if not res.ok:
         logger.warn(
-            f"method=_get_user_data msg='request returned error code' "
+            f"method=_get_favourite_challenges msg='request returned error code' "
             f"{res.status_code=} {res.text} {user=}"
         )
         raise HTTPException(res.status_code, detail=res.text)
@@ -245,7 +245,7 @@ async def _get_user_data(user_id: str):
     if not res.ok:
         logger.warn(
             f"method=_get_user_data msg='request returned error code' "
-            f"{res.status_code=} {res.text} {user_id=}"
+            f"{res.status_code=} {res.text=} {user_id=}"
         )
         raise HTTPException(res.status_code, detail=res.text)
     return _UserInfo(**res.json())
@@ -255,8 +255,8 @@ async def _get_competitors(user_id: str) -> list[PlayerId]:
     res = requests.get(f"https://lol-stats.de/api/users/{user_id}/competitors")
     if not res.ok:
         logger.warn(
-            f"method=_get_user_data msg='request returned error code' "
-            f"{res.status_code=} {res.text} {user_id=}"
+            f"method=_get_competitors msg='request returned error code' "
+            f"{res.status_code=} {res.text=} {user_id=}"
         )
         raise HTTPException(res.status_code, detail=res.text)
     competitors = _CompetitorsList(__root__=res.json()).__root__
