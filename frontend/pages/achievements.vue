@@ -54,7 +54,7 @@
               <AchievementFilters @filterApplied="filterApplied" />
             </div>
             <div class="col-9 col-achivements-table">
-              <div class="card-tabs">
+              <div class="card-tabs" v-if="!loadingAchiements">
                 <!-- Cards navigation -->
                 <ul class="nav nav-tabs">
                   <li
@@ -234,12 +234,7 @@
                     </div>
                   </div>
                 </div>
-                <div v-else class="tab-content">
-                  <div v-if="loadingAchiements" class="text-center">
-                    <div class="spinner-border text-light" role="status">
-                    </div>
-                    <p class="card-title mt-1">Loading Achievements...</p>
-                  </div>
+                <div v-else class="tab-content">  
                   <div
                     :id="getTabId(item.category)"
                     class="card tab-pane"
@@ -294,6 +289,11 @@
                   </div>
                 </div>
               </div>
+              <div v-else class="text-center">
+                <div class="spinner-border text-light" role="status">
+                </div>
+                <p class="card-title mt-1">Loading Achievements...</p>
+              </div>
             </div>
           </div>
         </div>
@@ -313,7 +313,10 @@ export default {
     } else {
       this.showImportPlayerModal = false
     }
-    this.fetchAchievements()
+
+    if (this.$route.query.player_name === undefined) {
+      this.fetchAchievements()
+    }
   },
   beforeRouteUpdate(to, from, next) {
     clearInterval(this.importInterval)
@@ -411,6 +414,14 @@ export default {
         this.importPlayer()
       }, 5000)
     },
+    async getCompetitors(userId) {
+      try {
+        const response = await this.$axios.get(`/users/${userId}/competitors/`)
+        return response.data.competitors
+      } catch (e) {
+        console.log(e)
+      }
+    },
     async filterApplied(filters) {
       try {
         const query = { ...filters }
@@ -421,8 +432,8 @@ export default {
         if (query.compare === 'global') {
           compareRequest = '&global=true'
         } else if (query.compare === 'competitors') {
-          const testIds = [1, 2, 3]
-          for (const id in testIds) {
+          const ids = await this.getCompetitors(this.$auth.user.id)
+          for (const id in ids) {
             compareRequest += `&competitor_id=${id}`
           }
         } else if (query.compare === 'player') {
@@ -440,13 +451,16 @@ export default {
         }
 
         if (!this.isImportingData && !this.requiresImport) {
-          await this.$axios.get(
+          this.loadingAchiements = true
+          const response = await this.$axios.get(
             `/achievements?me=${this.$auth.user.id}&champion=${query.champion}&rank=${query.rank}${compareRequest}`
           )
+          this.this.achievements = response.data.items
         }
       } catch (err) {
         console.log(err)
       }
+      this.loadingAchiements = false
     },
   },
 }
