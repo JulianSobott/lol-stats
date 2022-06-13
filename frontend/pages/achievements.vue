@@ -59,7 +59,7 @@
               <AchievementFilters @filterApplied="filterApplied" />
             </div>
             <div class="col-9 col-achivements-table">
-              <div class="card-tabs" v-if="!loadingAchiements">
+              <div v-if="!loadingAchiements" class="card-tabs">
                 <div v-if="achievements.length == 0" class="card">
                   <div class="card-body">
                       <div class="empty">
@@ -140,9 +140,9 @@
                 <!-- Cards navigation -->
                 <ul class="nav nav-tabs">
                   <li
-                    class="nav-item nav-item-tab"
                     v-for="item in achievements"
                     :key="item.category"
+                    class="nav-item nav-item-tab"
                   >
                     <a
                       :href="getTabIdRef(item.category)"
@@ -252,7 +252,7 @@
                               </div>
                             </div>
                           </div>
-                          <div class="progress mb-2" v-if="importData">
+                          <div v-if="importData" class="progress mb-2">
                             <div
                               v-if="
                                 ['PENDING', 'FINISHED'].includes(
@@ -273,8 +273,8 @@
                           <a
                             href="#"
                             class="btn btn-primary"
-                            @click="triggerImportPlayer"
                             :class="{ disabled: isImportingData }"
+                            @click="triggerImportPlayer"
                           >
                             <svg
                               v-if="!isImportingData"
@@ -317,11 +317,11 @@
                 </div>
                 <div v-else class="tab-content">  
                   <div
+                    v-for="item in achievements"
                     :id="getTabId(item.category)"
                     class="card tab-pane"
-                    :class="{ 'show active': item.category === 'Favourites' }"
-                    v-for="item in achievements"
                     :key="item.category"
+                    :class="{ 'show active': item.category === 'Favourites' }"
                   >
                     <div class="table-responsive">
                       <table
@@ -387,25 +387,11 @@
 <script>
 export default {
   name: 'AchievementsPage',
-  middleware: ['auth', 'settings'],
-  mounted() {
-    if (this.$route.query.import !== undefined) {
-      this.showImportPlayerModal = this.$route.query.import === 'true'
-    } else {
-      this.showImportPlayerModal = false
-    }
-
-    if (this.$route.query.player_name === undefined) {
-      this.fetchAchievements()
-    }
-  },
   beforeRouteUpdate(to, from, next) {
     clearInterval(this.importInterval)
     next()
   },
-  destroyed() {
-    clearInterval(this.importInterval)
-  },
+  middleware: ['auth', 'settings'],
   data() {
     return {
       showImportPlayerModal: false,
@@ -422,6 +408,20 @@ export default {
       achievements: [],
       loadingAchiements: false,
     }
+  },
+  mounted() {
+    if (this.$route.query.import !== undefined) {
+      this.showImportPlayerModal = this.$route.query.import === 'true'
+    } else {
+      this.showImportPlayerModal = false
+    }
+
+    if (this.$route.query.player_name === undefined) {
+      this.fetchAchievements()
+    }
+  },
+  destroyed() {
+    clearInterval(this.importInterval)
   },
   methods: {
     getCompareColor(key){
