@@ -46,7 +46,7 @@ class riot_api_connector:
         last = self.db.get_last_patch()
         if not last:
             return True
-        return last[0] == str(cassiopeia.Patch.latest(region='euw'))
+        return last[0] == str(cassiopeia.Patch.latest(region='EUW'))
 
     def add_patch(self):
         self.db.add_patch(patch=str(cassiopeia.Patch.latest(region='EUW')))
