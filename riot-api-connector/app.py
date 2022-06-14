@@ -5,10 +5,10 @@ import time
 from threading import Thread
 import os
 import cassiopeia
+import static_data
 
 
 cassiopeia.set_riot_api_key(os.environ["RIOT_API_KEY"])
-
 
 class riot_api_connector:
     def __init__(self):
@@ -17,10 +17,26 @@ class riot_api_connector:
 
     def update_loop(self):
         while True:
+            if self.patch_changed():
+                self.add_patch()
             print("Updating ...")
             summoner.update_all(db=self.db, region='EUW')
             print("Finished updating")
             time.sleep(300)
+
+    def patch_changed(self) -> bool:
+        last = self.db.get_last_patch()
+        print(str(cassiopeia.Patch.latest(region='EUW')))
+        if not last:
+            return True
+        return last == str(cassiopeia.Patch.latest(region='euw'))
+
+    def add_patch(self):
+        self.db.add_patch(patch=str(cassiopeia.Patch.latest(region='EUW')))
+        static_data.update_champions()
+        static_data.update_items()
+        static_data.update_summoner_icons()
+        static_data.update_summoner_spells()
 
 
 x = riot_api_connector()
@@ -28,6 +44,8 @@ grpc_thread = Thread(target=playerImportRequest.serve,
                      args=(x.db, summoner.update_summoner_by_puuid))
 grpc_thread.start()
 x.update_loop()
+
+
 # x.update_summoner_by_name(name='LinkX20', region='EUW')
 # match_history.riot_watcher_mh(
 #    puuid='i6rhuj9rVlNXt0WRoGzMelbaGItog4yYs6mC8yZXQOY2rpuY68virbdeyvnoptwJ07u1cgZKW1tBPA', start_time=1627776000)

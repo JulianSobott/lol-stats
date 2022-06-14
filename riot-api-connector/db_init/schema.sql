@@ -69,3 +69,8 @@ CREATE TABLE IF NOT EXISTS Games (
    FOREIGN KEY (champ_id)
         REFERENCES Champions (id)
 );
+
+CREATE TABLE IF NOT EXISTS Patches (
+   patch        TEXT                    NOT NULL,
+   added        FLOAT                   NOT NULL
+);
