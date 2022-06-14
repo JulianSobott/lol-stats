@@ -138,7 +138,7 @@
                     </div>
                 </div>
                 <!-- Cards navigation -->
-                <ul class="nav nav-tabs">
+                <ul class="nav nav-tabs" style="background: #1e293b; border-top-left-radius: 5px; border-top-right-radius: 5px">
                   <li
                     v-for="item in achievements"
                     :key="item.category"
