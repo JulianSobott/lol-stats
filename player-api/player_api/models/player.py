@@ -4,34 +4,53 @@ from pydantic import BaseModel, Field
 
 
 class TierEnum(str, Enum):
-    iron = "iron"
-    bronze = "bronze"
-    silver = "silver"
-    gold = "gold"
-    platinum = "platinum"
-    diamond = "diamond"
-    master = "master"
-    grandmaster = "grandmaster"
-    challenger = "challenger"
+    IRON = "iron"
+    BRONZE = "bronze"
+    SILVER = "silver"
+    GOLD = "gold"
+    PLATINUM = "platinum"
+    DIAMOND = "diamond"
+    MASTER = "master"
+    GRANDMASTER = "grandmaster"
+    CHALLENGER = "challenger"
+    UNRANKED = "unranked"
 
 
 class Rank(BaseModel):
     division: int = Field(ge=1, le=4)
     tier: TierEnum
-    league_points: int = Field(ge=0, le=100)
+    league_points: int = Field(ge=0)
 
     @property
     def division_str(self) -> str:
         return {
-            1: "one",
-            2: "two",
-            3: "three",
-            4: "four",
+            1: "I",
+            2: "II",
+            3: "III",
+            4: "IV",
         }[self.division]
 
     @staticmethod
     def division_from_str(division: str) -> int:
-        return {"one": 1, "two": 2, "three": 3, "four": 4}[division]
+        return {"I": 1, "II": 2, "III": 3, "IV": 4}[division]
+
+    @staticmethod
+    def from_summoner(player: "Summoners"):
+        if player.tier == TierEnum.UNRANKED:
+            rank = Rank(division=1, tier=player.tier, league_points=0)
+        elif (
+            player.division is None
+            or player.tier is None
+            or player.league_points is None
+        ):
+            rank = None
+        else:
+            rank = Rank(
+                division=Rank.division_from_str(player.division),
+                tier=player.tier,
+                league_points=player.league_points,
+            )
+        return rank
 
 
 class MostPlayed(BaseModel):
@@ -91,3 +110,4 @@ class ImportProgress(BaseModel):
 
 PlayerId = str
 PlayerName = str
+UserId = str

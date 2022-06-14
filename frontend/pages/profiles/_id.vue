@@ -15,21 +15,20 @@
                 <FavoriteCompetitorStar
                   :userId="$auth.user.id"
                   :competitorUuidId="playerData.id"
-                  :initState="isInCompetitorsList()"
                 />
               </h2>
               <div v-else class="placeholder col-3 mt-1"></div>
             </div>
             <div
-              v-if="!playerData.imported"
+              v-if="!playerData.imported && !isFetchingData"
               class="col-12 col-md-auto ms-auto d-print-none"
             >
               <div class="d-flex">
                 <button
                   href="#"
                   class="btn btn-danger"
-                  @click="importPlayerData"
                   :disabled="isImportingData"
+                  @click="triggerImportPlayer"
                 >
                   <svg
                     v-if="!isImportingData"
@@ -69,7 +68,10 @@
       <div class="page-body">
         <div class="container-xl">
           <div class="row row-cards">
-            <div v-if="!playerData.imported" class="col-md-12 col-lg-12">
+            <div
+              v-if="!playerData.imported && !isFetchingData"
+              class="col-md-12 col-lg-12"
+            >
               <div class="card bg-danger mb-3">
                 <div class="card-stamp">
                   <div class="card-stamp-icon bg-white text-primary">
@@ -107,7 +109,7 @@
             <PlayerStatsMostPlayed :playerData="playerData" />
             <PlayerStatsRecentGames
               ref="recentGames"
-              :playerUuid="this.$route.params.id"
+              :playerUuid="$route.params.id"
             />
           </div>
         </div>
@@ -119,42 +121,52 @@
 <script>
 export default {
   name: 'ProfilePage',
-  mounted() {
-    this.fetchPlayerData()
-    this.$refs.recentGames.fetchPlayerData()
+  beforeRouteUpdate(to, from, next) {
+    clearInterval(this.importInterval)
+    next()
   },
   data() {
     return {
       playerData: {},
       isImportingData: false,
+      importInterval: null,
+      isFetchingData: false,
     }
+  },
+  mounted() {
+    this.fetchPlayerData()
+    this.$refs.recentGames.fetchPlayerData()
+  },
+  destroyed() {
+    clearInterval(this.importInterval)
   },
   methods: {
     async fetchPlayerData() {
+      this.isFetchingData = true
       try {
         const response = await this.$axios.get(
-        `/players/${this.$route.params.id}`
+          `/players/${this.$route.params.id}`
         )
         this.playerData = response.data
-      } catch(e) {
+      } catch (e) {
         if (e.response.status === 404) {
           this.$router.push('/dashboard')
         }
       }
+      this.isFetchingData = false
     },
     championIconPath(champion) {
       return `background-image: url("${champion.icon_path}");`
     },
-    isInCompetitorsList() {
-      const competitors = this.$auth.user.competitors
-      const currentPlayerId = this.$route.params.id
-      return (
-        competitors.filter(function (e) {
-          return e.player_uuid === currentPlayerId
-        }).length > 0
-      )
+    triggerImportPlayer() {
+      this.isImportingData = true
+
+      this.importPlayer()
+      this.importInterval = setInterval((async) => {
+        this.importPlayer()
+      }, 5000)
     },
-    async importPlayerData() {
+    async importPlayer() {
       try {
         const response = await this.$axios.post(
           `/players/${this.$route.params.id}/import`,
@@ -164,8 +176,9 @@ export default {
         this.importData = response.data
 
         if (this.importData.imported) {
+          clearInterval(this.importInterval)
           this.isImportingData = false
-          // send request to show all data
+          this.$router.go(this.$router.currentRoute)
         }
       } catch (err) {
         console.log(err)

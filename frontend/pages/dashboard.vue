@@ -18,7 +18,7 @@
       <div class="page-body">
         <div class="container-xl">
           <div class="row row-cards">
-            <div v-if="this.isImportPlayerData" class="col-md-12 col-lg-12">
+            <div v-if="isImportPlayerData" class="col-md-12 col-lg-12">
               <div class="card bg-primary mb-3">
                 <div class="card-stamp">
                   <div class="card-stamp-icon bg-white text-primary">
@@ -108,7 +108,24 @@ import { mapActions } from 'vuex'
 
 export default {
   name: 'IndexPage',
+  beforeRouteUpdate(to, from, next) {
+    clearInterval(this.importInterval)
+    next()
+  },
   middleware: ['auth', 'settings'],
+  data() {
+    return {
+      isImportPlayerData: false,
+      importInterval: null,
+      importData: {
+        import_state: 'PENDING',
+        imported_games: 0,
+        total_games: 0,
+        imported: true,
+        percentage: 100,
+      },
+    }
+  },
   computed: {
     playerData() {
       return this.$store.state.dashboard.playerData
@@ -130,19 +147,6 @@ export default {
   destroyed() {
     clearInterval(this.importInterval)
   },
-  data() {
-    return {
-      isImportPlayerData: false,
-      importInterval: null,
-      importData: {
-        import_state: 'PENDING',
-        imported_games: 0,
-        total_games: 0,
-        imported: true,
-        percentage: 100,
-      },
-    }
-  },
   methods: {
     ...mapActions({
       getPlayerData: 'dashboard/getPlayerData',
@@ -163,7 +167,6 @@ export default {
           clearInterval(this.importInterval)
           this.isImportingData = false
           this.$router.go(this.$router.currentRoute)
-          // send request to show all data
         }
       } catch (err) {
         console.log(err)

@@ -2,6 +2,7 @@ import os
 import time
 from datetime import datetime
 
+from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
 from sqlalchemy.ext.declarative import declarative_base
 import enum
 from sqlalchemy import (
@@ -13,6 +14,7 @@ from sqlalchemy import (
     ForeignKey,
     Enum,
     CheckConstraint,
+    Float,
 )
 from sqlalchemy.orm import relationship, sessionmaker
 
@@ -24,21 +26,28 @@ db_pw = os.environ.get("POSTGRES_PASSWORD", "postgres")
 db_host = os.environ.get("POSTGRES_HOST", "localhost")
 db_type = os.environ.get("DB_TYPE", "postgresql")
 db_database = os.environ.get("DB_DATABASE", "postgres")
+db_port = os.environ.get("DB_PORT", "5432")
 
 engine = create_engine(
-    f"{db_type}://{db_user}:{db_pw}@{db_host}/{db_database}",
+    f"{db_type}://{db_user}:{db_pw}@{db_host}:{db_port}/{db_database}",
 )
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
+async_engine = create_async_engine(
+    f"{db_type}+asyncpg://{db_user}:{db_pw}@{db_host}:{db_port}/{db_database}",
+)
+AsyncSessionLocal = sessionmaker(
+    autocommit=False, autoflush=False, bind=async_engine, class_=AsyncSession
+)
 
 Base = declarative_base()
 
 
 class DivisionEnum(str, enum.Enum):
-    one = "one"
-    two = "two"
-    three = "three"
-    four = "four"
+    I = "I"
+    II = "II"
+    III = "III"
+    IV = "IV"
 
 
 class Summoners(Base):
@@ -50,10 +59,10 @@ class Summoners(Base):
     level = Column(Integer, nullable=True)
     icon_path = Column(String, nullable=True)
     last_update = Column(Integer, nullable=True)
-    tier = Column(Enum(TierEnum))
-    division = Column(Enum(DivisionEnum))
+    tier = Column(Enum(TierEnum), nullable=True)
+    division = Column(Enum(DivisionEnum), nullable=True)
     league_points = Column(
-        Integer, CheckConstraint("league_points >= 0 AND league_points <= 100")
+        Integer, CheckConstraint("league_points >= 0"), nullable=True
     )
 
 
@@ -86,7 +95,25 @@ class ChallengeClasses(Base):
 
     name = Column(String, primary_key=True)
     class_name = Column(String, nullable=False, name="class")
+    description = Column(String, nullable=False)
     comparison_operator = Column(String, nullable=False)
+
+
+class Challenges(Base):
+    __tablename__ = "challenges"
+
+    name = Column(
+        String, ForeignKey("challengeclasses.name"), nullable=False, primary_key=True
+    )
+    summoner_id = Column(
+        String, ForeignKey("summoners.puuid"), nullable=False, primary_key=True
+    )
+    total = Column(Float)
+    average_per_game = Column(Float)
+    highscore = Column(Float)
+
+    summoner = relationship("Summoners", foreign_keys=[summoner_id])
+    challenge_class = relationship("ChallengeClasses", foreign_keys=[name])
 
 
 class Games(Base):

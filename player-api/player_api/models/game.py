@@ -41,6 +41,7 @@ class TeamMember(BaseModel):
     player: GamePlayer
     stats: PlayerStats
     team: TeamSide
+    lane: str
 
 
 class Game(BaseModel):

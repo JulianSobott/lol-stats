@@ -1,7 +1,10 @@
+import logging
 from concurrent import futures
 from playerImportRequest_pb2_grpc import ImporterServicer, add_ImporterServicer_to_server
 from playerImportRequest_pb2 import ImportRequest, ImportReply
 import grpc
+
+logger = logging.getLogger(__name__)
 
 
 class PlayerImportRequest(ImporterServicer):
@@ -12,8 +15,11 @@ class PlayerImportRequest(ImporterServicer):
         self.addSummoner = addSummonerMethod
 
     def import_player(self, request, context):
+        logger.debug(f"msg='starting import' {request.puuid=}")
         for progress, total in self.addSummoner(db=self.db, puuid=request.puuid):
+            logger.debug(f"msg='import progress' {progress=} {total=}  {request.puuid=}")
             yield ImportReply(games_imported=progress, total_games=total)
+        logger.debug(f"msg='finished import  {request.puuid=}")
 
 
 def serve(db, addSummonerMethod):

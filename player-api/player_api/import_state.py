@@ -1,3 +1,6 @@
+import os
+
+import grpc
 from sqlalchemy.orm import Session
 from starlette.background import BackgroundTasks
 
@@ -5,7 +8,8 @@ from player_api.log import get_logger
 from player_api.models.player import PlayerId
 from player_api.get_player import get_player_by_id
 from player_api.models.player import ImportProgress, ImportState
-
+from player_api.playerImportRequest_pb2 import ImportRequest, ImportReply
+from player_api.playerImportRequest_pb2_grpc import ImporterStub
 
 logger = get_logger(__name__)
 
@@ -41,7 +45,45 @@ def start_import(
 
 
 def import_player_task(player_id: PlayerId):
-    pass
+    with grpc.insecure_channel(
+        f"{os.environ.get('GRPC_IMPORT_HOST', 'localhost')}:50051"
+    ) as channel:
+        stub = ImporterStub(channel)
+        try:
+            for value in stub.import_player(ImportRequest(puuid=player_id)):
+                global_import_state.set_import_state(
+                    player_id,
+                    progress=ImportProgress(
+                        imported_games=value.games_imported,
+                        total_games=value.total_games,
+                        imported=False,
+                        percentage=ImportProgress.calc_percentage(
+                            value.games_imported, value.total_games
+                        ),
+                        import_state=ImportState.IMPORTING,
+                    ),
+                )
+                logger.debug(
+                    f"method=import_player_task {global_import_state.of(player_id)=}"
+                )
+            global_import_state.import_successfully_finished(player_id)
+            logger.debug(
+                f"method=import_player_task msg='finished importing' {global_import_state.of(player_id)=}"
+            )
+        except Exception as e:
+            global_import_state.set_import_state(
+                player_id,
+                progress=ImportProgress(
+                    imported_games=0,
+                    total_games=0,
+                    imported=False,
+                    percentage=0,
+                    import_state=ImportState.FAILED,
+                ),
+            )
+            logger.warning(
+                f"method=import_player_task msg='FAILED importing' {global_import_state.of(player_id)=} exception={e}"
+            )
 
 
 class GlobalImportState:
@@ -63,10 +105,16 @@ class GlobalImportState:
         return self.players[player_id]
 
     def is_player_currently_imported(self, player_id: PlayerId):
-        return player_id in self.players
+        return player_id in self.players and self.players[player_id].import_state in [
+            ImportState.IMPORTING,
+            ImportState.PENDING,
+        ]
 
     def set_import_state(self, player_id: PlayerId, progress: ImportProgress):
         self.players[player_id] = progress
+
+    def import_successfully_finished(self, player_id: PlayerId):
+        self.players.pop(player_id)
 
 
 global_import_state = GlobalImportState()

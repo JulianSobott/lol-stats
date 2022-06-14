@@ -36,7 +36,7 @@ export default {
         this.currentState = !this.currentState
         if (this.currentState) {
           await this.$axios.post(`/users/${this.userId}/achievements`, {
-            id: this.achivementId,
+            name: this.achivementId,
           })
         } else {
           await this.$axios.delete(
@@ -52,8 +52,7 @@ export default {
 </script>
 
 <style>
-.icon-tabler-star-active,
-.icon-tabler-star:hover {
+.icon-tabler-star-active{
   fill: #fff;
 }
 </style>

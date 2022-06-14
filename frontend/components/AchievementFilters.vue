@@ -42,7 +42,7 @@
         @playerSelected="playerChanged"
       />
     </div>
-    <div class="form-group mb-3">
+    <div class="form-group mb-3 d-none">
       <label class="form-label subheader mb-2">Champion</label>
       <div>
         <select v-model="filters.champion" class="form-select">

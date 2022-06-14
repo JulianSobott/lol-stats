@@ -22,6 +22,7 @@ from player_api.models.game import (
 )
 from player_api.models.player import PlayerId
 from player_api.models.responses import ExceptionMessage
+from player_api.riot_api import find_player_in_riot_api_by, SearchTerm
 
 DEFAULT_GAMES_PER_PAGE = 5
 
@@ -45,6 +46,12 @@ async def recent_games(
     logger.debug(f"method=recent_games {player_id=}")
     player = get_player_by_id(db, player_id)
     if player is None:
+        riot_player = find_player_in_riot_api_by(player_id, SearchTerm.id)
+        if riot_player:
+            logger.debug(
+                f"method=recent_games {player_id=} msg='player not in DB, but found in Riot API'"
+            )
+            return Page[Game](items=[], next="")
         raise HTTPException(status_code=404, detail="player not found")
     logger.debug(f"method=recent_games {player_id=} {player.name=}")
     if start_before is None:
@@ -117,7 +124,8 @@ async def compute_game(db: Session, game: Games, player_id: PlayerId) -> Game | 
                 id=player_game.summoner.puuid, name=player_game.summoner.name
             ),
             stats=stats,
-            team=TeamSide.red if game.team == TeamSide.red.value else TeamSide.blue,
+            team=player_game.team,
+            lane=player_game.lane,
         )
         if player_game.team == game.team:
             ally_team.append(team_member)
@@ -131,12 +139,24 @@ async def compute_game(db: Session, game: Games, player_id: PlayerId) -> Game | 
     return Game(
         match_id=game.match_id,
         victorious_team=TeamSide.red
-        if self.team == TeamSide.red and win
+        if (self.team == TeamSide.red and win)
+        or (self.team == TeamSide.blue and not win)
         else TeamSide.blue,
-        ally_team=ally_team,
-        enemy_team=enemy_team,
+        ally_team=_order_members(ally_team),
+        enemy_team=_order_members(enemy_team),
         duration=game.duration,
         timestamp=db_to_datetime(game.start_time),
         self=self,
         win=win,
     )
+
+
+def _order_members(members: list[TeamMember]) -> list[TeamMember]:
+    position_order = {
+        "TOP_LANE": 0,
+        "JUNGLE": 1,
+        "MID_LANE": 2,
+        "BOT_LANE": 3,
+        "UTILITY": 4,
+    }
+    return sorted(members, key=lambda m: position_order.get(m.lane, 5))

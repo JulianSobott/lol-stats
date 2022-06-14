@@ -1,0 +1,45 @@
+version: 1
+disable_existing_loggers: false
+formatters:
+    simple:
+        format: ts="%(asctime)s" lvl=%(levelname)s logger=%(name)s %(message)s
+
+
+
+handlers:
+    console:
+        class: logging.StreamHandler
+        level: DEBUG
+        formatter: simple
+
+root:
+    level: INFO
+    handlers: [console]
+    propagate: yes
+
+loggers:
+
+    __main__: &module_config
+        level: DEBUG
+        handlers: [console]
+        propagate: no
+
+    summoner:
+        *module_config
+    challenges:
+        *module_config
+    match_history:
+        *module_config
+    playerImportRequest:
+        *module_config
+    riotwatcherWrapper:
+        *module_config
+    static_data:
+        *module_config
+    db_connector:
+        *module_config
+
+    # external logger that is very verbose on INFO level
+    datapipelines:
+        level: WARNING
+        handlers: [ console ]

@@ -1,3 +1,6 @@
+import logging
+import os
+
 from riotwatcher import LolWatcher, ApiError
 from db_connector import db
 import time
@@ -6,7 +9,9 @@ import sys
 import match_history
 from riotwatcherWrapper import call_with_retry
 
-lol_watcher = LolWatcher('RGAPI-ba00cb63-7be0-4e50-8610-eb749b1ea70d')
+logger = logging.getLogger(__name__)
+
+lol_watcher = LolWatcher(os.environ["RIOT_API_KEY"])
 
 
 def add_summoner(db: db, summoner, rank, icon_url):
@@ -15,6 +20,7 @@ def add_summoner(db: db, summoner, rank, icon_url):
 
 
 def update_summoner(db: db, summoner):
+    logger.debug(f"method=update_summoner {summoner=}")
     icon_url = db.get_summoner_icon_url(summoner['profileIconId'])
     rank = _get_rank(summoner['id'])
     if db_summoner := db.get_summoner(puuid=summoner['puuid']):
@@ -54,8 +60,11 @@ def update_all(db: db, region: str) -> None:
         sys.stdout.write('\r')
         sys.stdout.write("[%-20s] %d%%\n" % ('='*int(20*j), 100*j))
         sys.stdout.flush()
-        for _ in update_summoner_by_region_id(db=db, id=row[1], region=region):
-            pass
+        try:
+            for _ in update_summoner_by_region_id(db=db, id=row[1], region=region):
+                pass
+        except Exception as exception:
+            logging.error(f"msg='Update summoner failed' {exception=} id={row[1]}")
         i += 1
 
 
@@ -79,12 +88,11 @@ def _get_rank(id: str):
     rank = lol_watcher.league.by_summoner(
         region='euw1', encrypted_summoner_id=id)
     if len(rank) == 0:
-        return {'tier': 'UNRANKED', 'rank': '', 'leaguePoints': 0}
-    found = False
+        return {'tier': 'UNRANKED', 'rank': None, 'leaguePoints': None}
     for s in rank:
         if s['queueType'] == 'RANKED_SOLO_5x5':
             rank = s
-            found = True
-    if not found:
+            break
+    else:
         rank = rank[0]
     return rank

@@ -24,13 +24,30 @@
 <script>
 export default {
   name: 'FavoriteCompetitorStar',
-  props: ['userId', 'competitorUuidId', 'initState'],
+  props: ['userId', 'competitorUuidId'],
   data() {
     return {
       currentState: this.initState,
     }
   },
+  mounted() {
+    this.isInCompetitorsList()
+  },
   methods: {
+    async isInCompetitorsList() {
+      try {
+        const response = await this.$axios.get(`/users/${this.userId}/competitors/`)
+        const competitors = response.data.competitors
+        const currentPlayerId = this.$route.params.id
+        const equalList = competitors.filter(function (e) {
+            return e.player_uuid === currentPlayerId
+          }
+        )
+        this.currentState = equalList.length > 0
+      } catch (e) {
+        console.log(e)
+      }
+    },
     async toggleFavoriteCompetitor() {
       try {
         this.currentState = !this.currentState
