@@ -1,0 +1,85 @@
+\documentclass[12pt]{article}
+\parindent0em
+\parskip 1ex plus 0.4ex minus 0.4ex
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%                   Packages                         %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\usepackage[a4paper,vmargin=30mm,hmargin=25mm]{geometry}
+\usepackage{polyglossia}
+\setdefaultlanguage{german}
+\usepackage{fontspec}
+\usepackage{hyperref}
+\usepackage[font=small,labelfont=bf]{caption}
+\usepackage{lipsum}
+\usepackage[table]{xcolor}
+\usepackage{sectsty}
+\usepackage{array}
+\usepackage{tabularx,stackengine,collcell}
+\usepackage{listings}
+\usepackage{todonotes}
+\usepackage{graphicx}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%                   Link-Setup                       %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\hypersetup{
+    colorlinks = true,
+    linkbordercolor = {white},
+    linkcolor = {blue}
+}
+\usepackage{graphicx}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%             Insert Graphic Command                 %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\graphicspath{ {./images/} }
+\newcommand{\graphic}[2]{
+\captionsetup{type=figure}
+\begin{center}
+\includegraphics[width=0.95\textwidth,height=0.75\textheight,keepaspectratio]{#1}
+\end{center}
+\captionof{figure}{#2}
+\bigskip
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%             	   Fonts & Colors                    %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\renewcommand{\familydefault}{\sfdefault}
+\definecolor{DarkBlue}{rgb}{0.212,0.373,0.576}
+\definecolor{LightBlue}{rgb}{0.318,0.506,0.741}
+\definecolor{TableBlue1}{rgb}{0.855,0.933,0.953}
+\definecolor{TableBlue2}{rgb}{0.929,0.965,0.976}
+\definecolor{grey}{rgb}{0.302,0.333,0.361}
+
+\sectionfont{\rmfamily\color{DarkBlue}}
+\subsectionfont{\rmfamily\color{LightBlue}}
+\subsubsectionfont{\rmfamily\color{LightBlue}}
+
+\newcommand{\method}[1]{
+{\color{grey}#1}
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%               Insert Table Command                 %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\renewcommand*{\arraystretch}{1.5}
+\newcolumntype{L}[1]{>{\bf\raggedright\let\newline\\\arraybackslash}m{#1}}
+\newcolumntype{C}[1]{>{\raggedright\let\newline\\\arraybackslash}m{#1}}
+
+\newbool{firstline}
+\newenvironment{atab}
+{\leavevmode\newline\newline
+\rowcolors{2}{TableBlue1}{TableBlue2}
+\begin{tabular*}{0.75\textwidth}[t]{L{3cm}C{13cm}}
+ & \\
+}{\end{tabular*}}
+
+\newenvironment{btab}
+{\newcommand{\h}[1]{$\makebox[\linewidth]{\textbf{##1}}$}\leavevmode\newline\newline
+\rowcolors{2}{TableBlue1}{TableBlue2}
+\begin{tabular*}{0.75\textwidth}[t]{C{16cm}}
+\\
+}{\end{tabular*}}
