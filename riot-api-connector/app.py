@@ -30,9 +30,10 @@ class riot_api_connector:
         while True:
             try:
                 if self.patch_changed():
+                    logger.info("msg='new patch available. updating static db data'")
                     self.add_patch()
             except Exception as exception:
-                logger.error(f"msg='Update all failed' {exception=}")
+                logger.error(f"msg='add_patch failed' {exception=}")
             logger.info("Updating ...")
             try:
                 summoner.update_all(db=self.db, region='EUW')
@@ -49,10 +50,10 @@ class riot_api_connector:
 
     def add_patch(self):
         self.db.add_patch(patch=str(cassiopeia.Patch.latest(region='EUW')))
-        static_data.update_champions()
-        static_data.update_items()
-        static_data.update_summoner_icons()
-        static_data.update_summoner_spells()
+        static_data.update_champions(self.db)
+        static_data.update_items(self.db)
+        static_data.update_summoner_icons(self.db)
+        static_data.update_summoner_spells(self.db)
 
 
 x = riot_api_connector()
