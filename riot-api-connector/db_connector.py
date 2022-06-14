@@ -59,7 +59,7 @@ class db:
         return self.cursor.fetchall()
 
     def add_summoner_icon(self, id: int, icon_path: str) -> None:
-        sql = """INSERT INTO summonericons(id, icon_path) VALUES (%s, %s) ON CONFLICT DO UPDATE SET icon_path = %s;"""
+        sql = """INSERT INTO summonericons(id, icon_path) VALUES (%s, %s) ON CONFLICT (id) DO UPDATE SET icon_path = %s;"""
         self.cursor.execute(sql, (id, icon_path, icon_path))
         self.connection.commit()
 
@@ -74,7 +74,7 @@ class db:
         self.connection.commit()
 
     def add_summoner_spell(self, id: int, name: str, icon_path: str) -> None:
-        sql = """INSERT INTO summonerspells(id, name, icon_path) VALUES (%s, %s, %s) ON CONFLICT DO UPDATE SET icon_path = %s;"""
+        sql = """INSERT INTO summonerspells(id, name, icon_path) VALUES (%s, %s, %s) ON CONFLICT (id) DO UPDATE SET icon_path = %s;"""
         self.cursor.execute(sql, (id, name, icon_path, icon_path))
         self.connection.commit()
 
@@ -84,7 +84,7 @@ class db:
         self.connection.commit()
 
     def add_champion(self, id: int, name: str, icon_path: str) -> None:
-        sql = """INSERT INTO champions(id, name, icon_path) VALUES (%s, %s, %s) ON CONFLICT DO UPDATE SET icon_path = %s;"""
+        sql = """INSERT INTO champions(id, name, icon_path) VALUES (%s, %s, %s) ON CONFLICT (id) DO UPDATE SET icon_path = %s;"""
         self.cursor.execute(sql, (id, name, icon_path, icon_path))
         self.connection.commit()
 
@@ -94,7 +94,7 @@ class db:
         self.connection.commit()
 
     def add_item(self, id: int, name: str, icon_path: str) -> None:
-        sql = """INSERT INTO items(id, name, icon_path) VALUES (%s, %s, %s) ON CONFLICT DO UPDATE SET icon_path = %s;"""
+        sql = """INSERT INTO items(id, name, icon_path) VALUES (%s, %s, %s) ON CONFLICT (id) DO UPDATE SET icon_path = %s;"""
         self.cursor.execute(sql, (id, name, icon_path, icon_path))
         self.connection.commit()
 
