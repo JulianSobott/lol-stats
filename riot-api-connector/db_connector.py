@@ -1,6 +1,7 @@
 import os
 import time
 import psycopg2
+from sentry_sdk import capture_exception
 
 
 class db:
@@ -18,6 +19,7 @@ class db:
                                                port=5432)
             self.cursor = self.connection.cursor()
         except (Exception, psycopg2.DatabaseError) as error:
+            capture_exception(error)
             print(error)
         return True
 
@@ -131,6 +133,7 @@ class db:
             if not no_commit:
                 self.connection.commit()
         except (TypeError) as error:
+            capture_exception(error)
             print(f'Error adding challenge {name} to database')
 
     def update_challenge(self, name: str, puuid: str, total: float, average_per_game: float, highscore: float, no_commit: bool = False) -> None:
@@ -141,6 +144,7 @@ class db:
             if not no_commit:
                 self.connection.commit()
         except (TypeError) as error:
+            capture_exception(error)
             print(f'Error updating challenge {name} in database')
 
     def get_challenge_entry(self, name: str, puuid: str):

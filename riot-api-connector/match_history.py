@@ -9,6 +9,7 @@ from cassiopeia.core.match import Participant, Side
 import riotwatcher
 from riotwatcher import LolWatcher, ApiError
 from riotwatcher._apis.league_of_legends import MatchApiV5
+from sentry_sdk import capture_exception
 
 from db_connector import db
 
@@ -64,6 +65,7 @@ def add_missing_games_to_db(db: db, match_ids, puuid: str):
         try:
             add_game_to_db(db=db, match=match, puuid=puuid, c=c)
         except Exception as e:
+            capture_exception(e)
             print(e, e.args)
             print(traceback.format_exc())
         yield i, len(match_ids)

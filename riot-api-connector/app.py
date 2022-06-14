@@ -12,6 +12,18 @@ import os
 import cassiopeia
 import static_data
 
+import sentry_sdk
+from sentry_sdk import capture_exception
+
+sentry_sdk.init(
+    dsn="https://4ebf5021c23444058fc40d48c097ad6b@o1288571.ingest.sentry.io/6505634",
+
+    # Set traces_sample_rate to 1.0 to capture 100%
+    # of transactions for performance monitoring.
+    # We recommend adjusting this value in production.
+    traces_sample_rate=1.0
+)
+
 with open(Path(__file__).parent.joinpath("logging.yml"), 'rt') as f:
     config = yaml.safe_load(f.read())
 logging.config.dictConfig(config)
@@ -33,11 +45,13 @@ class riot_api_connector:
                     logger.info("msg='new patch available. updating static db data'")
                     self.add_patch()
             except Exception as exception:
+                capture_exception(exception)
                 logger.error(f"msg='add_patch failed' {exception=}")
             logger.info("Updating ...")
             try:
                 summoner.update_all(db=self.db, region='EUW')
             except Exception as exception:
+                capture_exception(exception)
                 logger.error(f"msg='Update all failed' {exception=}")
             logger.info("Finished updating")
             time.sleep(300)

@@ -4,3 +4,4 @@ riotwatcher==3.2.2
 grpcio==1.46.3
 grpcio-tools==1.46.3
 pyyaml==6.0
+sentry-sdk==1.5.12

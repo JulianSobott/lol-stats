@@ -2,6 +2,8 @@ import logging
 import os
 
 from riotwatcher import LolWatcher, ApiError
+from sentry_sdk import capture_exception
+
 from db_connector import db
 import time
 import cassiopeia as cass
@@ -64,6 +66,7 @@ def update_all(db: db, region: str) -> None:
             for _ in update_summoner_by_region_id(db=db, id=row[1], region=region):
                 pass
         except Exception as exception:
+            capture_exception(exception)
             logging.error(f"msg='Update summoner failed' {exception=} id={row[1]}")
         i += 1
 
