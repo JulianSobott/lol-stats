@@ -200,7 +200,7 @@ class db:
     def get_last_patch(self):
         sql = """SELECT * FROM patches ORDER BY added DESC;"""
         self.cursor.execute(sql)
-        return self.cursor.fetchone()
+        return self.cursor.fetchone()[0]
 
     def add_patch(self, patch):
         sql = """INSERT INTO patches(patch, added) VALUES (%s, %s);"""
