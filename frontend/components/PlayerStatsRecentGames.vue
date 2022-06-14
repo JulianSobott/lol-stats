@@ -3,7 +3,7 @@
     <h3 class="mb-3">Recent Games</h3>
     <div class="card">
       <div class="table-responsive">
-        <table class="table table-vcenter card-table">
+        <table class="table table-vcenter card-table table-responsive">
           <thead>
             <tr>
               <th class="w-1">Victory</th>
@@ -31,23 +31,27 @@
               </td>
               <td>
                 <div class="row">
-                  <div class="col-12 col-sm-6">
+                  <div class="col-6 col-sm-6">
                     <TeamList :match="game" :team="game.ally_team" />
                   </div>
-                  <div class="col-12 col-sm-6">
+                  <div class="col-6 col-sm-6">
                     <TeamList :match="game" :team="game.enemy_team" />
                   </div>
                 </div>
               </td>
               <td class="text-center">
-                {{ game.self.stats.kills }} / {{ game.self.stats.deaths }} /
-                {{ game.self.stats.assists }}
+                <span style="display: inline; white-space: nowrap">
+                  {{ game.self.stats.kills }} / {{ game.self.stats.deaths }} /
+                  {{ game.self.stats.assists }}
+                </span>
               </td>
               <td class="text-center">
                 {{ converDuration(game.duration) }}
               </td>
               <td class="text-center">
-                {{ converTimestamp(game.timestamp) }}
+                <span style="display: inline; white-space: nowrap">
+                  {{ converTimestamp(game.timestamp) }}
+                </span>
               </td>
             </tr>
           </tbody>
@@ -109,7 +113,7 @@ export default {
       return `background-image: url("${champion.icon_path}");`
     },
     converTimestamp(value) {
-      return moment(String(value)).format('MM-DD-YYYY')
+      return moment(String(value)).format('YYYY-MM-DD HH:mm')
     },
     converDuration(secs) {
       return moment.utc(secs * 1000).format('mm:ss')
