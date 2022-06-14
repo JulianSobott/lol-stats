@@ -26,7 +26,6 @@ class riot_api_connector:
 
     def patch_changed(self) -> bool:
         last = self.db.get_last_patch()
-        print(str(cassiopeia.Patch.latest(region='EUW')))
         if not last:
             return True
         return last == str(cassiopeia.Patch.latest(region='euw'))
