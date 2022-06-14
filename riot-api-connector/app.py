@@ -10,6 +10,7 @@ import time
 from threading import Thread
 import os
 import cassiopeia
+import static_data
 
 with open(Path(__file__).parent.joinpath("logging.yml"), 'rt') as f:
     config = yaml.safe_load(f.read())
@@ -27,6 +28,12 @@ class riot_api_connector:
 
     def update_loop(self):
         while True:
+            try:
+                if self.patch_changed():
+                    logger.info("msg='new patch available. updating static db data'")
+                    self.add_patch()
+            except Exception as exception:
+                logger.error(f"msg='add_patch failed' {exception=}")
             logger.info("Updating ...")
             try:
                 summoner.update_all(db=self.db, region='EUW')
@@ -35,22 +42,22 @@ class riot_api_connector:
             logger.info("Finished updating")
             time.sleep(300)
 
+    def patch_changed(self) -> bool:
+        last = self.db.get_last_patch()
+        if not last:
+            return True
+        return last == str(cassiopeia.Patch.latest(region='euw'))
+
+    def add_patch(self):
+        self.db.add_patch(patch=str(cassiopeia.Patch.latest(region='EUW')))
+        static_data.update_champions(self.db)
+        static_data.update_items(self.db)
+        static_data.update_summoner_icons(self.db)
+        static_data.update_summoner_spells(self.db)
+
 
 x = riot_api_connector()
 grpc_thread = Thread(target=playerImportRequest.serve,
                      args=(x.db, summoner.update_summoner_by_puuid))
 grpc_thread.start()
 x.update_loop()
-# x.update_summoner_by_name(name='LinkX20', region='EUW')
-# match_history.riot_watcher_mh(
-#    puuid='i6rhuj9rVlNXt0WRoGzMelbaGItog4yYs6mC8yZXQOY2rpuY68virbdeyvnoptwJ07u1cgZKW1tBPA', start_time=1627776000)
-# x.update_summoner_by_puuid(
-#     'i6rhuj9rVlNXt0WRoGzMelbaGItog4yYs6mC8yZXQOY2rpuY68virbdeyvnoptwJ07u1cgZKW1tBPA')
-# x.update_all(region='EUW')
-# playerImportRequest.serve(lambda y: x.update_summoner_by_region_id(id=y, region='EUW'))
-# x.update_all(region='EUW')
-# x.db.create_tables()
-#x.update_summoner_by_name('LinkX20', region='EUW')
-# x.get_summoner('gravitysuit', region='EUW')
-# x.get_summoner('LinkX20', 'EUW')
-# static_data.update_summoner_icons(x.db)

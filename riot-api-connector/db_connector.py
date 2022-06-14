@@ -1,4 +1,5 @@
 import os
+import time
 import psycopg2
 
 
@@ -58,7 +59,7 @@ class db:
         return self.cursor.fetchall()
 
     def add_summoner_icon(self, id: int, icon_path: str) -> None:
-        sql = """INSERT INTO summonericons(id, icon_path) VALUES (%s, %s);"""
+        sql = """INSERT INTO summonericons(id, icon_path) VALUES (%s, %s) ON CONFLICT DO UPDATE;"""
         self.cursor.execute(sql, (id, icon_path))
         self.connection.commit()
 
@@ -73,7 +74,7 @@ class db:
         self.connection.commit()
 
     def add_summoner_spell(self, id: int, name: str, icon_path: str) -> None:
-        sql = """INSERT INTO summonerspells(id, name, icon_path) VALUES (%s, %s, %s);"""
+        sql = """INSERT INTO summonerspells(id, name, icon_path) VALUES (%s, %s, %s) ON CONFLICT DO UPDATE;"""
         self.cursor.execute(sql, (id, name, icon_path))
         self.connection.commit()
 
@@ -83,7 +84,7 @@ class db:
         self.connection.commit()
 
     def add_champion(self, id: int, name: str, icon_path: str) -> None:
-        sql = """INSERT INTO champions(id, name, icon_path) VALUES (%s, %s, %s);"""
+        sql = """INSERT INTO champions(id, name, icon_path) VALUES (%s, %s, %s) ON CONFLICT DO UPDATE;"""
         self.cursor.execute(sql, (id, name, icon_path))
         self.connection.commit()
 
@@ -93,7 +94,7 @@ class db:
         self.connection.commit()
 
     def add_item(self, id: int, name: str, icon_path: str) -> None:
-        sql = """INSERT INTO items(id, name, icon_path) VALUES (%s, %s, %s);"""
+        sql = """INSERT INTO items(id, name, icon_path) VALUES (%s, %s, %s) ON CONFLICT DO UPDATE;"""
         self.cursor.execute(sql, (id, name, icon_path))
         self.connection.commit()
 
@@ -192,4 +193,14 @@ class db:
         for e in d:
             print(e['win'], e['side'], e['g'], e['s'])
             self.cursor.execute(sql, (e['win'], e['side'], e['g'], e['s']))
+        self.connection.commit()
+
+    def get_last_patch(self):
+        sql = """SELECT * FROM patches ORDER BY added DESC;"""
+        self.cursor.execute(sql)
+        return self.cursor.fetchone()[0]
+
+    def add_patch(self, patch):
+        sql = """INSERT INTO patches(patch, added) VALUES (%s, %s);"""
+        self.cursor.execute(sql, (patch, time.time()))
         self.connection.commit()
