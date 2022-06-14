@@ -59,8 +59,8 @@ class db:
         return self.cursor.fetchall()
 
     def add_summoner_icon(self, id: int, icon_path: str) -> None:
-        sql = """INSERT INTO summonericons(id, icon_path) VALUES (%s, %s) ON CONFLICT DO UPDATE;"""
-        self.cursor.execute(sql, (id, icon_path))
+        sql = """INSERT INTO summonericons(id, icon_path) VALUES (%s, %s) ON CONFLICT DO UPDATE SET icon_path = %s;"""
+        self.cursor.execute(sql, (id, icon_path, icon_path))
         self.connection.commit()
 
     def get_summoner_icon_url(self, id: int) -> str:
@@ -74,8 +74,8 @@ class db:
         self.connection.commit()
 
     def add_summoner_spell(self, id: int, name: str, icon_path: str) -> None:
-        sql = """INSERT INTO summonerspells(id, name, icon_path) VALUES (%s, %s, %s) ON CONFLICT DO UPDATE;"""
-        self.cursor.execute(sql, (id, name, icon_path))
+        sql = """INSERT INTO summonerspells(id, name, icon_path) VALUES (%s, %s, %s) ON CONFLICT DO UPDATE SET icon_path = %s;"""
+        self.cursor.execute(sql, (id, name, icon_path, icon_path))
         self.connection.commit()
 
     def clear_summoner_spells(self) -> None:
@@ -84,8 +84,8 @@ class db:
         self.connection.commit()
 
     def add_champion(self, id: int, name: str, icon_path: str) -> None:
-        sql = """INSERT INTO champions(id, name, icon_path) VALUES (%s, %s, %s) ON CONFLICT DO UPDATE;"""
-        self.cursor.execute(sql, (id, name, icon_path))
+        sql = """INSERT INTO champions(id, name, icon_path) VALUES (%s, %s, %s) ON CONFLICT DO UPDATE SET icon_path = %s;"""
+        self.cursor.execute(sql, (id, name, icon_path, icon_path))
         self.connection.commit()
 
     def clear_champions(self) -> None:
@@ -94,8 +94,8 @@ class db:
         self.connection.commit()
 
     def add_item(self, id: int, name: str, icon_path: str) -> None:
-        sql = """INSERT INTO items(id, name, icon_path) VALUES (%s, %s, %s) ON CONFLICT DO UPDATE;"""
-        self.cursor.execute(sql, (id, name, icon_path))
+        sql = """INSERT INTO items(id, name, icon_path) VALUES (%s, %s, %s) ON CONFLICT DO UPDATE SET icon_path = %s;"""
+        self.cursor.execute(sql, (id, name, icon_path, icon_path))
         self.connection.commit()
 
     def clear_items(self) -> None:
