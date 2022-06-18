@@ -11,11 +11,6 @@
               <!-- Page pre-title -->
               <h2 class="page-title">Achievements</h2>
             </div>
-            <div class="col-12 col-md-auto ms-auto d-print-none">
-              <button class="btn btn-primary d-sm-inline-block" @click="fetchAchievements()">
-                Refresh
-              </button>
-            </div>
             <!-- Page title actions -->
             <div class="col-auto col-md-auto ms-auto d-print-none">
               <div class="btn-list">
@@ -47,6 +42,15 @@
                   </svg>
                 </a>
               </div>
+            </div>
+            <div class="col-auto col-md-auto ms-auto d-print-none">
+              <button class="btn btn-primary d-sm-inline-block btn-icon" @click="fetchAchievements()">
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-refresh" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                  <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                  <path d="M20 11a8.1 8.1 0 0 0 -15.5 -2m-.5 -4v4h4"></path>
+                  <path d="M4 13a8.1 8.1 0 0 0 15.5 2m.5 4v-4h-4"></path>
+                </svg>
+              </button>
             </div>
           </div>
         </div>
