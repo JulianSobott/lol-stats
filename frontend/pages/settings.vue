@@ -12,9 +12,7 @@
           <div class="card-body text-center py-2 p-sm-5">
             <h1 class="mt-1">Welcome to LoL Stats!</h1>
             <p class="text-muted">
-              On LoL Stats you can compare your player stats and achievements
-              with all League of legends players over the world or just with
-              your competitors.
+              On LoL Stats you can compare your player stats and achievements with all League of Legends players around the world or just with your competitors.
             </p>
           </div>
         </div>
@@ -45,9 +43,7 @@
               @playerSelected="playerSelected"
             />
             <div class="form-hint">
-              In order for you to view player information and statistics, we
-              still need your gamer tag. Please enter your gamer tag in this
-              field, which you also use in <strong>League of Legends</strong>.
+              Please enter your gamer tag, which you also use in <strong>League of Legends</strong>.
             </div>
           </div>
         </div>
