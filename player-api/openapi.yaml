@@ -206,6 +206,40 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/HTTPValidationError'
+  /achievements/leaderboards:
+    get:
+      summary: Get Leaderboards
+      operationId: get_leaderboards_achievements_leaderboards_get
+      parameters:
+      - required: false
+        schema:
+          title: Challenges
+          type: integer
+          default: 3
+        name: challenges
+        in: query
+      - required: false
+        schema:
+          title: Players
+          type: integer
+          default: 5
+        name: players
+        in: query
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Leaderboards'
+        '204':
+          description: Filter didn't match any challenges
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
 components:
   schemas:
     Achievement:
@@ -310,6 +344,21 @@ components:
         imported:
           title: Imported
           type: boolean
+    Challenge:
+      title: Challenge
+      required:
+      - name
+      - players
+      type: object
+      properties:
+        name:
+          title: Name
+          type: string
+        players:
+          title: Players
+          type: array
+          items:
+            $ref: '#/components/schemas/LeaderboardPlayer'
     Champion:
       title: Champion
       required:
@@ -435,6 +484,38 @@ components:
       - FAILED
       type: string
       description: An enumeration.
+    LeaderboardPlayer:
+      title: LeaderboardPlayer
+      required:
+      - id
+      - name
+      - player_icon_path
+      - value
+      type: object
+      properties:
+        id:
+          title: Id
+          type: string
+        name:
+          title: Name
+          type: string
+        player_icon_path:
+          title: Player Icon Path
+          type: string
+        value:
+          title: Value
+          type: number
+    Leaderboards:
+      title: Leaderboards
+      required:
+      - challenges
+      type: object
+      properties:
+        challenges:
+          title: Challenges
+          type: array
+          items:
+            $ref: '#/components/schemas/Challenge'
     MostPlayed:
       title: MostPlayed
       required:
@@ -563,6 +644,7 @@ components:
       - player
       - stats
       - team
+      - lane
       type: object
       properties:
         champion:
@@ -573,6 +655,9 @@ components:
           $ref: '#/components/schemas/PlayerStats'
         team:
           $ref: '#/components/schemas/TeamSide'
+        lane:
+          title: Lane
+          type: string
     TeamSide:
       title: TeamSide
       enum:
