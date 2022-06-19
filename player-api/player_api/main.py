@@ -12,11 +12,11 @@ from player_api.endpoints import (
     get_player,
     recent_games,
     achievements,
+    leaderboards,
 )
 
 sentry_sdk.init(
     dsn="https://2068deda898a4da48826ee7956fe3924@o1288571.ingest.sentry.io/6505584",
-
     # Set traces_sample_rate to 1.0 to capture 100%
     # of transactions for performance monitoring.
     # We recommend adjusting this value in production,
@@ -48,6 +48,7 @@ app.include_router(find_player.router)
 app.include_router(import_player.router)
 app.include_router(recent_games.router)
 app.include_router(achievements.router)
+app.include_router(leaderboards.router)
 
 
 FastAPIInstrumentor.instrument_app(app)
