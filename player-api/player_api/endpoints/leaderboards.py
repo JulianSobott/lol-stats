@@ -1,3 +1,5 @@
+import asyncio
+
 from fastapi import APIRouter, Depends, Query
 from pydantic import BaseModel
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -28,13 +30,19 @@ async def get_leaderboards(
     db: AsyncSession = Depends(get_async_db),
 ):
     challenges = await _get_random_challenges(db, n=num_challenges)
+    top_players = await asyncio.gather(
+        *[
+            _get_top_players(db, challenge=challenge, n=num_players)
+            for challenge in challenges
+        ]
+    )
     return Leaderboards(
         challenges=[
             Challenge(
                 name=challenge.name,
-                players=await _get_top_players(db, challenge=challenge, n=num_players),
+                players=top_players[i],
             )
-            for challenge in challenges
+            for i, challenge in enumerate(challenges)
         ]
     )
 
