@@ -228,9 +228,9 @@
                         <div class="mb-2">
                           <p class="empty-title">Player not imported</p>
                           <p class="empty-subtitle text-muted">
-                            There is no player data in our system yet. To be
-                            able to compare you with the player, please click
-                            the button below import the player.
+                            Your data is not yet present in our system. To be
+                            able to compare yourself with others please click
+                            the button below to import your data.
                           </p>
                         </div>
                         <div class="w-100">
