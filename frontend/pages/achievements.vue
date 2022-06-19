@@ -64,7 +64,7 @@
             </div>
             <div class="col-9 col-achivements-table">
               <div v-if="!loadingAchiements" class="card-tabs">
-                <div v-if="achievements.length == 0" class="card">
+                <div v-if="achievements.length == 0 && !showImportPlayerModal" class="card">
                   <div class="card-body">
                       <div class="empty">
                         <div class="empty-img">
@@ -228,9 +228,9 @@
                         <div class="mb-2">
                           <p class="empty-title">Player not imported</p>
                           <p class="empty-subtitle text-muted">
-                            There is no player data in our system yet. To be
-                            able to compare you with the player, please click
-                            the button below import the player.
+                            Your data is not yet present in our system. To be
+                            able to compare yourself with others please click
+                            the button below to import your data.
                           </p>
                         </div>
                         <div class="w-100">
@@ -458,11 +458,22 @@ export default {
       }
       this.loadingAchiements = false
     },
+    async fetchAchievementsFromPlayer() {
+      this.loadingAchiements = true
+      try {
+        const response = await this.$axios.get(
+          `/achievements?me=${this.$auth.user.id}?&competitor=${this.selectedPlayerUuid}`
+        )
+        this.achievements = response.data.items
+      } catch (err) {
+        console.log(err)
+      }
+      this.loadingAchiements = false
+    },
     async importPlayer() {
       try {
         const response = await this.$axios.post(
           `/players/${this.selectedPlayerUuid}/import`,
-          {}
         )
         this.importData = response.data
 
@@ -470,7 +481,7 @@ export default {
           clearInterval(this.importInterval)
           this.isImportingData = false
           this.showImportPlayerModal = false
-          // send request to show all data
+          this.fetchAchievementsFromPlayer()
         }
       } catch (err) {
         console.log(err)
@@ -493,7 +504,6 @@ export default {
     },
     triggerImportPlayer() {
       this.isImportingData = true
-
       this.importPlayer()
       this.importInterval = setInterval((async) => {
         this.importPlayer()
