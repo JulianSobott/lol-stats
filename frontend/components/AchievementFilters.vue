@@ -99,7 +99,6 @@ export default {
         champion: '*',
         rank: '*',
       },
-      // TODO: all champs fetched from backend
       allChampions: [
         'Aatrox',
         'Ahri',

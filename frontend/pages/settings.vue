@@ -92,8 +92,6 @@ export default {
       this.firstSetup = this.$route.query.firstsetup === 'true'
     } else {
       this.firstSetup = false
-      // TODO: Make query to player backend
-      // Fetch current player settings
       this.getPlayerData()
     }
   },
