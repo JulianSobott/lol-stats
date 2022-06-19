@@ -80,7 +80,9 @@
                           ></span>
                           <div class="flex-fill">
                             <div class="font-weight-medium m-2">
-                              <span>{{ player.name }}</span>
+                              <span>
+                                <NuxtLink :to="'/profiles/' + player.id">{{ player.name }}</NuxtLink>
+                              </span>
                             </div>
                           </div>
                         </div>
