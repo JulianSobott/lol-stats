@@ -81,13 +81,13 @@
                           <div class="flex-fill">
                             <div class="font-weight-medium m-2">
                               <span>
-                                <NuxtLink :to="'/profiles/' + player.id">{{ player.name }}</NuxtLink>
+                                <NuxtLink :to="'/profiles/' + player.id" class="text-white">{{ player.name }}</NuxtLink>
                               </span>
                             </div>
                           </div>
                         </div>
                       </td>
-                      <td class="text-center">{{ player.value }}</td>
+                      <td class="text-center">{{ formatFloat(player.value) }}</td>
                     </tr>
                   </tbody>
                 </table>
@@ -166,6 +166,9 @@ export default {
     }
   },
   methods: {
+    formatFloat(value) {
+      return Math.trunc(value * 1000) / 1000
+    },
     championIconPath(path) {
       return `background-image: url("${path}");`
     },
