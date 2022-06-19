@@ -30,19 +30,13 @@ async def get_leaderboards(
     db: AsyncSession = Depends(get_async_db),
 ):
     challenges = await _get_random_challenges(db, n=num_challenges)
-    top_players = await asyncio.gather(
-        *[
-            _get_top_players(db, challenge=challenge, n=num_players)
-            for challenge in challenges
-        ]
-    )
     return Leaderboards(
         challenges=[
             Challenge(
                 name=challenge.name,
-                players=top_players[i],
+                players=await _get_top_players(db, challenge=challenge, n=num_players),
             )
-            for i, challenge in enumerate(challenges)
+            for challenge in challenges
         ]
     )
 
@@ -50,11 +44,11 @@ async def get_leaderboards(
 async def _get_random_challenges(
     db: AsyncSession, n: int
 ) -> list["_SelectedChallenge"]:
-    q = select(ChallengeClasses.name, ChallengeClasses.comparison_operator)
+    q = select(ChallengeClasses.name, ChallengeClasses.comparison_operator, ChallengeClasses.description)
     all_challenges = list((await db.execute(q)))
     selected_challenges = random.choices(all_challenges, k=n)
     return [
-        _SelectedChallenge(name=row.name, comparator=row.comparison_operator)
+        _SelectedChallenge(name=row.description, comparator=row.comparison_operator, id=row.name)
         for row in selected_challenges
     ]
 
@@ -71,7 +65,7 @@ async def _get_top_players(
             Challenges.average_per_game,
         )
         .join(Summoners)
-        .where(Challenges.name == challenge.name)
+        .where(Challenges.name == challenge.id, Summoners.last_update.is_not(None))
         .order_by(cmp(Challenges.average_per_game))
         .limit(n)
     )
@@ -88,5 +82,6 @@ async def _get_top_players(
 
 
 class _SelectedChallenge(BaseModel):
+    id: str
     name: str
     comparator: str
