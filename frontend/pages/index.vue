@@ -49,10 +49,14 @@
         </div>
         <div class="container-xl mt-4">
           <div class="row g-4">
-            <div class="col-12 col-lg-4">
+            <div
+              v-for="item in challenges.challenges"
+              :key="item.challenge"
+              class="col-12 col-lg-4"
+            >
               <div class="card h-100">
                 <div class="card-header">
-                  <h3 class="card-title">Kills</h3>
+                  <h3 class="card-title">{{ item.name }}</h3>
                 </div>
                 <table class="table card-table table-vcenter">
                   <thead>
@@ -62,50 +66,34 @@
                       <th class="text-center">AVG</th>
                     </tr>
                   </thead>
-                  <tbody></tbody>
-                </table>
-              </div>
-            </div>
-            <div class="col-12 col-lg-4">
-              <div class="card h-100">
-                <div class="card-header">
-                  <h3 class="card-title">Kills</h3>
-                </div>
-                <table class="table card-table table-vcenter">
-                  <thead>
-                    <tr>
-                      <th class="w-1">No</th>
-                      <th>Player</th>
-                      <th class="text-center">AVG</th>
+                  <tbody>
+                    <tr
+                      v-for="(player, index) in item.players"
+                      :key="player.id"
+                    >
+                      <td>{{ index + 1 }}</td>
+                      <td class="p-0">
+                        <div class="d-flex px-3 align-items-center">
+                          <span
+                            class="avatar avatar-xs avatar-rounded"
+                            :style="championIconPath(player.player_icon_path)"
+                          ></span>
+                          <div class="flex-fill">
+                            <div class="font-weight-medium m-2">
+                              <span>{{ player.name }}</span>
+                            </div>
+                          </div>
+                        </div>
+                      </td>
+                      <td class="text-center">{{ player.value }}</td>
                     </tr>
-                  </thead>
-                  <tbody></tbody>
-                </table>
-              </div>
-            </div>
-            <div class="col-12 col-lg-4">
-              <div class="card h-100">
-                <div class="card-header">
-                  <h3 class="card-title">Kills</h3>
-                </div>
-                <table class="table card-table table-vcenter">
-                  <thead>
-                    <tr>
-                      <th class="w-1">No</th>
-                      <th>Player</th>
-                      <th class="text-center">AVG</th>
-                    </tr>
-                  </thead>
-                  <tbody></tbody>
+                  </tbody>
                 </table>
               </div>
             </div>
             <div class="col-12">
               <div class="text-center">
-                <a
-                  href="#"
-                  class="btn btn-primary"
-                >
+                <button class="btn btn-primary" @click="fetchRandomStats()">
                   <span>
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
@@ -154,7 +142,7 @@
                     </svg>
                   </span>
                   Fetch Stats
-                </a>
+                </button>
               </div>
             </div>
           </div>
@@ -167,5 +155,26 @@
 <script>
 export default {
   name: 'IndexPage',
+  mounted() {
+    this.fetchRandomStats()
+  },
+  data() {
+    return {
+      challenges: {},
+    }
+  },
+  methods: {
+    championIconPath(path) {
+      return `background-image: url("${path}");`
+    },
+    async fetchRandomStats() {
+      try {
+        const response = await this.$axios.get(`/achievements/leaderboards`)
+        this.challenges = response.data
+      } catch (err) {
+        console.log(err)
+      }
+    },
+  },
 }
 </script>
