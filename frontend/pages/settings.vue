@@ -39,6 +39,7 @@
           <div class="mb-3">
             <label class="form-label">Select your Player Name</label>
             <PlayerSearchInput
+              class="mb-3"
               ref="playerSearchInput"
               @playerSelected="playerSelected"
             />
