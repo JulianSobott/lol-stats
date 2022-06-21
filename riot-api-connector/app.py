@@ -71,7 +71,9 @@ class riot_api_connector:
 
 
 x = riot_api_connector()
+grpc_db = db()
+grpc_db.connect()
 grpc_thread = Thread(target=playerImportRequest.serve,
-                     args=(x.db, summoner.update_summoner_by_puuid))
+                     args=(grpc_db, summoner.update_summoner_by_puuid))
 grpc_thread.start()
 x.update_loop()
