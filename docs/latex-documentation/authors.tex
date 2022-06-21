@@ -1,0 +1,119 @@
+\section{Authors}
+\begin{itemize}
+\item
+\textbf{Introduction and Goals:} SP
+\item
+\textbf{Constraints:}
+	\begin{itemize}
+	\item
+	Riot API Ratelimits: TS
+	\item
+	Server performance limit: CG
+	\end{itemize}
+\item
+\textbf{Context and Scope:}
+	\begin{itemize}
+	\item
+	Context Diagram: JS
+	\item
+	Riot API: TS
+	\begin{itemize}
+		\item
+		Cassiopeia: TS
+		\item
+		Riot Watcher: TS
+	\end{itemize}
+	\end{itemize}
+\item
+\textbf{Solution Strategy:}
+\begin{itemize}
+	\item
+	Service Diagram: JS
+	\item
+	Technologies:
+	\begin{itemize}
+		\item
+		Games Importer: TS
+		\item
+		LoL Database: TS
+		\item
+		Player API: JS
+		\item
+		User Management: SP
+		\item
+		Frontend: CG
+	\end{itemize}
+	\item
+	Architecture:
+	\begin{itemize}
+	\item
+	Drivers: JS
+	\item
+	Patterns: JS
+	\item
+	Cross-Mapping: JS
+	\end{itemize}
+\end{itemize}
+\item
+\textbf{Building Block View:}
+\begin{itemize}
+	\item
+	Games Importer Service: TS
+	\item
+	Player API: JS
+	\item
+	User Management: SP
+	\item 
+	Frontend: CG
+\end{itemize}
+\item
+\textbf{Runtime View:}
+\begin{itemize}
+	\item
+	Register Account: SP
+	\item
+	Import new player: JS + CG
+	\item
+	Compare players: JS + CG
+	\item
+	Error handling:
+	\begin{itemize}
+		\item
+		Game importing: TS
+		\item
+		Monitoring: JS
+	\end{itemize}
+\end{itemize}
+\item
+\textbf{Deployment View:} JS
+\item
+\textbf{Crosscutting Concepts:}
+\begin{itemize}
+	\item
+	LoL Database ER-Diagram: TS
+	\item
+	User Database ER-Diagram: SP
+	\item
+	User Management API Specification: SP
+	\item
+	Player API Specification: JS
+	\item
+	GRPC Interface: TS
+	\item
+	Configurability and Traffic: JS
+\end{itemize}
+\item
+\textbf{Architecture Decisions:} CG
+\item
+\textbf{Risks:}
+\begin{itemize}
+	\item
+	Database performance CG
+	\item
+	Riot API Ratelimits TS
+	\item
+	Changes in Riot API TS
+	\item
+	Security CG
+\end{itemize}
+\end{itemize}
