@@ -4,7 +4,7 @@ import time
 import traceback
 
 import cassiopeia as cass
-from cassiopeia import Summoner, Patch, MatchHistory, Match, GameType
+from cassiopeia import Summoner, Patch, MatchHistory, Match, GameType, Map
 from cassiopeia.core.match import Participant, Side
 import riotwatcher
 from riotwatcher import LolWatcher, ApiError
@@ -57,7 +57,7 @@ def add_missing_games_to_db(db: db, match_ids, puuid: str):
     i = 0
     for match_id in match_ids:
         match: Match = cass.get_match(id=match_id, region='EUW')
-        if match.game_type != GameType.matched:
+        if match.game_type != GameType.matched or match.map.id != 1: # id 1 = Summoners Rift
             continue
         if db.has_game(match_id=match.id, summoner_id=puuid):
             continue
