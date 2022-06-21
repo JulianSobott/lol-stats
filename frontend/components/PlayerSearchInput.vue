@@ -1,5 +1,24 @@
 <template>
-  <div class="input-icon mb-3">
+  <div class="input-icon">
+    <span class="input-icon-addon">
+      <!-- Download SVG icon from http://tabler-icons.io/i/search -->
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        class="icon"
+        width="24"
+        height="24"
+        viewBox="0 0 24 24"
+        stroke-width="2"
+        stroke="currentColor"
+        fill="none"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      >
+        <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+        <circle cx="10" cy="10" r="7"></circle>
+        <line x1="21" y1="21" x2="15" y2="15"></line>
+      </svg>
+    </span>
     <input
       v-model="playername"
       :class="{ 'is-invalid': error, 'is-valid': success && !loading }"
@@ -9,21 +28,30 @@
       :disabled="disabled"
       @input="debouncePlayerSearch"
     />
-    <span v-if="loading && !error" class="input-icon-addon">
-      <div
-        class="spinner-border spinner-border-sm text-muted"
-        role="status"
-      ></div>
-    </span>
-    <div v-if="error" class="invalid-feedback">Playername not found.</div>
-    <div v-if="success" class="invalid-feedback text-green d-block">
-      Player found.
+    <div v-if="showMessage">
+      <span v-if="loading && !error" class="input-icon-addon">
+        <div
+          class="spinner-border spinner-border-sm text-muted"
+          role="status"
+        ></div>
+      </span>
+      <div v-if="error" class="invalid-feedback">Playername not found.</div>
+      <div v-if="success" class="invalid-feedback text-green d-block">
+        Player found.
+      </div>
     </div>
   </div>
 </template>
 
 <script>
 export default {
+  props: {
+    showMessage: {
+      type: Boolean,
+      default: true,
+      required: false
+    },
+  },
   name: 'PlayerSearchInput',
   data() {
     return {

@@ -38,6 +38,7 @@
     <div class="form-group mb-3" :class="{'d-none': !displayPlayerSearch}">
       <label class="form-label subheader mb-2">Player</label>
       <PlayerSearchInput
+        class="mb-3"
         ref="PlayerSearchInput"
         @playerSelected="playerChanged"
       />

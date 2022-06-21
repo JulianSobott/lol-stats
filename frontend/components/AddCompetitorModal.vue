@@ -21,6 +21,7 @@
           <div class="mb-3">
             <label class="form-label">Player</label>
             <PlayerSearchInput
+              class="mb-3"
               ref="PlayerSearchInput"
               @playerSelected="playerSelected"
             />
