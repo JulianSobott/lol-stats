@@ -101,6 +101,40 @@
                 <div class="card-body">
                   <h3 class="card-title">Player data is not imported!</h3>
                   <p>Click the Import Button to import the player.</p>
+                  <div v-if="isImportingData" class="d-flex mb-2">
+                    <div v-if="importData.import_state == 'IMPORTING'">
+                      Import: Recent matches
+                      {{ importData.imported_games }} of
+                      {{ importData.total_games }}
+                    </div>
+                    <div v-if="importData.import_state == 'PENDING'">
+                      Start importing data...
+                    </div>
+                    <div class="ms-auto">
+                      <span
+                        v-if="importData.import_state == 'IMPORTING'"
+                        class="text-white d-inline-flex align-items-center lh-1"
+                      >
+                        {{ importData.percentage }}%
+                      </span>
+                    </div>
+                  </div>
+                  <div v-if="isImportingData" class="progress mb-2">
+                    <div
+                      v-if="
+                        ['PENDING', 'FINISHED'].includes(
+                          importData.import_state
+                        )
+                      "
+                      class="progress-bar progress-bar-indeterminate bg-lime"
+                    ></div>
+                    <div
+                      v-else-if="importData.import_state == 'IMPORTING'"
+                      class="progress-bar bg-lime"
+                      :style="{ width: importData.percentage + '%' }"
+                      role="progressbar"
+                    ></div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -131,6 +165,13 @@ export default {
       isImportingData: false,
       importInterval: null,
       isFetchingData: false,
+      importData: {
+        import_state: 'PENDING',
+        imported_games: 0,
+        total_games: 0,
+        imported: true,
+        percentage: 100,
+      },
     }
   },
   mounted() {
