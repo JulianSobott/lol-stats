@@ -30,20 +30,58 @@ Riot API: \href{https://developer.riotgames.com/}\\
 \subsubsection{Responsibilities}
 \subsubsection{External Software}
 
+\newpage
 
 \subsection{Frontend}
 
 \subsubsection{Mockups}
 
-\begin{figure}
-\centering
-\includegraphics[width=1\textwidth]{mockups/mockup_all.png}
-\caption{Alle Mockups des Frontends}
-\label{fig:mockups_dashboard}
-\end{figure}
+Beim Planungsprozess wurden folgende Mockups erstellt.
+
+\graphic{mockups/mockup_all.png}{lle Mockups des Frontends}
+
+\subsubsection{Class Diagrams}
+
+\graphic{Frontend_UML.png}{Das UML-Diagramm des Frontends}
 
 \subsubsection{Responsibilities}
+
 Die Benutzeroberfläche (Frontend) dient als Client und ist für die Kommunikation mit dem verschiedenen Microservices zuständig. Es stellt die Daten übersichtlich dar und sorgt für eine
-angenehmes Nutzererlebnis.
+angenehmes Nutzererlebnis. \\
+
+\textbf{sign-up.vue}: Diese Seite ist für die Registrierung von neuen Benutzer:innen verantwortlich. Sobald die eine E-Mail und Passwörter übergeben wurden, so werden diese zunächst
+validiert. Dies schließt die Überprüfung einer korrekten E-Mail-Adresse sowie die ausrechende Länge des Passwortes mit ein. Die Methode \verb|register()| sendet eine HTTP-Anfrage mit den 
+entsprechenden Daten an das User-Backend, wo das Benutzerkonto erstellt wird.
+\newline
+
+\textbf{login.vue}: Zum Anmelden eines Benutzers muss auf dieser Seite die korrekten Anmeldedaten in das Formular eingegeben werden. Die Methode \verb|login()| prüft, ob das User-Backend
+verifiziert hat, dass die Anmeldedaten korrekt sind. Ist dies der Fall, so wird der Token, das das User-Backend zusendet, gespeichert. 
+\newline
+
+\textbf{setting.vue}: Bei der ersten Anmeldung müssen die Nutzer:innen den gewünschten Spielernamen übergeben. Durch das Speichern dieser Einstellungen durch die Methode \verb|savePlayername|
+sendet das Frontend den Spielernamen an das User-Backend. Anschließend werden die Nutzer:innen an die Hauptseite weitergeleitet. Im Zuge der Speicherung wird gleichzeitig ein "Import"-Befehl
+an das "Player-Backend" gesendet, sodass die Spielerinformationen direkt importiert werden und zur Verfügung stehen. Die Methode \verb|deleteAccount| ist für das Löschen eines Kontos zuständig.
+\newline
+
+\textbf{index.vue}: Die Hauptseite stellt mithilfe der Methode \verb|fetchRandomStats| Leaderboard-Statistiken dar. Hierfür das "Player-Backend" angefragt, welches zufällige 
+Leaderboards zurückgibt.
+\newline
+
+\textbf{dashboard.vue}: Das Dashboard stellt alle Informationen zu der jeweiligen LOL-Spieler:in dar. Die Methode \verb|fetchUserData| ruft die Spielerdaten anhand des gespeicherten Tokens
+von dem "Player-Backend" ab. Ebenso wird geprüft, ob die Account bereits importiert wird. Ist das nicht der Fall, so wird ein Ladebalken dargestellt, der den Import-Fortschritt aufzeigt. Dies
+wird durch eine regelmäßige Anfrage an das "Player-Backend" ermöglicht, welches die Aktuellen importieren Spiele sowie den Fortschritt in Prozent zurückgibt.
+\newline
+
+\textbf{competitors.vue}: Auf der "Competitors"-Seite können Spieler:innen zum Vergleichen von Statistiken hinzugefügt oder gelöscht werden. Die Methode \verb|getCompetitors| ruft die gespeicherten
+Freunde des Spielers ab und listet sie auf. Die Methode \verb|removeCompetitor| entfernt den jeweiligen Gegner aus der Freundesliste.
+\newline
+
+\textbf{achievements.vue}: Auf dieser Seite kann der eigene Account mit anderen Personen oder Ranks verglichen werden. Die einzelnen "Challanges" werden in Tabellen aufgelistet und in Tabs unterteilt.
+Das Aufrufen der Seite führt die Methode \verb|fetchAchievements| aus, die eine Anfrage an das "Player-Backend" sendet. Mithilfe eines Filtersystems können die persönlichen
+Statistiken zwischen den Freundeslisten, Global oder nur mit einer gewünschten Person verglichen werden. Falls der zu vergleichende Spieler nicht importiert wurde, kann auch von dort dieser über einen 
+Button importiert werden, wodurch die Methode \verb|importPlayer| aufgerufen wird. Außerdem ist es möglich, bestimmte Kategorien als Favorit abzuspeichern. Diese übernimmt die Methode
+\verb|toggleFavoriteAchivement|, die beim Betätigen der Favoriten-Buttons ausgelöst wird. Die Methode \verb|filterApplied| sendet eine aufbereitete HTTP-Anfrage mit den entsprechenden Filtern
+an das "Player-Backend", sobald die gewünschten Filter übernommen wurden.
+\newline
 
 \subsubsection{External Software}
