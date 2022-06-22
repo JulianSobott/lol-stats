@@ -29,28 +29,22 @@ Die Daten werden alle vom Games Importer Service aus der Riot API gelesen und in
 
 \subsubsection{Frontend}
 
+Über das Frontend lässt sich die Anwendung benutzen. Sie ist derzeit für die Benutzung mit dem Webbrowser ausgelegt. Dabei kommen folgende Technolgien zum Einsatz.
+
 \textbf{NuxtJS}
 
 Für die Umsetzung des reaktiven Frontends wurde das "NuxtJs"-Framework (\href{https://nuxtjs.org/}{https://nuxtjs.org/}) entschieden. Dieses erlaubt es komplexe Vue-Anwendungen umzusetzen und unterstützt Entwickler:innen
 bei unterschiedlichen Problemstellungen der Frontend-Entwicklung. Aufgrund bereits existierender Erfahrung mit Vue und dem Framework viel die Wahl auf diese Technologie.
 Dadurch ist eine rasche Entwicklung gewährleistet, indem die Einarbeitungszeit in neue Technologien wegfällt. Die Kommunikation mit verschiedenen Diensten passiert
 über das HTTP-Protokoll. Mit dem eingebauten Modul "Axios", welches als HTTP-Client dient, werden HTTP-Anfragen an das Backend gesendet, um die entsprechenden Daten 
-zu erhalten.
+zu erhalten. Zur Authentifizierung der Benutzer:innen wird das Modul "NuxtJs Auth" verwendet. Dieses stellt eine API zur Verfügung, mit der Registierungs- und Anmeldeprozess durchgeführt werden kann.
+Ebenso übernimmt es die Speicherung und Verifizierung des vom User-Backend erhaltene JWT-Token.
 
 \textbf{Design}
 
 Um ein einfache, responsive und übersichtliche Web-Oberfläche den Nutzer:innen zu gewährleisten, viel die Wahl auf "Tabler" (\href{http://tabler.io/}{http://tabler.io/}). Dies ist ein freies Frontend-CSS-Framework
 und stellt das Grundgerüst einer Administrationsoberfläche zur Verfügung. Aufgrund zahlreicher HTML-Module kann die Benutzeroberfläche nach Belieben konzeptioniert und 
 umgesetzt werden. Ebenso bietet diese CCS-Framework bereits ein responsives Layout, wodruch zeitgleich die Benutzeroberfläche automatisch für mobile Endgeräte angepasst wird.
-
-\textbf{Mockups}
-
-\begin{figure}
-\centering
-\includegraphics[width=0.8\textwidth]{mockups/Dashboard.jpg}
-\caption{Mockup des Dashboards}
-\label{fig:mockups_dashboard}
-\end{figure}
 
 \subsection{Architecture}
 \subsubsection{Drivers}
