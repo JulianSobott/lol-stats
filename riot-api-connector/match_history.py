@@ -21,20 +21,6 @@ logger = logging.getLogger(__name__)
 lol_watcher = LolWatcher('RGAPI-ba00cb63-7be0-4e50-8610-eb749b1ea70d')
 
 
-def get_match_history(summoner: Summoner) -> MatchHistory:
-    # TODO currently cass.get_match_history broken, returns only most recent 20 games
-    total_matches = 0
-    history = cass.get_match_history(
-        continent=summoner.region.continent,
-        region=summoner.region,
-        platform=summoner.region.platform,
-        puuid=summoner.puuid,
-        begin_time=Patch.from_str('10.12', region=summoner.region).start,
-        begin_index=total_matches,
-        end_index=total_matches+100)
-    return history
-
-
 def get_match_ids(puuid: str, start_time: int):
     start_index = 0
     full_result = []
