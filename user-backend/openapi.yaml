@@ -8,7 +8,7 @@ servers:
 paths:
   /api/auth/me:
     get:
-      description: Get own data
+      summary: Get own data
       tags:
         - user
       parameters:
@@ -27,14 +27,30 @@ paths:
                 properties:
                   User:
                     $ref: '#/components/schemas/User'
-                  player_stats:
-                    $ref: '#/components/schemas/Player'
-                  competitors:
-                    type: array
-                    items: 
-                      $ref: '#/components/schemas/Competitor'
         '404':
-          description: Invalid token
+          description: No token
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                  message:
+                    type: string
+        '400':
+          description: No token
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                  message:
+                    type: string
+        '401':
+          description: No Authentication in Header
           content:
             application/json:
               schema:
@@ -46,7 +62,7 @@ paths:
                     type: string
   /api/auth/login:
     post:
-      description: Login into website
+      summary: Login into website
       tags:
         - user
       requestBody:
@@ -89,7 +105,7 @@ paths:
                     type: string
   /api/token/info:
     get:
-      description: Verify token
+      summary: Verify token
       tags:
         - user
       parameters:
@@ -121,7 +137,7 @@ paths:
                     type: string
   /api/auth/logout:
     post:
-      description: Log out from website
+      summary: Log out from website
       tags:
         - user
       parameters:
@@ -142,9 +158,31 @@ paths:
                     type: string
                   message:
                     type: string
+        '401':
+          description: No Authentication in Header
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                  message:
+                    type: string
+        '400':
+          description: Session already expired
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                  message:
+                    type: string
   /api/auth/register:
     post:
-      description: Register new account
+      summary: Register new account
       tags:
         - user
       requestBody:
@@ -185,6 +223,40 @@ paths:
                       type: string
                   message:
                     type: string
+  /api/auth/delete:
+    delete:
+      tags:
+        - user
+      summary: Deletes user from System
+      parameters:
+      - name: token
+        in: header
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Sucessfully deleted user
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                  message:
+                    type: string
+        '404':
+          description: User not found 
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                  message:
+                    type: string
   /api/users/{user_id}:
     put:
       tags:
@@ -222,6 +294,61 @@ paths:
                 properties:
                   User:
                     $ref: '#/components/schemas/User'
+                  token:
+                    type: string
+        '404':
+          description: User not found or invalid 
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                  message:
+                    type: string
+        '401':
+          description: Not authorized 
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                  message:
+                    type: string
+    get:
+      tags:
+        - user
+      summary: Get user data from user id
+      parameters:
+      - name: user_id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: Sucessfully patched ingame user id
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  User:
+                    type: object
+                    properties:  
+                      id:
+                        type: integer
+                      player_uuid:
+                        type: string
+                      username:
+                        type: string
+                      region:
+                        type: string
+                  token:
+                    type: string
         '404':
           description: User not found or invalid 
           content:
@@ -235,7 +362,7 @@ paths:
                     type: string
   /api/users/{user_id}/competitors/:
     get:
-      description: List of competitors of user
+      summary: List of competitors of user
       tags:
         - competitor
       parameters:
@@ -259,7 +386,7 @@ paths:
                 items: 
                   $ref: '#/components/schemas/Competitor'
     post:
-      description: Add new competitor of user
+      summary: Add new competitor of user
       tags:
         - competitor
       parameters:
@@ -307,9 +434,52 @@ paths:
                     type: string
                   message:
                     type: string
+        '401':
+          description: Not authorized 
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                  message:
+                    type: string
+        '409':
+          description: Competitorship already exists 
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                  message:
+                    type: string
+  /api/users/{user_id}/competitors/puuids:
+    get:
+      summary: Get list of competitors puuids
+      tags:
+        - competitor
+      parameters:
+        - name: user_id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Sucessfully returned specific competitors puuids
+          content:
+            application/json:
+              schema: 
+                type: array
+                items:
+                    description: puuids 
+                    type: string
   /api/users/{user_id}/competitors/{competitor_puuid}:
       get:
-        description: Get specific competitor
+        summary: Get specific competitor
         tags:
           - competitor
         parameters:
@@ -338,8 +508,19 @@ paths:
                   properties: 
                     Competitor:
                       $ref: '#/components/schemas/Competitor'
+          '401':
+            description: Not authorized
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    status:
+                      type: string
+                    message:
+                      type: string
       delete:
-        description: Delete specific competitor of user
+        summary: Delete specific competitor of user
         tags:
           - competitor
         parameters:
@@ -370,8 +551,144 @@ paths:
                       type: string
                     message:
                       type: string
-          '400':
+          '404':
             description: Competitor not found
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    status:
+                      type: string
+                    message:
+                      type: string
+          '401':
+            description: Not authorized
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    status:
+                      type: string
+                    message:
+                      type: string
+  /api/users/{user_id}/achievements:
+    get:
+      summary: Get all favourite achievement of user
+      tags:
+        - achievement
+      parameters:
+          - name: user_id
+            in: path
+            required: true
+            schema:
+              type: integer
+      responses:
+       '200':
+            description: No content
+            content:
+              application/json:
+                schema:
+                  type: array
+                  items:
+                    description: name of achivement
+                    type: string 
+    post:
+      summary: Add specific achievement to user favourites
+      tags:
+        - achievement
+      parameters:
+          - name: token
+            in: header
+            required: true
+            schema:
+              type: string
+          - name: user_id
+            in: path
+            required: true
+            schema:
+              type: integer
+      responses:
+       '200':
+            description: No content
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    status:
+                      type: string
+                    message:
+                      type: string
+       '400':
+            description: Achievement already set as favourite
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    status:
+                      type: string
+                    message:
+                      type: string
+       '401':
+            description: Not authorized
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    status:
+                      type: string
+                    message:
+                      type: string
+  /api/users/{user_id}/achievements/{achievement_name}:
+    delete:
+      summary: Delete specific favourite achievement of user
+      tags:
+        - achievement
+      parameters:
+          - name: token
+            in: header
+            required: true
+            schema:
+              type: string
+          - name: user_id
+            in: path
+            required: true
+            schema:
+              type: integer
+          - name: achievement_name
+            in: path
+            required: true
+            schema:
+              type: string
+      responses:
+       '200':
+            description: No content
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    status:
+                      type: string
+                    message:
+                      type: string
+       '404':
+            description: Achievement not found
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    status:
+                      type: string
+                    message:
+                      type: string
+       '401':
+            description: Not authorized
             content:
               application/json:
                 schema:
