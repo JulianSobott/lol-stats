@@ -173,28 +173,6 @@ class db:
     def commit(self):
         self.connection.commit()
 
-    def fix_games(self):
-        sql = """SELECT * FROM games;"""
-        self.cursor.execute(sql)
-        import cassiopeia
-        d = []
-        while x := self.cursor.fetchone():
-            game: cassiopeia.Match = cassiopeia.get_match(
-                id='EUW1_' + str(x[0]), region='EUW')
-            participant = game.participants[x[1]]
-            if participant.side == cassiopeia.core.match.Side.blue:
-                win = game.blue_team.win
-                side = 'blue'
-            else:
-                win = game.red_team.win
-                side = 'red'
-            d.append({'win': win, 'side': side, 's': x[1], 'g': x[0]})
-        sql = """UPDATE games SET win = %s, team = %s WHERE match_id = %s AND summoner_id = %s"""
-        for e in d:
-            print(e['win'], e['side'], e['g'], e['s'])
-            self.cursor.execute(sql, (e['win'], e['side'], e['g'], e['s']))
-        self.connection.commit()
-
     def get_last_patch(self):
         sql = """SELECT * FROM patches ORDER BY added DESC;"""
         self.cursor.execute(sql)

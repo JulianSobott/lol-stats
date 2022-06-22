@@ -13,8 +13,15 @@ Table with Cross-Mapping of Architecture Principles to/from Architecture Drivers
 \subsection{Technologies}
 
 \subsubsection{Games Importer}
+Dieser Service ist die Verbindung zwischen der Riot API und unserer Anwendung. Er läuft in seinem eigenen Docker Container. Hier werden die Daten aus der Riot API abgefragt und dann in unserer Datenbank gespeichert.\\
+Der Service ist in Python geschrieben, da hierfür bereits Libraries zur Kommunikation mit der Riot API vorhanden sind (siehe \ref{riot-api-libraries}).\\
+Neben den Riot API Wrappern Cassiopeia und Riot Watcher wird noch das psycopg2 Package verwendet, welches Zugriff auf die PostgreSQL Datenbank bietet. Psycopg2 erlaubt es in Python SQL Statements zu bauen und auszuführen um somit die Daten von der Riot API in der Datenbank zu speichern.\\
+Der Games Importer Service läuft dauerhaft und aktualisiert in 5min Abständen alle in der Datenbank gespeicherten Spieler. \\
+Des weitere läuft in deinem weiteren Thread eine GRPC Connection, welche es erlaubt den Import eines neuen Spieler anzufragen. Dieser wird dann erstmals von der Riot API in die Datenbank importiert und bei den zukünftigen Updates berücksichtigt.
 
 \subsubsection{LoL Database}
+Die PostgreSQL Datenbank läuft in einem eigenen Docker Container. In dieser Datenbank werden alle Spieler bezogenen Daten gespeichert, welche auf der Website angezeigt werden.\\
+Die Daten werden alle vom Games Importer Service aus der Riot API gelesen und in dieser Datenbank gespeichert. Der Player API Service kann dann auf diese Daten zugreifen um sie an das Frontend weiterzugeben.
 
 \subsubsection{Player API}
 
