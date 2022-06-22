@@ -8,4 +8,15 @@ Storage capacity
 
 \subsection{Changes in Riot API}
 
-\subsection{Security}
+\subsection{Sicherheit}
+
+Derzeit ist eine Authentifizierung implementiert, die mit Hilfe von JWT-Zugriffstokens bestimmte Seiten vor unbefugten Zugriff schützen.
+Jedoch ist dies bei anderen API-Endpunkten ('Player-Backend') nicht der Fall. Ebenso existiert keine Zugriffskontrolle zwischen den
+einzelnen Microservice-Diensten, um zu verifizieren, dass der Anfragende befugt ist. Hierfür können Zertifikate, die jeweils ein
+Dienst besitzt, die dienstübergreifende Kommunikation mehr Sicherheit bieten. Ebenso wird dadurch die Kommunikation untereinander
+verschlüsselt.
+
+Ebenso fehlt ein Ratenlimit im Frontend beziehungsweise im Backend der einzelnen Dienste. Dadurch kann ein Denial-of-Service-Angriffe (DoS)
+nicht verhindert werden oder ungewollte Auslastung der Netzwerkbandbreite. Dies ist vor allem bei der Schnittstelle kritisch, die für das 
+Importieren von Spieler-Daten verantwortlich ist. Aufgrund der rechenintensiven Berechnung und Importierung der Spielerdaten kann 
+eine erhöhte Auslastung zur Unstabilität des Dienstes führen.
