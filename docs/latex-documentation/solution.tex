@@ -13,8 +13,15 @@ Table with Cross-Mapping of Architecture Principles to/from Architecture Drivers
 \subsection{Technologies}
 
 \subsubsection{Games Importer}
+Dieser Service ist die Verbindung zwischen der Riot API und unserer Anwendung. Er läuft in seinem eigenen Docker Container. Hier werden die Daten aus der Riot API abgefragt und dann in unserer Datenbank gespeichert.\\
+Der Service ist in Python geschrieben, da hierfür bereits Libraries zur Kommunikation mit der Riot API vorhanden sind (siehe \ref{riot-api-libraries}).\\
+Neben den Riot API Wrappern Cassiopeia und Riot Watcher wird noch das psycopg2 Package verwendet, welches Zugriff auf die PostgreSQL Datenbank bietet. Psycopg2 erlaubt es in Python SQL Statements zu bauen und auszuführen um somit die Daten von der Riot API in der Datenbank zu speichern.\\
+Der Games Importer Service läuft dauerhaft und aktualisiert in 5min Abständen alle in der Datenbank gespeicherten Spieler. \\
+Des weitere läuft in deinem weiteren Thread eine GRPC Connection, welche es erlaubt den Import eines neuen Spieler anzufragen. Dieser wird dann erstmals von der Riot API in die Datenbank importiert und bei den zukünftigen Updates berücksichtigt.
 
 \subsubsection{LoL Database}
+Die PostgreSQL Datenbank läuft in einem eigenen Docker Container. In dieser Datenbank werden alle Spieler bezogenen Daten gespeichert, welche auf der Website angezeigt werden.\\
+Die Daten werden alle vom Games Importer Service aus der Riot API gelesen und in dieser Datenbank gespeichert. Der Player API Service kann dann auf diese Daten zugreifen um sie an das Frontend weiterzugeben.
 
 \subsubsection{Player API}
 
@@ -22,28 +29,22 @@ Table with Cross-Mapping of Architecture Principles to/from Architecture Drivers
 
 \subsubsection{Frontend}
 
+Über das Frontend lässt sich die Anwendung benutzen. Sie ist derzeit für die Benutzung mit dem Webbrowser ausgelegt. Dabei kommen folgende Technolgien zum Einsatz.
+
 \textbf{NuxtJS}
 
 Für die Umsetzung des reaktiven Frontends wurde das "NuxtJs"-Framework (\href{https://nuxtjs.org/}{https://nuxtjs.org/}) entschieden. Dieses erlaubt es komplexe Vue-Anwendungen umzusetzen und unterstützt Entwickler:innen
 bei unterschiedlichen Problemstellungen der Frontend-Entwicklung. Aufgrund bereits existierender Erfahrung mit Vue und dem Framework viel die Wahl auf diese Technologie.
 Dadurch ist eine rasche Entwicklung gewährleistet, indem die Einarbeitungszeit in neue Technologien wegfällt. Die Kommunikation mit verschiedenen Diensten passiert
 über das HTTP-Protokoll. Mit dem eingebauten Modul "Axios", welches als HTTP-Client dient, werden HTTP-Anfragen an das Backend gesendet, um die entsprechenden Daten 
-zu erhalten.
+zu erhalten. Zur Authentifizierung der Benutzer:innen wird das Modul "NuxtJs Auth" verwendet. Dieses stellt eine API zur Verfügung, mit der Registierungs- und Anmeldeprozess durchgeführt werden kann.
+Ebenso übernimmt es die Speicherung und Verifizierung des vom User-Backend erhaltene JWT-Token.
 
 \textbf{Design}
 
 Um ein einfache, responsive und übersichtliche Web-Oberfläche den Nutzer:innen zu gewährleisten, viel die Wahl auf "Tabler" (\href{http://tabler.io/}{http://tabler.io/}). Dies ist ein freies Frontend-CSS-Framework
 und stellt das Grundgerüst einer Administrationsoberfläche zur Verfügung. Aufgrund zahlreicher HTML-Module kann die Benutzeroberfläche nach Belieben konzeptioniert und 
 umgesetzt werden. Ebenso bietet diese CCS-Framework bereits ein responsives Layout, wodruch zeitgleich die Benutzeroberfläche automatisch für mobile Endgeräte angepasst wird.
-
-\textbf{Mockups}
-
-\begin{figure}
-\centering
-\includegraphics[width=0.8\textwidth]{mockups/Dashboard.jpg}
-\caption{Mockup des Dashboards}
-\label{fig:mockups_dashboard}
-\end{figure}
 
 \subsection{Architecture}
 \subsubsection{Drivers}

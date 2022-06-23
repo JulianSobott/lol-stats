@@ -12,9 +12,7 @@
           <div class="card-body text-center py-2 p-sm-5">
             <h1 class="mt-1">Welcome to LoL Stats!</h1>
             <p class="text-muted">
-              On LoL Stats you can compare your player stats and achievements
-              with all League of legends players over the world or just with
-              your competitors.
+              With LoL Stats you can compare your stats and achievements with other League of Legends players. Compare them to specific players or all the players on your server.
             </p>
           </div>
         </div>
@@ -41,13 +39,12 @@
           <div class="mb-3">
             <label class="form-label">Select your Player Name</label>
             <PlayerSearchInput
+              class="mb-3"
               ref="playerSearchInput"
               @playerSelected="playerSelected"
             />
             <div class="form-hint">
-              In order for you to view player information and statistics, we
-              still need your gamer tag. Please enter your gamer tag in this
-              field, which you also use in <strong>League of Legends</strong>.
+              Please enter your <strong>League of Legends summoner name</strong>.
             </div>
           </div>
         </div>
@@ -96,8 +93,6 @@ export default {
       this.firstSetup = this.$route.query.firstsetup === 'true'
     } else {
       this.firstSetup = false
-      // TODO: Make query to player backend
-      // Fetch current player settings
       this.getPlayerData()
     }
   },

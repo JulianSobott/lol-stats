@@ -12,13 +12,27 @@ from flask_cors import CORS
 from flask import Flask, request, make_response, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from marshmallow import ValidationError
+from sentry_sdk import capture_exception
 from werkzeug import security
+import sentry_sdk
+from sentry_sdk.integrations.flask import FlaskIntegration
 
 import config
 from validation import user_schema, competitor_schema, user_setup_schema, user_dump_schema, UserDumpSchema, achievement_schema
 
 
 def create_app():
+    sentry_sdk.init(
+        dsn="https://c9afad850e5f46a6aa5ab228a8fea082@o1288571.ingest.sentry.io/6505644",
+        integrations=[
+            FlaskIntegration(),
+        ],
+
+        # Set traces_sample_rate to 1.0 to capture 100%
+        # of transactions for performance monitoring.
+        # We recommend adjusting this value in production.
+        traces_sample_rate=1.0
+    )
     flask_app = Flask(__name__)
     CORS(flask_app, origins=['*', 'http://localhost:3000'], allow_headers=['*'], supports_credentials=False)
     flask_app.config['SQLALCHEMY_DATABASE_URI'] = config.DATABASE_CONNECTION_URI
@@ -126,6 +140,7 @@ def get_own_data(current_user, access_token):
         response = requests.get(f"https://lol-stats.de/api/players/{current_user.player_uuid}")
         player_stats = response.json()
     except Exception as exc:
+        capture_exception(exc)
         print(f"Error: {exc}")
 
     user = Users.query.filter_by(id=current_user.id).first()

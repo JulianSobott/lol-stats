@@ -1,6 +1,7 @@
 import os
 import time
 import psycopg2
+from sentry_sdk import capture_exception
 
 
 class db:
@@ -18,6 +19,7 @@ class db:
                                                port=5432)
             self.cursor = self.connection.cursor()
         except (Exception, psycopg2.DatabaseError) as error:
+            capture_exception(error)
             print(error)
         return True
 
@@ -59,8 +61,8 @@ class db:
         return self.cursor.fetchall()
 
     def add_summoner_icon(self, id: int, icon_path: str) -> None:
-        sql = """INSERT INTO summonericons(id, icon_path) VALUES (%s, %s) ON CONFLICT DO UPDATE;"""
-        self.cursor.execute(sql, (id, icon_path))
+        sql = """INSERT INTO summonericons(id, icon_path) VALUES (%s, %s) ON CONFLICT (id) DO UPDATE SET icon_path = %s;"""
+        self.cursor.execute(sql, (id, icon_path, icon_path))
         self.connection.commit()
 
     def get_summoner_icon_url(self, id: int) -> str:
@@ -74,8 +76,8 @@ class db:
         self.connection.commit()
 
     def add_summoner_spell(self, id: int, name: str, icon_path: str) -> None:
-        sql = """INSERT INTO summonerspells(id, name, icon_path) VALUES (%s, %s, %s) ON CONFLICT DO UPDATE;"""
-        self.cursor.execute(sql, (id, name, icon_path))
+        sql = """INSERT INTO summonerspells(id, name, icon_path) VALUES (%s, %s, %s) ON CONFLICT (id) DO UPDATE SET icon_path = %s;"""
+        self.cursor.execute(sql, (id, name, icon_path, icon_path))
         self.connection.commit()
 
     def clear_summoner_spells(self) -> None:
@@ -84,8 +86,8 @@ class db:
         self.connection.commit()
 
     def add_champion(self, id: int, name: str, icon_path: str) -> None:
-        sql = """INSERT INTO champions(id, name, icon_path) VALUES (%s, %s, %s) ON CONFLICT DO UPDATE;"""
-        self.cursor.execute(sql, (id, name, icon_path))
+        sql = """INSERT INTO champions(id, name, icon_path) VALUES (%s, %s, %s) ON CONFLICT (id) DO UPDATE SET icon_path = %s;"""
+        self.cursor.execute(sql, (id, name, icon_path, icon_path))
         self.connection.commit()
 
     def clear_champions(self) -> None:
@@ -94,8 +96,8 @@ class db:
         self.connection.commit()
 
     def add_item(self, id: int, name: str, icon_path: str) -> None:
-        sql = """INSERT INTO items(id, name, icon_path) VALUES (%s, %s, %s) ON CONFLICT DO UPDATE;"""
-        self.cursor.execute(sql, (id, name, icon_path))
+        sql = """INSERT INTO items(id, name, icon_path) VALUES (%s, %s, %s) ON CONFLICT (id) DO UPDATE SET icon_path = %s;"""
+        self.cursor.execute(sql, (id, name, icon_path, icon_path))
         self.connection.commit()
 
     def clear_items(self) -> None:
@@ -131,6 +133,7 @@ class db:
             if not no_commit:
                 self.connection.commit()
         except (TypeError) as error:
+            capture_exception(error)
             print(f'Error adding challenge {name} to database')
 
     def update_challenge(self, name: str, puuid: str, total: float, average_per_game: float, highscore: float, no_commit: bool = False) -> None:
@@ -141,6 +144,7 @@ class db:
             if not no_commit:
                 self.connection.commit()
         except (TypeError) as error:
+            capture_exception(error)
             print(f'Error updating challenge {name} in database')
 
     def get_challenge_entry(self, name: str, puuid: str):
@@ -171,28 +175,6 @@ class db:
         return self.cursor.fetchone()
 
     def commit(self):
-        self.connection.commit()
-
-    def fix_games(self):
-        sql = """SELECT * FROM games;"""
-        self.cursor.execute(sql)
-        import cassiopeia
-        d = []
-        while x := self.cursor.fetchone():
-            game: cassiopeia.Match = cassiopeia.get_match(
-                id='EUW1_' + str(x[0]), region='EUW')
-            participant = game.participants[x[1]]
-            if participant.side == cassiopeia.core.match.Side.blue:
-                win = game.blue_team.win
-                side = 'blue'
-            else:
-                win = game.red_team.win
-                side = 'red'
-            d.append({'win': win, 'side': side, 's': x[1], 'g': x[0]})
-        sql = """UPDATE games SET win = %s, team = %s WHERE match_id = %s AND summoner_id = %s"""
-        for e in d:
-            print(e['win'], e['side'], e['g'], e['s'])
-            self.cursor.execute(sql, (e['win'], e['side'], e['g'], e['s']))
         self.connection.commit()
 
     def get_last_patch(self):

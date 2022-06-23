@@ -4,11 +4,12 @@ import time
 import traceback
 
 import cassiopeia as cass
-from cassiopeia import Summoner, Patch, MatchHistory, Match, GameType
+from cassiopeia import Summoner, Patch, MatchHistory, Match, GameType, Map
 from cassiopeia.core.match import Participant, Side
 import riotwatcher
 from riotwatcher import LolWatcher, ApiError
 from riotwatcher._apis.league_of_legends import MatchApiV5
+from sentry_sdk import capture_exception
 
 from db_connector import db
 
@@ -18,20 +19,6 @@ from riotwatcherWrapper import call_with_retry
 logger = logging.getLogger(__name__)
 
 lol_watcher = LolWatcher('RGAPI-ba00cb63-7be0-4e50-8610-eb749b1ea70d')
-
-
-def get_match_history(summoner: Summoner) -> MatchHistory:
-    # TODO currently cass.get_match_history broken, returns only most recent 20 games
-    total_matches = 0
-    history = cass.get_match_history(
-        continent=summoner.region.continent,
-        region=summoner.region,
-        platform=summoner.region.platform,
-        puuid=summoner.puuid,
-        begin_time=Patch.from_str('10.12', region=summoner.region).start,
-        begin_index=total_matches,
-        end_index=total_matches+100)
-    return history
 
 
 def get_match_ids(puuid: str, start_time: int):
@@ -56,7 +43,7 @@ def add_missing_games_to_db(db: db, match_ids, puuid: str):
     i = 0
     for match_id in match_ids:
         match: Match = cass.get_match(id=match_id, region='EUW')
-        if match.game_type != GameType.matched:
+        if match.game_type != GameType.matched or match.map.id != 1: # id 1 = Summoners Rift
             continue
         if db.has_game(match_id=match.id, summoner_id=puuid):
             continue
@@ -64,6 +51,7 @@ def add_missing_games_to_db(db: db, match_ids, puuid: str):
         try:
             add_game_to_db(db=db, match=match, puuid=puuid, c=c)
         except Exception as e:
+            capture_exception(e)
             print(e, e.args)
             print(traceback.format_exc())
         yield i, len(match_ids)

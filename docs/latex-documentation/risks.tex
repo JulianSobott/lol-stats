@@ -5,7 +5,21 @@ Potential problems, known technical risks, technical debt
 Storage capacity
 
 \subsection{Riot API Ratelimits}
+Wie bereits in \ref{riot-api-ratelimits} beschrieben, hat der momentan verwendete Development API Key geringe Ratelimits. Sollte die Website öffentlich zugänglich gemacht werden, muss zuerst ein Product API Key beantragt werden, was voraussetzt, dass das Produkt von Riot hierfür akzeptiert wird. Ist das nicht der Fall, so kann die Website nicht öffentlich zugänglich gemacht werden.
 
 \subsection{Changes in Riot API}
+Die Endpoints der Riot API verändern sich immer wieder. So wurde z.B. vor ein paar Monaten der alte Match-V4 Endpoint durch den neueren Match-V5 Endpoint ersetzt. Da für die Kommunikation mit der Riot API externe Libraries (Cassiopeia, Riot Watcher) verwendet werden, ist das Produkt momentan davon abhängig, dass auch diese dann geupdated werden.
+Außerdem müssten die Änderungen dann im Games Importer Service ebenfalls eingebaut werden.\\ Sollten die Libraries nicht geupdated werden, so müsste man auf eine neue Library umsteigen, was viele Code Änderugnen bedeuten würde, oder einen eigenen Wrapper für die Verbindung mit der Riot API schreiben.
 
-\subsection{Security}
+\subsection{Sicherheit}
+
+Derzeit ist eine Authentifizierung implementiert, die mit Hilfe von JWT-Zugriffstokens bestimmte Seiten vor unbefugten Zugriff schützen.
+Jedoch ist dies bei anderen API-Endpunkten ('Player-Backend') nicht der Fall. Ebenso existiert keine Zugriffskontrolle zwischen den
+einzelnen Microservice-Diensten, um zu verifizieren, dass der Anfragende befugt ist. Hierfür können Zertifikate, die jeweils ein
+Dienst besitzt, die dienstübergreifende Kommunikation mehr Sicherheit bieten. Ebenso wird dadurch die Kommunikation untereinander
+verschlüsselt.
+
+Ebenso fehlt ein Ratenlimit im Frontend beziehungsweise im Backend der einzelnen Dienste. Dadurch kann ein Denial-of-Service-Angriffe (DoS)
+nicht verhindert werden oder ungewollte Auslastung der Netzwerkbandbreite. Dies ist vor allem bei der Schnittstelle kritisch, die für das 
+Importieren von Spieler-Daten verantwortlich ist. Aufgrund der rechenintensiven Berechnung und Importierung der Spielerdaten kann 
+eine erhöhte Auslastung zur Unstabilität des Dienstes führen.

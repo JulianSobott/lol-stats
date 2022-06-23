@@ -11,11 +11,6 @@
               <!-- Page pre-title -->
               <h2 class="page-title">Achievements</h2>
             </div>
-            <div class="col-12 col-md-auto ms-auto d-print-none">
-              <button class="btn btn-primary d-sm-inline-block" @click="fetchAchievements()">
-                Refresh
-              </button>
-            </div>
             <!-- Page title actions -->
             <div class="col-auto col-md-auto ms-auto d-print-none">
               <div class="btn-list">
@@ -48,6 +43,15 @@
                 </a>
               </div>
             </div>
+            <div class="col-auto col-md-auto ms-auto d-print-none">
+              <button class="btn btn-primary d-sm-inline-block btn-icon" @click="fetchAchievements()">
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-refresh" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                  <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                  <path d="M20 11a8.1 8.1 0 0 0 -15.5 -2m-.5 -4v4h4"></path>
+                  <path d="M4 13a8.1 8.1 0 0 0 15.5 2m.5 4v-4h-4"></path>
+                </svg>
+              </button>
+            </div>
           </div>
         </div>
         <!-- Page title -->
@@ -60,7 +64,7 @@
             </div>
             <div class="col-9 col-achivements-table">
               <div v-if="!loadingAchiements" class="card-tabs">
-                <div v-if="achievements.length == 0" class="card">
+                <div v-if="achievements.length == 0 && !showImportPlayerModal" class="card">
                   <div class="card-body">
                       <div class="empty">
                         <div class="empty-img">
@@ -138,7 +142,7 @@
                     </div>
                 </div>
                 <!-- Cards navigation -->
-                <ul class="nav nav-tabs">
+                <ul class="nav nav-tabs" style="background: #1e293b; border-top-left-radius: 5px; border-top-right-radius: 5px">
                   <li
                     v-for="item in achievements"
                     :key="item.category"
@@ -224,9 +228,9 @@
                         <div class="mb-2">
                           <p class="empty-title">Player not imported</p>
                           <p class="empty-subtitle text-muted">
-                            There is no player data in our system yet. To be
-                            able to compare you with the player, please click
-                            the button below import the player.
+                            Your data is not yet present in our system. To be
+                            able to compare yourself with others please click
+                            the button below to import your data.
                           </p>
                         </div>
                         <div class="w-100">
@@ -454,11 +458,22 @@ export default {
       }
       this.loadingAchiements = false
     },
+    async fetchAchievementsFromPlayer() {
+      this.loadingAchiements = true
+      try {
+        const response = await this.$axios.get(
+          `/achievements?me=${this.$auth.user.id}?&competitor=${this.selectedPlayerUuid}`
+        )
+        this.achievements = response.data.items
+      } catch (err) {
+        console.log(err)
+      }
+      this.loadingAchiements = false
+    },
     async importPlayer() {
       try {
         const response = await this.$axios.post(
           `/players/${this.selectedPlayerUuid}/import`,
-          {}
         )
         this.importData = response.data
 
@@ -466,7 +481,7 @@ export default {
           clearInterval(this.importInterval)
           this.isImportingData = false
           this.showImportPlayerModal = false
-          // send request to show all data
+          this.fetchAchievementsFromPlayer()
         }
       } catch (err) {
         console.log(err)
@@ -489,7 +504,6 @@ export default {
     },
     triggerImportPlayer() {
       this.isImportingData = true
-
       this.importPlayer()
       this.importInterval = setInterval((async) => {
         this.importPlayer()

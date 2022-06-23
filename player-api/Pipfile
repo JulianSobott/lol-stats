@@ -18,6 +18,7 @@ requests = "*"
 starlette = "*"
 pyyaml = "*"
 asyncpg = "*"
+sentry-sdk = "*"
 
 [dev-packages]
 pytest = "*"
