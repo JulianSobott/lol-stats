@@ -4,6 +4,23 @@ Show and explain context diagram with clear system boundaries and external syste
 
 \subsection{Context Diagram}
 
+\begin{figure}
+    \centering
+    \includegraphics[width=\textwidth]{images/03-context-diagram}
+    \caption{Context Diagramm der Applikation}
+    \label{fig:context-diagram}
+\end{figure}
+
+In Abbildung~\ref{fig:context-diagram} ist das Context Diagramm der Applikation zu sehen.
+Der User kann über eine Webseite mit der Applikation kommunizieren.
+Ein User kann sich authentifizieren und danach Spieldaten anschauen.
+Außerdem kann er sich mit anderen Spielern vergleichen.
+
+Um an die Spiele und Spieler zu kommen, werden Anfragen an die Riot API gestellt.
+Zusätzlich zur Riot API, die dynamische Daten zur Verfügung stellt, werden statische Assets über die Datadragon
+Webseite geladen.
+Diese Webseite wird von Riot für diesen Zweck zur Verfügung gestellt.
+
 \subsection{Riot API}\label{riot-api-libraries}
 Die Riot API ist eine Schnittstelle, mit mehreren Endpoints. Für dieses Projekt sind nur Endpoints des Spiels League of Legends interessant. Genauer werden die folgenden Endpoints verwendet:
 \begin{itemize}
