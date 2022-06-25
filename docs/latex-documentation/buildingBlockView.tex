@@ -22,9 +22,55 @@ psycopg2: \href{https://pypi.org/project/psycopg2/}\\
 Riot API: \href{https://developer.riotgames.com/}\\
 
 \subsection{Player API}
-\subsubsection{Class Diagrams}
+
+\subsubsection{Component Diagram}\label{subsubsec:player-api-component-diagram}
+
+\begin{figure}
+    \centering
+    \includegraphics[width=\textwidth]{images/cdc-06-player-api-static.drawio}
+    \caption{Komponenten Diagramm des PlayerAPI Services}
+    \label{fig:player-api-component-diagram}
+\end{figure}
+Das in Abbildung~\ref{fig:player-api-component-diagram} abgebildete Komponenten Diagramm stellt die wichtigsten
+Komponenten des PlayerAPI Services dar.
+Wobei im \lstinline{model} Package nur die Module ohne die Klassen dargestellt werden, um das Diagramm
+übersichtlich zu halten und es sich hierbei nur um Datenklassen handelt ohne Logik.
+
 \subsubsection{Responsibilities}
+
+Dieser Service stellt folgende Endpunkte zur Verfügung:
+\begin{itemize}
+    \item \textbf{achievements}: Ein Spieler kann seine/ihre Challenges mit anderen Spielern vergleichen.
+    \item \textbf{find\_player}: Prüft ob ein Spieler existiert.
+    \item \textbf{leaderboards}: Stellt globale Highscore Listen zur Verfügung.
+    \item \textbf{get\_player}: Stellt Informationen wie rank eines Spielers zur Verfügung
+    \item \textbf{import\_player}: Triggert den Importprozess, falls Import noch nicht läuft.
+    Gibt immer den aktuellen progress zurück.
+    \item \textbf{recent\_games}: Stellt die zuletzt gespielten Spiele paginiert zur Verfügung.
+\end{itemize}
+
+Das \lstinline{main} Modul ist der Einstiegspunkt für die Applikation.
+Hier wird die App mit den Routen konfiguriert, middlewares hinzugefügt und logging mit monitoring konfiguriert.
+
+\lstinline{import_state} und \lstinline{get_player} haben Funktionen, die in fast jedem Endpunkt genutzt werden.
+
+Im \lstinline{db} Modul ist das ORM Modell und die Verbindung zur Datenbank.
+
+Das \lstinline{models} Package enthält Datenklassen, die keine Logik enthalten.
+FastAPI wandelt diese in den Endpunkten automatisch in JSON um, wodurch alles typisiert ist.
+Um das Diagramm übersichtlich zu halten, wurden nur die Module ohne die enthaltenen Klassen dargestellt.
+
 \subsubsection{External Software}
+
+\begin{itemize}
+    \item \textbf{FastAPI} (\href{https://fastapi.tiangolo.com/}{https://fastapi.tiangolo.com/}): Web framework
+    \item \textbf{pydantic} (\href{https://pydantic-docs.helpmanual.io/}{https://pydantic-docs.helpmanual.io/}): Datenklassen und Validierung
+    \item \textbf{sqlalchemy} (\href{https://www.sqlalchemy.org/}{https://www.sqlalchemy.org/}): Datenbank ORM
+    \item \textbf{GRPC} (\href{https://grpc.io/docs/languages/python/basics/}{https://grpc.io/docs/languages/python/basics/}): Kommunikation über GRPC
+    \item \textbf{sentry} (\href{https://sentry.io}{https://sentry.io}): Fehler Überwachung fürs Monitoring
+    \item \textbf{opentelemetry} (\href{https://opentelemetry.io/}{https://opentelemetry.io/}): Tracing fürs Monitoring
+\end{itemize}
+
 \subsection{User Management}
 \subsubsection{Class Diagrams}
 \subsubsection{Responsibilities}

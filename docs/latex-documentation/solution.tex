@@ -22,7 +22,7 @@ In Abbildung~\ref{fig:service-diagram} ist das Service Diagramm für die Applika
 
 \subsection{Technologies}
 
-\subsubsection{Games Importer}
+\subsubsection{Games Importer}\label{subsubsec:games-importer}
 Dieser Service ist die Verbindung zwischen der Riot API und unserer Anwendung. Er läuft in seinem eigenen Docker Container. Hier werden die Daten aus der Riot API abgefragt und dann in unserer Datenbank gespeichert.\\
 Der Service ist in Python geschrieben, da hierfür bereits Libraries zur Kommunikation mit der Riot API vorhanden sind (siehe \ref{riot-api-libraries}).\\
 Neben den Riot API Wrappern Cassiopeia und Riot Watcher wird noch das psycopg2 Package verwendet, welches Zugriff auf die PostgreSQL Datenbank bietet. Psycopg2 erlaubt es in Python SQL Statements zu bauen und auszuführen um somit die Daten von der Riot API in der Datenbank zu speichern.\\
@@ -34,6 +34,11 @@ Die PostgreSQL Datenbank läuft in einem eigenen Docker Container. In dieser Dat
 Die Daten werden alle vom Games Importer Service aus der Riot API gelesen und in dieser Datenbank gespeichert. Der Player API Service kann dann auf diese Daten zugreifen um sie an das Frontend weiterzugeben.
 
 \subsubsection{Player API}
+
+Dieser Service stellt die importierten Daten des Service~\ref{subsubsec:games-importer} dar.
+Als Programmiersprache um eine schnelle Entwicklung zu erreichen und um im Backend nur eine Sprache zu verwenden.
+Als Webframework wurde sich für FastAPI entschieden, aufgrund der hohen Performance.
+Für den Datenbankzugriff wurde sich für SQLAlchemy entschieden, um ein ORM verwenden zu können.
 
 \subsubsection{User Management}
 
@@ -57,8 +62,42 @@ und stellt das Grundgerüst einer Administrationsoberfläche zur Verfügung. Auf
 umgesetzt werden. Ebenso bietet diese CCS-Framework bereits ein responsives Layout, wodruch zeitgleich die Benutzeroberfläche automatisch für mobile Endgeräte angepasst wird.
 
 \subsection{Architecture}
+
+In den beiden Tabellen~\ref{tab:goals} und~\ref{tab:principles}, werden die Ziele der Architektur aufgelistet
+und die jeweiligen Architektur Prinzipien, die diese unterstützen.
+
 \subsubsection{Drivers}
-Early decisions that influence which patterns will be used later on
-\subsubsection{Patterns}
-\subsubsection{Cross-Mapping}
-Map which driver lead to which pattern
+\begin{center}
+    \begin{tabular}{|l|l|l| p{5cm} |p{2.5cm}|}
+        \hline
+        \textbf{Priorität} & \textbf{Arch. Ziel (AG)} & \textbf{Abkürzung} & \textbf{Eigenschaften} & \textbf{Unterstützt von APs?} \\
+        \hline
+        1 & Funktionalität & AG:FUNC & UI, Business Logik, Daten & AP:SOA \\
+        2 & Benutzbarkeit & AG:USA & responsive ui &  \\
+        3 & Portabilität & AG:PORT & DB, OS Unabhängigkeit & AP:PY AP:DOCKER AP:ORM\\
+        4 & Interoperabilität & AG:INT & RDB Austauschbarkeit & AP:ORM \\
+        5 & Wartbarkeit & AG:MTN & & AP:SOA AP:PY AP:DOCKER AP:ORM\\
+        6 & Performance & AG:PERF & Latenz & AP:POLL \\
+        7 & Ausfallsicherheit & AG:RLB & ACID Transaktionen, unabhängige Services & AP:SOA AP:RDB AP:DOCKER\\
+        8 & Security & AG:SEC & Passwörter hashen, Kommunikation über https &  \\
+        \hline
+    \end{tabular}
+    \label{tab:goals}
+\end{center}
+\subsubsection{Prinzipien}
+
+\begin{center}
+    \begin{tabular}{|l|l| p{5cm} |p{3cm}|}
+        \hline
+        \textbf{Arch. Prinzip (AP)} & \textbf{Abkürzung} & \textbf{Beschreibung.} & \textbf{Unterstützt AGs} \\
+        \hline
+        Service orientiert & AP:SOA & Backends aufgeteilt auf Services um Requests zu händeln & AG:FUNC AG:MTN AG:RLB \\
+        Relationale DB & AP:RDB & Daten in relationaler Datenbank mit SQL gespeichert & AG:RLB \\
+        Python & AP:PY & Python ist OS unabhängig und ermöglicht gute Wartbarkeit & AG:PORT AG:MTN \\
+        Docker & AP:DOCKER & Docker erlaubt unabhängiges und einfaches deployment & AG:MTN AG:PORT AG:RLB \\
+        OR Mapping & AP:ORM & Datenbankunabhängigkeit und einfaches Entwickeln & AG:PORT AG:INT AG:MTN \\
+        Polling & AP:POLL & Polling statt lang wartende Requests ermöglicht schnelle Antworten & AG:PERF \\
+        \hline
+    \end{tabular}
+    \label{tab:principles}
+\end{center}
