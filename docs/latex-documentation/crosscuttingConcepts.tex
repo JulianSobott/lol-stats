@@ -1,4 +1,4 @@
-\section{Crosscutting concepts}
+\section{Querschnittliche Konzepte}
 Persistence 
 E-R Diagram, information architecture model, etc.
 REST APIs
@@ -24,11 +24,11 @@ Tabellen in der Datenbank:\\
 \item \textbf{Patches:} Hier wird gespeichert, welche Patches von League of Legends bereits in der Datenbank eingetragen wurden. Da mit jedem Patch z.B. neue Icons dazukommen, müssen die Tabellen nach jedem Patch geupdated werden. Nach dem update wird in dieser Tabelle festgehalten, wann die Datenbank für welchen Patch geupdated wurde.
 \end{itemize}
 
-\subsection{User Database ER-Diagram}
+\subsection{User Database ER-Diagramm}
 
-\subsection{User Management API Specification}
+\subsection{User Management API Spezifikation}
 
-\subsection{Player API Specification}s
+\subsection{Player API Spezifikation}s
 
 \subsection{GRPC Interface}
 Damit der Import eines neuen Spieler angefragt werden kann, muss eine Kommunikation zwischen Frontend und dem Games Importer Service bestehen. Das Frontend kommuniziert nur mit der PlayerAPI, welche die Anfrage dann an den Games Importer Service weiterleiten muss.\\
@@ -54,4 +54,4 @@ message ImportReply {
 Der Request beinhaltet hierbei die ID des zu importierenden Spielers und die Reply den aktuellen Fortschritt des Vorgangs. Die Reply wird solange gesendet, bis der Spieler vollständig importiert wurde.\\
 Mithilfe dieser Datei werden dann die nötigen Python Klassen generiert. In der \textit{PlayerImportRequest.py} wird dann die \textit{import\_player(request, context)} Methode implementiert, welche dann beim erhalten eines Requests aufgerufen wird und im request Parameter die ID des Spieler erhält. Dann kann der Games Importer diesen importieren und mittels eines \textit{yield} Statements in der \textit{import\_player()} Funktion die Replies an die Player API senden.
 
-\subsection{Configurability and Traffic}
+\subsection{Konfigurierbarkeit und Traffic}

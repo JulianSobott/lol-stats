@@ -1,20 +1,20 @@
-\section{Building block view}
+\section{Bausteinsicht}
 UML package and class diagrams (perhaps auto-generate with tool, but ensure clean and well-organized)
 Include description of responsibility and name of each package and class.
-List external software used and provide links
+List Externe Software used and provide links
 
 
 \subsection{Games Importer Service}
-\subsubsection{Class Diagrams}
+\subsubsection{Klassendiagramm}
 \graphic{GamesImporter}{Klassendiagramm des Game Importer Service}
-\subsubsection{Responsibilities}
+\subsubsection{Verantwortlichkeiten}
 Dieser Service ist dafür zuständig, die benötigten Daten bei der Riot API anzufragen und dann in der LoL Datenbank zu speichern. Die Struktur des Services ist im obigen Klassendiagramm zu sehen. \\
 Die db Klasse bietet alle Funktionen, um mit der Datenbank zu interagieren: neue Daten speichern, Daten lesen und Daten updaten. Dazu wird das psycopg2 Package verwendet.\\
 Die App Klasse beinhaltet den main loop (update\_loop Funktion). In dieser werden dann weitere Funktionen aufgerufen, um alle Spieler zu updaten. Dazu werden zuerst die Methoden des summoner.py Moduls verwendet, welche einen einzelnen Spieler updaten können. In dieser Methode werden zunächst alle Daten des Summoners (Level, Name, ...) aktualisiert. Dann wird das matchhistory.py Modul verwendet, welches für den Spieler die MatchHistory importieren kann (add\_missing\_games\_tp\_db(db, get\_match\_ids(), puuid). Dieses verwendet dabei noch die Challenges Klasse, welche die Challenges für einzelne Spieler speichern kann (store\_challenges()). Dabei werden mithilfe der in der Datenbank vorhandenen Werte für total, average und highscore die neuen Werte berechnet und diese dann gespeichert.\\
 
 Der PlayerImportRequest erbt von der von GRPC generierten Klasse ImporterService und ist für die Verbindung mit der PlayerAPI zuständig. Über diese Klasse kann eine Anfrage gesendet werden, um den Import eines neuen Spielers zu starten, wobei dann dieselbe Abfolge durchlaufen wird wie oben bereits beim updaten eines Spielers beschrieben.
 
-\subsubsection{External Software}
+\subsubsection{Externe Software}
 GRPC: \href{https://grpc.io/docs/languages/python/basics/}\\
 Cassiopeia: \href{https://github.com/meraki-analytics/cassiopeia}\\
 Riot Watcher: \href{https://github.com/pseudonym117/Riot-Watcher}\\
@@ -23,7 +23,7 @@ Riot API: \href{https://developer.riotgames.com/}\\
 
 \subsection{Player API}
 
-\subsubsection{Component Diagram}\label{subsubsec:player-api-component-diagram}
+\subsubsection{Komponentendiagramm}\label{subsubsec:player-api-component-diagram}
 
 \begin{figure}
     \centering
@@ -36,7 +36,7 @@ Komponenten des PlayerAPI Services dar.
 Wobei im \lstinline{model} Package nur die Module ohne die Klassen dargestellt werden, um das Diagramm
 übersichtlich zu halten und es sich hierbei nur um Datenklassen handelt ohne Logik.
 
-\subsubsection{Responsibilities}
+\subsubsection{Verantwortlichkeiten}
 
 Dieser Service stellt folgende Endpunkte zur Verfügung:
 \begin{itemize}
@@ -60,7 +60,7 @@ Das \lstinline{models} Package enthält Datenklassen, die keine Logik enthalten.
 FastAPI wandelt diese in den Endpunkten automatisch in JSON um, wodurch alles typisiert ist.
 Um das Diagramm übersichtlich zu halten, wurden nur die Module ohne die enthaltenen Klassen dargestellt.
 
-\subsubsection{External Software}
+\subsubsection{Externe Software}
 
 \begin{itemize}
     \item \textbf{FastAPI} (\href{https://fastapi.tiangolo.com/}{https://fastapi.tiangolo.com/}): Web framework
@@ -72,9 +72,9 @@ Um das Diagramm übersichtlich zu halten, wurden nur die Module ohne die enthalt
 \end{itemize}
 
 \subsection{User Management}
-\subsubsection{Class Diagrams}
-\subsubsection{Responsibilities}
-\subsubsection{External Software}
+\subsubsection{Klassendiagramms}
+\subsubsection{Verantwortlichkeiten}
+\subsubsection{Externe Software}
 
 \newpage
 
@@ -86,11 +86,11 @@ Beim Planungsprozess wurden folgende Mockups erstellt.
 
 \graphic{mockups/mockup_all.png}{lle Mockups des Frontends}
 
-\subsubsection{Class Diagrams}
+\subsubsection{Klassendiagramms}
 
 \graphic{Frontend_UML.png}{Das UML-Diagramm des Frontends}
 
-\subsubsection{Responsibilities}
+\subsubsection{Verantwortlichkeiten}
 
 Die Benutzeroberfläche (Frontend) dient als Client und ist für die Kommunikation mit dem verschiedenen Microservices zuständig. Es stellt die Daten übersichtlich dar und sorgt für eine
 angenehmes Nutzererlebnis. \\
@@ -130,4 +130,4 @@ Button importiert werden, wodurch die Methode \verb|importPlayer| aufgerufen wir
 an das "Player-Backend", sobald die gewünschten Filter übernommen wurden.
 \newline
 
-\subsubsection{External Software}
+\subsubsection{Externe Software}
