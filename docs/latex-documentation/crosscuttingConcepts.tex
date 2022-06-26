@@ -54,4 +54,7 @@ message ImportReply {
 Der Request beinhaltet hierbei die ID des zu importierenden Spielers und die Reply den aktuellen Fortschritt des Vorgangs. Die Reply wird solange gesendet, bis der Spieler vollständig importiert wurde.\\
 Mithilfe dieser Datei werden dann die nötigen Python Klassen generiert. In der \textit{PlayerImportRequest.py} wird dann die \textit{import\_player(request, context)} Methode implementiert, welche dann beim erhalten eines Requests aufgerufen wird und im request Parameter die ID des Spieler erhält. Dann kann der Games Importer diesen importieren und mittels eines \textit{yield} Statements in der \textit{import\_player()} Funktion die Replies an die Player API senden.
 
-\subsection{Konfigurierbarkeit und Traffic}
+\subsection{Zentrales Logging}
+
+Die Logs aller Services werden zentral von Loki eingesammelt und gespeichert.
+Über Grafana lassen sich die Logs durchsuchen.
