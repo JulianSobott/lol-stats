@@ -74,7 +74,16 @@ Um das Diagramm übersichtlich zu halten, wurden nur die Module ohne die enthalt
 \subsection{User Management}
 \subsubsection{Klassendiagramms}
 \subsubsection{Verantwortlichkeiten}
+Zu den eigenen Daten des User Backends gehören unter anderem die Region oder die Referenz zu einem Lol-Account dazu, 
+aber auch alle notwendige Daten, die bei der Registrierung und beim Login entstehen. Für die Validierung dieser einkommenden Daten wurde die Libaries "Werkzeug" und "Marshmallow" verwendet.
+Außerdem beinhaltet dieser Service die Zuständigkeit für das Token und Competitor Management. So wurde für das Kreieren und Validieren der Tokens die Libary
+"PyJWT" verwendet.
 \subsubsection{Externe Software}
+\item \textbf{Flask} (\href{https://flask.palletsprojects.com/en/2.1.x/}{https://flask.palletsprojects.com/en/2.1.x/}): Webframework
+\item \textbf{sqlalchemy} (\href{https://www.sqlalchemy.org/}{https://www.sqlalchemy.org/}): Datenbank ORM
+\item \textbf{Werkzeug} (\href{https://pypi.org/project/Werkzeug/}{https://pypi.org/project/Werkzeug/}): Datenbank ORM
+\item \textbf{Marshmallow} (\href{https://marshmallow.readthedocs.io/en/stable/}{https://marshmallow.readthedocs.io/en/stable/): Datenbank ORM
+\item \textbf{PyJWT} (\href{https://pyjwt.readthedocs.io/en/latest/}{https://pyjwt.readthedocs.io/en/latest/}): Datenbank ORM
 
 \newpage
 
