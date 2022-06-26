@@ -32,7 +32,7 @@ Tabellen in der Datenbank:\\
 
 \subsection{GRPC Interface}
 Damit der Import eines neuen Spieler angefragt werden kann, muss eine Kommunikation zwischen Frontend und dem Games Importer Service bestehen. Das Frontend kommuniziert nur mit der PlayerAPI, welche die Anfrage dann an den Games Importer Service weiterleiten muss.\\
-Da der Player API Service und der Games Importer Service beide in Pyton geschrieben wurden, kann diese Kommunikation über GRPC erfolgen, welches es der PlayerAPI erlaubt über einen Protocol Request die Import Funktion des Game Importers aufzurufen.\\
+Da der Player API Service und der Games Importer Service beide in Pyton geschrieben wurden, kann diese Kommunikation über GRPC erfolgen, welches es der PlayerAPI erlaubt über einen Protocol Request die Import Funktion des Game Importers aufzurufen.\\ % TODO Tim: für grps müssen Applikationen nicht in gleicher Sprache geschrieben sein. Grund war eher, dass grpc Streaming erlaubt
 Die Schnittstelle wird in einer .proto Datei definiert:
 
 \begin{lstlisting}
