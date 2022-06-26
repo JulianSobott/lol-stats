@@ -1,8 +1,11 @@
 \section{Risiken und technische Schulden}
 Potential problems, known technical risks, technical debt
 
-\subsection{Database performance}
-Storage capacity
+\subsection{Database Performance}
+
+Derzeit wird als Datenbankmanagementsystem "PostgreSQL" verwendet. In Kombination mit dieser und der gewählten Architektur verarbeitet das System die Anfragen und Berechnungen zuverlässig.
+Jedoch kann es zu Performance-Problemen kommen, sobald die Softwarelösung von deutlich mehr Nutzer:innen verwendet wird. Der Grund dafür ist das ständige Wachsen der "LoL-Datenbank", wodurch die Abfrage und
+die Berechnungen der Achievements langsamer werden. Hierfür müsste die Architektur so angepasst werden, dass eine bessere Skalierbarkeit des Datenbankmanagementsystems möglich ist.
 
 \subsection{Riot API Ratelimits}
 Wie bereits in \ref{riot-api-ratelimits} beschrieben, hat der momentan verwendete Development API Key geringe Ratelimits. Sollte die Website öffentlich zugänglich gemacht werden, muss zuerst ein Product API Key beantragt werden, was voraussetzt, dass das Produkt von Riot hierfür akzeptiert wird. Ist das nicht der Fall, so kann die Website nicht öffentlich zugänglich gemacht werden.
