@@ -38,21 +38,14 @@ def get_match_history(summoner: Summoner) -> MatchHistory:
     return history
 
 
-def get_match_ids(puuid: str, start_time: int):
-    start_index = 0
-    full_result = []
-    while result := _get_mh(region='euw1', puuid=puuid, start_time=start_time, count=100, start=start_index):
-        if len(result) == 0:
-            break
-        full_result.extend(result)
-        start_index += 100
-    recent_ids = full_result[-IMPORT_LIMIT_MATCHES:]
-    return recent_ids
+def get_match_ids(puuid: str, start_time: int | None = None):
+    end_time = 9900000000 if start_time is None else None   # Start from end and pick value in the far future
+    return _get_mh(region='euw1', puuid=puuid, start_time=start_time, count=IMPORT_LIMIT_MATCHES, end_time=end_time)
 
 
 @call_with_retry(max_retries=5)
-def _get_mh(region: str, puuid: str, start_time: int, count: int, start: int):
-    return lol_watcher.match.matchlist_by_puuid(region=region, puuid=puuid, start_time=start_time, count=count, start=start)
+def _get_mh(region: str, puuid: str, start_time: int | None, count: int, end_time: int | None):
+    return lol_watcher.match.matchlist_by_puuid(region=region, puuid=puuid, start_time=start_time, count=count, end_time=end_time)
 
 
 def add_missing_games_to_db(db: db, match_ids, puuid: str):

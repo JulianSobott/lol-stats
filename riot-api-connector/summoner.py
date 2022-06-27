@@ -36,7 +36,7 @@ def update_summoner(db: db, summoner):
     else:
         add_summoner(db=db, summoner=summoner, rank=rank, icon_url=icon_url)
         mh = match_history.get_match_ids(
-            puuid=summoner['puuid'], start_time=1643790000)
+            puuid=summoner['puuid'])
         yield from match_history.add_missing_games_to_db(
             db=db, match_ids=mh, puuid=summoner['puuid'])
 
