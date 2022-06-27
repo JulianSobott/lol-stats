@@ -113,9 +113,11 @@ async def _compare_achievements(
     user_challenges: Iterable[Challenges],
 ):
     challenge_categories: dict[str, list[Achievement]] = {}
-    for user_challenge, other_challenge in zip(
-        user_challenges, other_challenges, strict=True
-    ):
+    other_challenges_dict = {c.name: c for c in other_challenges}
+    for user_challenge in user_challenges:
+        if user_challenge.name not in other_challenges_dict:
+            continue
+        other_challenge = other_challenges_dict[user_challenge.name]
         challenge_class = classes_lookup[other_challenge.name]
         if challenge_class.class_name not in challenge_categories:
             challenge_categories[challenge_class.class_name] = []
