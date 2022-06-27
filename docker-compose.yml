@@ -16,6 +16,7 @@ services:
       POSTGRES_HOST: psql-achievements
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       RIOT_API_KEY: ${RIOT_API_KEY}
+      IMPORT_LIMIT_MATCHES: ${IMPORT_LIMIT_MATCHES}
     depends_on:
       psql-achievements:
         condition: service_healthy

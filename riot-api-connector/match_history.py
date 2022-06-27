@@ -1,4 +1,5 @@
 import logging
+import os
 
 import time
 import traceback
@@ -19,6 +20,8 @@ from riotwatcherWrapper import call_with_retry
 logger = logging.getLogger(__name__)
 
 lol_watcher = LolWatcher('RGAPI-ba00cb63-7be0-4e50-8610-eb749b1ea70d')
+
+IMPORT_LIMIT_MATCHES = int(os.environ.get("IMPORT_LIMIT_MATCHES", 20))
 
 
 def get_match_history(summoner: Summoner) -> MatchHistory:
@@ -43,7 +46,8 @@ def get_match_ids(puuid: str, start_time: int):
             break
         full_result.extend(result)
         start_index += 100
-    return full_result
+    recent_ids = full_result[-IMPORT_LIMIT_MATCHES:]
+    return recent_ids
 
 
 @call_with_retry(max_retries=5)
