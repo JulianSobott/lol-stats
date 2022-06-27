@@ -61,7 +61,7 @@ def add_missing_games_to_db(db: db, match_ids, puuid: str):
     i = 0
     for match_id in match_ids:
         match: Match = cass.get_match(id=match_id, region='EUW')
-        if match.game_type != GameType.matched or match.map.id != 1: # id 1 = Summoners Rift
+        if match.game_type != GameType.matched or match.map.id not in [1, 2, 11]:    # Summoners Rift
             continue
         if db.has_game(match_id=match.id, summoner_id=puuid):
             continue
@@ -74,8 +74,8 @@ def add_missing_games_to_db(db: db, match_ids, puuid: str):
             print(traceback.format_exc())
         yield i, len(match_ids)
         i += 1
-        print(f'[INFO] Imported game in {time.time() - start_time}s')
-    print(f'[INFO] Imported match history in {time.time() - mh_start_time}s')
+        logger.info(f'method=add_missing_games_to_db msg="imported game in {time.time() - start_time}s"')
+    logger.info(f'method=add_missing_games_to_db msg="Imported match history in {time.time() - mh_start_time}s"')
 
 
 def add_game_to_db(db: db, match: Match, puuid: str, c: challenges.Challenges):
