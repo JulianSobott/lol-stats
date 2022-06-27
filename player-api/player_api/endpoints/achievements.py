@@ -93,9 +93,13 @@ async def get_achievements(
             lambda challenge: challenge.fav, _flatten_challenges(challenge_categories)
         )
     )
-    achievements = [
-        AchievementCategory(category="Favourites", achievements=favourites)
-    ] + [
+    if favourites:
+        achievements = [
+            AchievementCategory(category="Favourites", achievements=favourites)
+        ]
+    else:
+        achievements = []
+    achievements += [
         AchievementCategory(category=cat_name, achievements=cat_value)
         for cat_name, cat_value in challenge_categories.items()
     ]
