@@ -1,3 +1,19 @@
 \section{Einführungen und Ziele}
 Requirements description
 Required Functions
+
+\subsection{Ziel}
+
+Lol-Stats ist eine Webanwendung, die speziell für aktive "League of Legends"-Spieler entwickelt wurde. Ihre Hauptfunktionalität liegt in der Berechnung und Vermittlung
+von Statistiken, die innerhalb der Spielrunden erfasst werden. Bei den Statistiken handelt sich nicht nur um übliche, simple Daten, sondern vielmehr um spezielle Errungenschaften. 
+Lol-Stats bietet außerdem die Möglichkeit, diese Errungenschaften mit denen anderer Spieler zu vergleichen. Man kann bestimmte Spieler auch als Konkurrenten hinzufügen, um öfters mit ihnen zu vergleichen.
+Zudem kann man mit der gesamten Gruppe an ausgewählten Konkurrenten und der globalen Liste an Spieler vergleichen.
+
+\subsection{Anforderungen}
+
+\subsubsection{Technisch}
+
+Die gesamte Architektur soll dabei geschickt in Microservices aufgeteilt werden, wobei jeder Microservice in seinem eigenen Docker-Container funktionieren sollte. 
+Ebenso gibt es kein zentrales Datenbanksystem, denn jeder Microservice soll, wenn nötig, über eine eigene Datenbank aufweisen. 
+In dieser Anwendung soll es unter anderem Echtzeitverarbeitung von Daten geben.
+Im speziellen für die einzelnen Komponenten wurde für das Frontend angefordert, eine Benutzerschnittstelle zu implementieren, die Responsiveness und Intuitivität aufweist, sodass der Benutzer einen einfachen Umgang mit der Webseite ausüben kann.

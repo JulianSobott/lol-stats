@@ -42,6 +42,10 @@ Für den Datenbankzugriff wurde sich für SQLAlchemy entschieden, um ein ORM ver
 
 \subsubsection{User Management}
 
+Im Bereich des User Managements werden Daten vom Nutzer gespeichert, die für die eigene Plattform relevant sind.
+Dieser Backend-Service wurde in Python mit Flask geschrieben.
+Für das Mapping der Daten wurde SQLAlchemy genommen und die Speicherung findet in der PostgreSQL-Datenbank statt.    
+
 \subsubsection{Frontend}
 
 Über das Frontend lässt sich die Anwendung benutzen. Sie ist derzeit für die Benutzung mit dem Webbrowser ausgelegt. Dabei kommen folgende Technolgien zum Einsatz.  \\
@@ -66,7 +70,7 @@ umgesetzt werden. Ebenso bietet diese CCS-Framework bereits ein responsives Layo
 In den beiden Tabellen~\ref{tab:goals} und~\ref{tab:principles}, werden die Ziele der Architektur aufgelistet
 und die jeweiligen Architektur Prinzipien, die diese unterstützen.
 
-\subsubsection{Drivers}
+\subsubsection{Architektur Ziele}
 \begin{center}
     \begin{tabular}{|l|l|l| p{5cm} |p{2.5cm}|}
         \hline

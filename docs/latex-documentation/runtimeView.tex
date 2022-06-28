@@ -5,12 +5,25 @@ Error and exception behaviour
 
 \subsection{Neuer Spieler importieren}
 
-Um einen neuen Spieler zu importieren, wird eine Anfrage von dem Front and die "Player-API" gesendet. Da diese Anfrage zustandslos ist, werden regelmäßig HTTP-Anfragen gesendet, um den aktuellen Import-Status 
-zu erhalten. Diese Informationen werden im Frontend an den entsprechenden stellen dargestellt.
+Um einen neuen Spieler zu importieren, wird eine Anfrage von dem Front and die "Player-API" gesendet.
+Da diese Anfrage zustandslos ist, werden regelmäßig HTTP-Anfragen gesendet, um den aktuellen Import-Status
+zu erhalten.
+Diese Informationen werden im Frontend an den entsprechenden stellen dargestellt.
+Im Player-API Service wird für den Import ein Backgroundtask gestartet, der über einen grpc Stream den Import im
+Games Importer Service startet und die Anzahl der importierten Spiele streamt.
 
-\graphic{Player_Import.png}{Flussdiagramm des Spieler imports}
+\graphic{cdc-07-import-player.drawio}{Flussdiagramm des Spieler imports}
 
 \subsection{Spieler vergleichen}
+
+Das Diagramm in Abbildung~\ref{fig:compare-diagram} stellt den Ablauf dar, wenn sich ein Spieler mit anderen Spielern vergleichen will.
+\begin{figure}
+    \centering
+    \includegraphics[width=\textwidth]{images/cdc-07-compare.drawio}
+    \caption{Swimlane Diagramm zum Vergleich von Spielern}
+    \label{fig:compare-diagram}
+\end{figure}
+
 
 \subsection{Error handling}
 \subsubsection{Game importing}
