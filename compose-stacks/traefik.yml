@@ -1,0 +1,49 @@
+version: "3.9"
+
+x-logging: &logging
+  logging:
+    driver: loki
+    options:
+      loki-url: "http://localhost:3100/loki/api/v1/push"
+      loki-max-backoff: "5s"
+      loki-retries: "2"
+
+networks:
+  traefik:
+    external: true
+
+volumes:
+  letsencrypt:
+
+services:
+  traefik:
+    image: traefik:v2.7
+    restart: unless-stopped
+    command:
+      - "--accesslog=true"
+      - "--api.insecure=true"
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--entrypoints.web.address=:80"
+      - "--entryPoints.websecure.address=:443"
+      - "--entrypoints.web.http.redirections.entrypoint.to=websecure"
+      - "--entrypoints.web.http.redirections.entrypoint.scheme=https"
+      - "--certificatesresolvers.le.acme.httpchallenge=true"
+      - "--certificatesresolvers.le.acme.httpchallenge.entrypoint=web"
+      # TODO: enter your mail - "--certificatesResolvers.le.acme.email="
+      - "--certificatesResolvers.le.acme.storage=/letsencrypt/acme.json"
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.traefik_dashboard.rule=Host(`dashboard.lol-stats.de`)
+      - traefik.http.services.traefik_dashboard_lb.loadbalancer.server.port=8080
+      - traefik.http.routers.traefik_dashboard.entrypoints=websecure
+      - traefik.http.routers.traefik_dashboard.tls.certresolver=le
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - "letsencrypt:/letsencrypt"
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+    networks:
+      - traefik
+    <<: *logging

@@ -1,0 +1,139 @@
+version: "3.5"
+
+networks:
+  frontend:
+    name: frontend
+  storage:
+    name: storage
+  services:
+    external: true
+  traefik:
+    external: true
+
+volumes:
+  data-elasticsearch:
+  data-mongo:
+
+services:
+  mongodb:
+    image: mongo:${MONGODB_VERSION:-3.6}
+    restart: always
+    volumes:
+      - data-mongo:/data/db
+      - ./logs/apim-mongodb:/var/log/mongodb
+    networks:
+      - storage
+
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:${ELASTIC_VERSION:-7.7.0}
+    restart: always
+    volumes:
+      - data-elasticsearch:/usr/share/elasticsearch/data
+    environment:
+      - http.host=0.0.0.0
+      - transport.host=0.0.0.0
+      - xpack.security.enabled=false
+      - xpack.monitoring.enabled=false
+      - cluster.name=elasticsearch
+      - bootstrap.memory_lock=true
+      - discovery.type=single-node
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+      nofile: 65536
+    networks:
+      - storage
+
+  gateway:
+    image: graviteeio/apim-gateway:${APIM_VERSION:-3}
+    restart: always
+
+    labels:
+      - traefik.enable=true
+      - traefik.docker.network=traefik
+      - traefik.http.routers.gravitee_api.rule=Host(`lol-stats.de`) && PathPrefix(`/api`)
+      - traefik.http.services.gravitee_api_lb.loadbalancer.server.port=8082
+      - traefik.http.routers.gravitee_api.entrypoints=websecure
+      - traefik.http.routers.gravitee_api.tls.certresolver=le
+    depends_on:
+      - mongodb
+      - elasticsearch
+    volumes:
+      - ./logs/apim-gateway:/opt/graviteeio-gateway/logs
+    environment:
+      - gravitee_management_mongodb_uri=mongodb://mongodb:27017/gravitee?serverSelectionTimeoutMS=5000&connectTimeoutMS=5000&socketTimeoutMS=5000
+      - gravitee_ratelimit_mongodb_uri=mongodb://mongodb:27017/gravitee?serverSelectionTimeoutMS=5000&connectTimeoutMS=5000&socketTimeoutMS=5000
+      - gravitee_reporters_elasticsearch_endpoints_0=http://elasticsearch:9200
+    networks:
+      - storage
+      - frontend
+      - services
+      - traefik
+
+  management_api:
+    image: graviteeio/apim-management-api:${APIM_VERSION:-3}
+    restart: always
+    labels:
+      - traefik.enable=true
+      - traefik.docker.network=traefik
+      - traefik.http.routers.gravitee_management.rule=Host(`api-management.lol-stats.de`)
+      - traefik.http.services.gravitee_management_lb.loadbalancer.server.port=8083
+      - traefik.http.routers.gravitee_management.entrypoints=websecure
+      - traefik.http.routers.gravitee_management.tls.certresolver=le
+    links:
+      - mongodb
+      - elasticsearch
+    depends_on:
+      - mongodb
+      - elasticsearch
+    volumes:
+      - ./logs/apim-management-api:/opt/graviteeio-management-api/logs
+    environment:
+      - gravitee_management_mongodb_uri=mongodb://mongodb:27017/gravitee?serverSelectionTimeoutMS=5000&connectTimeoutMS=5000&socketTimeoutMS=5000
+      - gravitee_analytics_elasticsearch_endpoints_0=http://elasticsearch:9200
+    networks:
+      - storage
+      - frontend
+      - traefik
+
+  management_ui:
+    image: graviteeio/apim-management-ui:${APIM_VERSION:-3}
+    restart: always
+    labels:
+      - traefik.enable=true
+      - traefik.docker.network=traefik
+      - traefik.http.routers.gravitee_ui.rule=Host(`api-ui.lol-stats.de`)
+      - traefik.http.services.gravitee_ui_lb.loadbalancer.server.port=8080
+      - traefik.http.routers.gravitee_ui.entrypoints=websecure
+      - traefik.http.routers.gravitee_ui.tls.certresolver=le
+    depends_on:
+      - management_api
+    environment:
+      - MGMT_API_URL=https://api-management.lol-stats.de/management/organizations/DEFAULT/environments/DEFAULT/
+    volumes:
+      - ./logs/apim-management-ui:/var/log/nginx
+    networks:
+      - frontend
+      - traefik
+
+  portal_ui:
+    image: graviteeio/apim-portal-ui:${APIM_VERSION:-3}
+    restart: always
+    depends_on:
+      - management_api
+    labels:
+      - traefik.enable=true
+      - traefik.docker.network=traefik
+      - traefik.http.routers.gravitee_portal.rule=Host(`portal.lol-stats.de`)
+      - traefik.http.services.gravitee_portal.loadbalancer.server.port=8080
+      - traefik.http.routers.gravitee_portal.entrypoints=websecure
+      - traefik.http.routers.gravitee_portal.tls.certresolver=le
+    environment:
+      - PORTAL_API_URL=https://api-management.lol-stats.de/portal/environments/DEFAULT
+    volumes:
+      - ./logs/apim-portal-ui:/var/log/nginx
+    networks:
+      - frontend
+      - traefik
