@@ -26,18 +26,10 @@
                       <div class="mb-2">
                         <p class="empty-title">Welcome to LOL-Stats.de</p>
                         <p class="empty-subtitle text-muted">
-                          Lorem ipsum dolor sit amet, consetetur sadipscing
-                          elitr, sed diam nonumy eirmod tempor invidunt ut
-                          labore et dolore magna aliquyam erat, sed diam
-                          voluptua. At vero eos et accusam et justo duo dolores
-                          et ea rebum. Stet clita kasd gubergren, no sea
-                          takimata sanctus est Lorem ipsum dolor sit amet. Lorem
-                          ipsum dolor sit amet, consetetur sadipscing elitr, sed
-                          diam nonumy eirmod tempor invidunt ut labore et dolore
-                          magna aliquyam erat, sed diam voluptua. At vero eos et
-                          accusam et justo duo dolores et ea rebum. Stet clita
-                          kasd gubergren, no sea takimata sanctus est Lorem
-                          ipsum dolor sit amet.
+                          Lol-Stats is a web application designed specifically for active "League of Legends" players. Its main functionality lies in the calculation and mediation of statistics
+                          statistics that are collected during the game rounds. The statistics are not just usual, simple data, but rather special achievements. 
+                          Lol-Stats also offers the possibility to compare these achievements with those of other players. You can also add certain players as competitors to compare with them more often.
+                          Moreover, you can compare with the entire group of selected competitors and the global list of players.
                         </p>
                       </div>
                     </div>
