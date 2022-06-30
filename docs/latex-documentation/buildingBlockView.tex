@@ -98,10 +98,15 @@ Beim Planungsprozess wurden folgende Mockups erstellt.
 
 \graphic{mockups/mockup_all.png}{Mockups des Frontends}
 
-\subsubsection{Klassendiagramms}
+\subsubsection{Klassendiagramm}
 
 \graphic{Frontend_UML.png}{Das UML-Diagramm des Frontends}
-\todo{Frontend Klassendiagramm Erklärung}
+
+Die gezeigte Abbildung stellt alle Module der Frontends dar. Hierbei wird zwischen "Page"-Komponenten und "Vue"-Komponenten, die beide unterschiedliche Logik implementieren.
+Die "Page"-Komponente ist primär zur Darstellung der eigentlichen Seite verantwortlich und kann mehrere "Vue"-Komponenten enthalten.
+Die "Vue"-Komponente hingegen ist nur für die Darstellung und Verarbeitung eines bestimmten Bereichs auf der Webseite wie die Auflistung aller letzten Spiele verantwortlich.
+Sie sind nicht auf eine Seite beschränkt, sondern können auf mehreren Seiten eingebunden werden. Dadurch ist eine Modularität des Frontends möglich.
+Im Package "Template Components" befinden sie Komponenten, die auf jeder Seite eingebunden ist, wie beispielsweise die Navigationsleiste.
 
 \subsubsection{Verantwortlichkeiten}
 
