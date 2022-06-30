@@ -1,12 +1,4 @@
 \section{Querschnittliche Konzepte}
-Persistence 
-E-R Diagram, information architecture model, etc.
-REST APIs
-List the backend REST APIs. For more detail you can refer to generated API doc.
-User Interface
-E.g.., SPA, responsive, etc.
-Communication/Integration with other Software Systems (external APIs)
-Configurability
 
 \subsection{LoL Database ER-Diagram}
 \graphic{LoLDatabase}{ER-Diagramm der LoL Datenbank}
@@ -25,10 +17,13 @@ Tabellen in der Datenbank:\\
 \end{itemize}
 
 \subsection{User Database ER-Diagramm}
+\todo{User DB ER-Diagram}
 
 \subsection{User Management API Spezifikation}
+\todo{User Management API Spec}
 
-\subsection{Player API Spezifikation}s
+\subsection{Player API Spezifikation}
+\todo{Player API Spec}
 
 \subsection{GRPC Interface}
 Damit der Import eines neuen Spieler angefragt werden kann, muss eine Kommunikation zwischen Frontend und dem Games Importer Service bestehen. Das Frontend kommuniziert nur mit der PlayerAPI, welche die Anfrage dann an den Games Importer Service weiterleiten muss.\\
@@ -58,3 +53,4 @@ Mithilfe dieser Datei werden dann die nötigen Python Klassen generiert. In der 
 
 Die Logs aller Services werden zentral von Loki eingesammelt und gespeichert.
 Über Grafana lassen sich die Logs durchsuchen.
+\todo{Zentrales Logging ausführlicher?}

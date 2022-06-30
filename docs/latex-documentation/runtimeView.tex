@@ -1,8 +1,6 @@
 \section{Laufzeitsicht}
-At least 1 UML sequence diagram of main scenario with explanation
-Error and exception behaviour
 \subsection{Account registrieren}
-
+\todo{Account registrieren Szenario}
 \subsection{Neuer Spieler importieren}
 
 Um einen neuen Spieler zu importieren, wird eine Anfrage von dem Front and die "Player-API" gesendet.
@@ -19,7 +17,7 @@ Games Importer Service startet und die Anzahl der importierten Spiele streamt.
 Das Diagramm in Abbildung~\ref{fig:compare-diagram} stellt den Ablauf dar, wenn sich ein Spieler mit anderen Spielern vergleichen will.
 \begin{figure}
     \centering
-    \includegraphics[width=\textwidth]{images/cdc-07-compare.drawio}
+    \includegraphics[width=\textwidth]{cdc-07-compare.drawio}
     \caption{Swimlane Diagramm zum Vergleich von Spielern}
     \label{fig:compare-diagram}
 \end{figure}
@@ -27,6 +25,9 @@ Das Diagramm in Abbildung~\ref{fig:compare-diagram} stellt den Ablauf dar, wenn 
 
 \subsection{Error handling}
 \subsubsection{Game importing}
+Beim importieren des Spiels können wie in \ref{riot-api-libraries} bereits erklärt verschiedene Fehler auftreten. Damit Fehler, die von der Riot API kommen und meist nur temporär sind, nicht den Service zum Absturz bringen, werden alle API Aufrufe innerhalb einer try, except Anweisung ausgeführt. Sollte dann ein API Aufruf zu einem Fehler führen, so wird dieser bei Fehlern wie 503 - Service Unavailable wiederholt. Bei Fehlern, die nicht temporär sind (400 - Bad Request) wird der Request verworfen.\\
+Auch die Datenbank kann Errors liefern, weshalb auch alle Datenbank Anfragen innerhalb von try, except Anweisung laufen. Tritt hierbei ein Fehler auf, so wird die komplette Anfrage die zu diesem geführt hat (zB das importieren eines Spiels) abgebrochen, so dass der Service weitere Anfragen verarbeiten kann. Wird ein Ablauf, wie das importieren eines Spiels unterbrochen, so wird dieser im nächsten update Durchlauf erneut versucht.
+
 \subsubsection{Monitoring}
 
 Um die Applikation zu Monitoren werden verschiedene Tools verwendet.
@@ -41,7 +42,7 @@ Außerdem werden automatisch Datenbank Operationen gemessen, wodurch es möglich
 und Datenbank Operationen zu unterscheiden, wie in Abbildung~\ref{fig:signoz-traces} zu sehen ist.
 \begin{figure}
     \centering
-    \includegraphics[width=\textwidth]{images/signoz_traces}
+    \includegraphics[width=\textwidth]{signoz_traces}
     \caption{Trace Details in SigNoz zu einem /achievements Request}
     \label{fig:signoz-traces}
 \end{figure}

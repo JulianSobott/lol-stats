@@ -1,12 +1,4 @@
 \section{Lösungsstrategie}
-Top level architecture
-Technologyy decisions
-Architectural pattern / Desgin pattern
-Development process
-Abstract, highest-level architecture or solution concept. Show blocks that address (solve) the prior context diagram. How are you structuring the system to achieve the system goal? Without going into the details that the next section goes into (packages and classes).
-Architecture Drivers: : see table example in software architecture course slides
-Architecture Principles/Pattern: : see table example in software architecture course slides
-Table with Cross-Mapping of Architecture Principles to/from Architecture Drivers: see table example in software architecture course slides
 
 \subsection{Service-Diagramm}
 
@@ -18,7 +10,7 @@ Table with Cross-Mapping of Architecture Principles to/from Architecture Drivers
 \end{figure}
 
 In Abbildung~\ref{fig:service-diagram} ist das Service Diagramm für die Applikation zu sehen.
-% TODO: ausformulieren
+\todo{Diagramm erklären}
 
 \subsection{Technolgien}
 
@@ -42,9 +34,9 @@ Für den Datenbankzugriff wurde sich für SQLAlchemy entschieden, um ein ORM ver
 
 \subsubsection{User Management}
 
-Im Bereich des User Managements werden Daten vom Nutzer gespeichert, die für die eigene Plattform relevant sind.
+Im Bereich des User Managements werden Daten vom Nutzer gespeichert, die für die eigene Plattform relevant sind. Dieser Service bietet u.a. Funktionen um Accounts zu erstellen oder zu löschen.\\
 Dieser Backend-Service wurde in Python mit Flask geschrieben.
-Für das Mapping der Daten wurde SQLAlchemy genommen und die Speicherung findet in der PostgreSQL-Datenbank statt.    
+Für das Mapping der Daten wurde SQLAlchemy genommen und die Speicherung findet in einer PostgreSQL-Datenbank statt.    
 
 \subsubsection{Frontend}
 

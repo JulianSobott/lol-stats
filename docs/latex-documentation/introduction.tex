@@ -1,19 +1,17 @@
 \section{Einführungen und Ziele}
-Requirements description
-Required Functions
-
 \subsection{Ziel}
 
 Lol-Stats ist eine Webanwendung, die speziell für aktive "League of Legends"-Spieler entwickelt wurde. Ihre Hauptfunktionalität liegt in der Berechnung und Vermittlung
 von Statistiken, die innerhalb der Spielrunden erfasst werden. Bei den Statistiken handelt sich nicht nur um übliche, simple Daten, sondern vielmehr um spezielle Errungenschaften. 
-Lol-Stats bietet außerdem die Möglichkeit, diese Errungenschaften mit denen anderer Spieler zu vergleichen. Man kann bestimmte Spieler auch als Konkurrenten hinzufügen, um öfters mit ihnen zu vergleichen.
-Zudem kann man mit der gesamten Gruppe an ausgewählten Konkurrenten und der globalen Liste an Spieler vergleichen.
+Lol-Stats bietet außerdem die Möglichkeit, diese Errungenschaften mit denen anderer Spieler zu vergleichen. Man kann bestimmte Spieler auch als Konkurrenten hinzufügen, um sicher schneller und einfacher mit ihnen zu vergleichen.\\
+Zudem kann man sich mit der gesamten Gruppe an ausgewählten Konkurrenten oder der globalen Liste an Spieler vergleichen.
 
 \subsection{Anforderungen}
 
 \subsubsection{Technisch}
 
-Die gesamte Architektur soll dabei geschickt in Microservices aufgeteilt werden, wobei jeder Microservice in seinem eigenen Docker-Container funktionieren sollte. 
-Ebenso gibt es kein zentrales Datenbanksystem, denn jeder Microservice soll, wenn nötig, über eine eigene Datenbank aufweisen. 
+Die gesamte Architektur soll dabei geschickt in Microservices aufgeteilt werden, wobei jeder Microservice in seinem eigenen Docker-Container funktionieren sollte.
+Ebenso gibt es kein zentrales Datenbanksystem, denn jeder Microservice soll, wenn nötig, über eine eigene Datenbank verfügen.\\
+Das Backend ist dafür zuständig die Daten aus der Riot API zu importieren und dem Frontend zur Verfügung zu stellen. Dazu muss eine Schnittstelle zwischen der Riot API und dem Backend, sowie zwischen Backend und Frontend geschaffen werden. Des weiteren existiert ein Servive zur Verwaltung der User-Accounts, welcher ebenfalls mit dem Frontend kommunizieren muss.\\
 In dieser Anwendung soll es unter anderem Echtzeitverarbeitung von Daten geben.
-Im speziellen für die einzelnen Komponenten wurde für das Frontend angefordert, eine Benutzerschnittstelle zu implementieren, die Responsiveness und Intuitivität aufweist, sodass der Benutzer einen einfachen Umgang mit der Webseite ausüben kann.
+Das Frontend soll eine Benutzerschnittstelle implementieren, die Responsiveness und Intuitivität aufweist, sodass der Umgang mit der Website für Benutzer möglichst einfach ist.

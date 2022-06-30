@@ -1,8 +1,4 @@
 \section{Bausteinsicht}
-UML package and class diagrams (perhaps auto-generate with tool, but ensure clean and well-organized)
-Include description of responsibility and name of each package and class.
-List Externe Software used and provide links
-
 
 \subsection{Games Importer Service}
 \subsubsection{Klassendiagramm}
@@ -15,11 +11,15 @@ Die App Klasse beinhaltet den main loop (update\_loop Funktion). In dieser werde
 Der PlayerImportRequest erbt von der von GRPC generierten Klasse ImporterService und ist für die Verbindung mit der PlayerAPI zuständig. Über diese Klasse kann eine Anfrage gesendet werden, um den Import eines neuen Spielers zu starten, wobei dann dieselbe Abfolge durchlaufen wird wie oben bereits beim updaten eines Spielers beschrieben.
 
 \subsubsection{Externe Software}
-GRPC: \href{https://grpc.io/docs/languages/python/basics/}\\
-Cassiopeia: \href{https://github.com/meraki-analytics/cassiopeia}\\
-Riot Watcher: \href{https://github.com/pseudonym117/Riot-Watcher}\\
-psycopg2: \href{https://pypi.org/project/psycopg2/}\\
-Riot API: \href{https://developer.riotgames.com/}\\
+\begin{itemize}
+
+\item \textbf{GRPC:} \href{https://grpc.io/docs/languages/python/basics/}{https://grpc.io} Kommunikation zwischen Backend Services\\
+\item \textbf{Cassiopeia:} \href{https://github.com/meraki-analytics/cassiopeia}{https://github.com/meraki-analytics/cassiopeia} Riot API Wrapper für Python\\
+\item \textbf{Riot Watcher:} \href{https://github.com/pseudonym117/Riot-Watcher}{https://github.com/pseudonym117/Riot-Watcher} Riot API Wrapper für Python\\
+\item \textbf{psycopg2:} \href{https://pypi.org/project/psycopg2/}{https://pypi.org/project/psycopg2/} Python library für Zugriff auf PostgreSQL Datenbanken \\
+\item \textbf{Riot API:} \href{https://developer.riotgames.com/}{https://developer.riotgames.com/} API von Riot die Zugriff zu Daten über u.a. League of Legends bietet\\
+
+\end{itemize}
 
 \subsection{Player API}
 
@@ -27,13 +27,13 @@ Riot API: \href{https://developer.riotgames.com/}\\
 
 \begin{figure}
     \centering
-    \includegraphics[width=\textwidth]{images/cdc-06-player-api-static.drawio}
+    \includegraphics[width=\textwidth]{cdc-06-player-api-static.drawio}
     \caption{Komponenten Diagramm des PlayerAPI Services}
     \label{fig:player-api-component-diagram}
 \end{figure}
 Das in Abbildung~\ref{fig:player-api-component-diagram} abgebildete Komponenten Diagramm stellt die wichtigsten
 Komponenten des PlayerAPI Services dar.
-Wobei im \lstinline{model} Package nur die Module ohne die Klassen dargestellt werden, um das Diagramm
+Wobei im \lstinline!model! Package nur die Module ohne die Klassen dargestellt werden, um das Diagramm
 übersichtlich zu halten und es sich hierbei nur um Datenklassen handelt ohne Logik.
 
 \subsubsection{Verantwortlichkeiten}
@@ -49,14 +49,14 @@ Dieser Service stellt folgende Endpunkte zur Verfügung:
     \item \textbf{recent\_games}: Stellt die zuletzt gespielten Spiele paginiert zur Verfügung.
 \end{itemize}
 
-Das \lstinline{main} Modul ist der Einstiegspunkt für die Applikation.
+Das \lstinline!main! Modul ist der Einstiegspunkt für die Applikation.
 Hier wird die App mit den Routen konfiguriert, middlewares hinzugefügt und logging mit monitoring konfiguriert.
 
-\lstinline{import_state} und \lstinline{get_player} haben Funktionen, die in fast jedem Endpunkt genutzt werden.
+\lstinline!import_state! und \lstinline!get_player! haben Funktionen, die in fast jedem Endpunkt genutzt werden.
 
-Im \lstinline{db} Modul ist das ORM Modell und die Verbindung zur Datenbank.
+Im \lstinline!db! Modul ist das ORM Modell und die Verbindung zur Datenbank.
 
-Das \lstinline{models} Package enthält Datenklassen, die keine Logik enthalten.
+Das \lstinline!models! Package enthält Datenklassen, die keine Logik enthalten.
 FastAPI wandelt diese in den Endpunkten automatisch in JSON um, wodurch alles typisiert ist.
 Um das Diagramm übersichtlich zu halten, wurden nur die Module ohne die enthaltenen Klassen dargestellt.
 
@@ -72,18 +72,21 @@ Um das Diagramm übersichtlich zu halten, wurden nur die Module ohne die enthalt
 \end{itemize}
 
 \subsection{User Management}
-\subsubsection{Klassendiagramms}
+\subsubsection{Klassendiagramm}
+\todo{User Management Klassendiagramm}
 \subsubsection{Verantwortlichkeiten}
 Zu den eigenen Daten des User Backends gehören unter anderem die Region oder die Referenz zu einem Lol-Account dazu, 
 aber auch alle notwendige Daten, die bei der Registrierung und beim Login entstehen. Für die Validierung dieser einkommenden Daten wurde die Libaries "Werkzeug" und "Marshmallow" verwendet.
 Außerdem beinhaltet dieser Service die Zuständigkeit für das Token und Competitor Management. So wurde für das Kreieren und Validieren der Tokens die Libary
 "PyJWT" verwendet.
 \subsubsection{Externe Software}
+\begin{itemize}
 \item \textbf{Flask} (\href{https://flask.palletsprojects.com/en/2.1.x/}{https://flask.palletsprojects.com/en/2.1.x/}): Webframework
 \item \textbf{sqlalchemy} (\href{https://www.sqlalchemy.org/}{https://www.sqlalchemy.org/}): Datenbank ORM
 \item \textbf{Werkzeug} (\href{https://pypi.org/project/Werkzeug/}{https://pypi.org/project/Werkzeug/}): Datenbank ORM
-\item \textbf{Marshmallow} (\href{https://marshmallow.readthedocs.io/en/stable/}{https://marshmallow.readthedocs.io/en/stable/): Datenbank ORM
+\item \textbf{Marshmallow} (\href{https://marshmallow.readthedocs.io/en/stable/}{https://marshmallow.readthedocs.io/en/stable/}): Datenbank ORM
 \item \textbf{PyJWT} (\href{https://pyjwt.readthedocs.io/en/latest/}{https://pyjwt.readthedocs.io/en/latest/}): Datenbank ORM
+\end{itemize}
 
 \newpage
 
@@ -93,11 +96,12 @@ Außerdem beinhaltet dieser Service die Zuständigkeit für das Token und Compet
 
 Beim Planungsprozess wurden folgende Mockups erstellt.
 
-\graphic{mockups/mockup_all.png}{lle Mockups des Frontends}
+\graphic{mockups/mockup_all.png}{Mockups des Frontends}
 
 \subsubsection{Klassendiagramms}
 
 \graphic{Frontend_UML.png}{Das UML-Diagramm des Frontends}
+\todo{Frontend Klassendiagramm Erklärung}
 
 \subsubsection{Verantwortlichkeiten}
 
@@ -140,3 +144,4 @@ an das "Player-Backend", sobald die gewünschten Filter übernommen wurden.
 \newline
 
 \subsubsection{Externe Software}
+\todo{Frontend externe Software}
