@@ -1,0 +1,53 @@
+version: "3.9"
+
+x-logging: &logging
+  logging:
+    driver: loki
+    options:
+      loki-url: "http://localhost:3100/loki/api/v1/push"
+      loki-max-backoff: "5s"
+      loki-retries: "2"
+
+services:
+  grafana:
+    image: grafana/grafana-oss:9.0.1
+    environment:
+      GF_SERVER_DOMAIN: grafana.lol-stats.de
+    restart: always
+    ports:
+    - "3000:3000"
+    volumes:
+      - grafana-storage:/var/lib/grafana
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=traefik"
+      - "traefik.http.routers.grafana.rule=Host(`grafana.lol-stats.de`)"
+      - "traefik.http.routers.grafana.service=grafana"
+      - "traefik.http.services.grafana.loadbalancer.server.port=3000"
+      - "traefik.http.routers.grafana.tls=true"
+      - "traefik.http.routers.grafana.tls.certresolver=le"
+      - "traefik.http.routers.grafana.entrypoints=websecure"
+    networks:
+    - traefik
+    - loki
+    <<: *logging
+
+  loki:
+    image: grafana/loki:latest
+    restart: always
+    ports:
+      - "3100:3100"
+    command:
+      - -config.file=/etc/loki/local-config.yaml
+    volumes:
+      - loki:/etc/loki
+    networks:
+    - loki
+
+networks:
+  traefik:
+    external: true
+  loki:
+volumes:
+  loki: {}
+  grafana-storage: {}

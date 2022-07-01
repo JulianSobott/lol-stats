@@ -1,4 +1,13 @@
-version: "3"
+version: "3.9"
+
+x-logging: &logging
+  logging:
+    driver: loki
+    options:
+      loki-url: "http://localhost:3100/loki/api/v1/push"
+      loki-max-backoff: "5s"
+      loki-retries: "2"
+
 services:
   riot-api-connector:
     build: riot-api-connector
@@ -7,11 +16,13 @@ services:
       POSTGRES_HOST: psql-achievements
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       RIOT_API_KEY: ${RIOT_API_KEY}
+      IMPORT_LIMIT_MATCHES: ${IMPORT_LIMIT_MATCHES}
     depends_on:
       psql-achievements:
         condition: service_healthy
     networks:
       - stats-storage
+    <<: *logging
 
   psql-achievements:
     image: postgres:14.2
@@ -31,6 +42,7 @@ services:
       retries: 3
     networks:
       - stats-storage
+    <<: *logging
 
   frontend:
     build: frontend/
@@ -45,6 +57,7 @@ services:
       - traefik.http.routers.frontend.tls.certresolver=le
     networks:
       - traefik
+    <<: *logging
 
   player-api:
     build: player-api
@@ -61,6 +74,7 @@ services:
       - services
       - stats-storage
       - tracing
+    <<: *logging
 
   user-management:
     build: user-backend/user_backend/
@@ -81,6 +95,7 @@ services:
       - user_management
       - tracing
       - services
+    <<: *logging
 
   user-management-database:
     image: postgres:14
@@ -96,6 +111,7 @@ services:
     container_name: user-management-db
     networks:
       - user_management
+    <<: *logging
 
 volumes:
   pg_data: {}

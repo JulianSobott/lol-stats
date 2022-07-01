@@ -6,7 +6,7 @@ from sqlalchemy.orm import Session
 
 from player_api.db import Games, Champions
 from player_api.get_player import get_player_by_id
-from player_api.import_state import is_player_imported
+from player_api.import_state import is_player_imported, is_player_currently_imported
 from player_api.log import get_logger
 from player_api.middlewares import get_db
 from player_api.models.player import Player, PlayerId, MostPlayed, Rank, TierEnum
@@ -57,6 +57,7 @@ async def get_player(player_id: PlayerId, db: Session = Depends(get_db)):
     logger.debug(f"method=get_player {win_rate=}")
 
     rank = Rank.from_summoner(player)
+    imported = not is_player_currently_imported(player_id)
     return Player(
         id=player.puuid,
         player_icon_path=player.icon_path,
@@ -65,7 +66,7 @@ async def get_player(player_id: PlayerId, db: Session = Depends(get_db)):
         rank=rank,
         most_played=most_played,
         win_rate=win_rate,
-        imported=True,
+        imported=imported,
     )
 
 

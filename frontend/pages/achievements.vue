@@ -319,13 +319,13 @@
                     </div>
                   </div>
                 </div>
-                <div v-else class="tab-content">  
+                <div v-else class="tab-content">
                   <div
-                    v-for="item in achievements"
+                    v-for="(item, index) in achievements"
                     :id="getTabId(item.category)"
                     class="card tab-pane"
                     :key="item.category"
-                    :class="{ 'show active': item.category === 'Favourites' }"
+                    :class="{ 'show active': index === 0 }"
                   >
                     <div class="table-responsive">
                       <table

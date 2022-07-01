@@ -1,4 +1,5 @@
 import logging
+import os
 
 import time
 import traceback
@@ -20,21 +21,17 @@ logger = logging.getLogger(__name__)
 
 lol_watcher = LolWatcher('RGAPI-ba00cb63-7be0-4e50-8610-eb749b1ea70d')
 
+IMPORT_LIMIT_MATCHES = int(os.environ.get("IMPORT_LIMIT_MATCHES", 20))
 
-def get_match_ids(puuid: str, start_time: int):
-    start_index = 0
-    full_result = []
-    while result := _get_mh(region='euw1', puuid=puuid, start_time=start_time, count=100, start=start_index):
-        if len(result) == 0:
-            break
-        full_result.extend(result)
-        start_index += 100
-    return full_result
+
+def get_match_ids(puuid: str, start_time: int | None = None):
+    end_time = 9900000000 if start_time is None else None   # Start from end and pick value in the far future
+    return _get_mh(region='euw1', puuid=puuid, start_time=start_time, count=IMPORT_LIMIT_MATCHES, end_time=end_time)
 
 
 @call_with_retry(max_retries=5)
-def _get_mh(region: str, puuid: str, start_time: int, count: int, start: int):
-    return lol_watcher.match.matchlist_by_puuid(region=region, puuid=puuid, start_time=start_time, count=count, start=start)
+def _get_mh(region: str, puuid: str, start_time: int | None, count: int, end_time: int | None):
+    return lol_watcher.match.matchlist_by_puuid(region=region, puuid=puuid, start_time=start_time, count=count, end_time=end_time)
 
 
 def add_missing_games_to_db(db: db, match_ids, puuid: str):
@@ -43,7 +40,7 @@ def add_missing_games_to_db(db: db, match_ids, puuid: str):
     i = 0
     for match_id in match_ids:
         match: Match = cass.get_match(id=match_id, region='EUW')
-        if match.game_type != GameType.matched or match.map.id != 1: # id 1 = Summoners Rift
+        if match.game_type != GameType.matched or match.map.id not in [1, 2, 11]:    # Summoners Rift
             continue
         if db.has_game(match_id=match.id, summoner_id=puuid):
             continue
@@ -56,8 +53,8 @@ def add_missing_games_to_db(db: db, match_ids, puuid: str):
             print(traceback.format_exc())
         yield i, len(match_ids)
         i += 1
-        print(f'[INFO] Imported game in {time.time() - start_time}s')
-    print(f'[INFO] Imported match history in {time.time() - mh_start_time}s')
+        logger.info(f'method=add_missing_games_to_db msg="imported game in {time.time() - start_time}s"')
+    logger.info(f'method=add_missing_games_to_db msg="Imported match history in {time.time() - mh_start_time}s"')
 
 
 def add_game_to_db(db: db, match: Match, puuid: str, c: challenges.Challenges):
