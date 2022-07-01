@@ -17,7 +17,7 @@ schnell und einfach deployt werden.
 
 \subsubsection{Mögliche Alternativen}\label{subsubsec:mogliche-alternativen}
 
-\textbf{Monolith}: Es wurde sich gegen ein Monolith entschieden, um eine Unabhängige Entwicklung zu gewährleisten.
+\textbf{Monolith}: Es wurde sich gegen ein Monolith entschieden, um eine unabhängige Entwicklung zu gewährleisten.
 
 \textbf{Microservices}: Es wurde sich gegen eine strenge Microservices Architektur entschieden, weil diese schwieriger
 zu designen ist und komplexer in der Kommunikation ist.
@@ -29,16 +29,16 @@ Für die Kommunikation zwischen Player API und Games Importer soll grpc verwende
 
 \subsubsection{Gründe für die Entscheidung}\label{subsubsec:grunde-fur-die-entscheidung-01}
 
-\textbf{Streaming}: Durch grpc ist es sehr einfach Streaming zu verwenden.
-Streaming ist hier sinnvoll, da es eine Verbindung gibt, über die immer wieder updates übertragen werden sollen.
+\textbf{Streaming}: Durch grpc ist es sehr einfach, Streaming zu verwenden.
+Streaming ist hier sinnvoll, da es eine Verbindung gibt, über die immer wieder Updates übertragen werden sollen.
 
-\textbf{Einfache Implementierung}: Mithilfe der Client Bibliotheken, ist die Implemtierung sehr einfach, da es eine
-sehr high level Schnittstelle bietet.
+\textbf{Einfache Implementierung}: Mithilfe der Client-Bibliotheken ist die Implementierung sehr einfach, da es eine
+sehr high-level Schnittstelle bietet.
 
 \subsubsection{Mögliche Alternativen}\label{subsubsec:mogliche-alternativen-01}
 
 \textbf{Sockets}: Ist sehr low level und man muss sich um mehr kümmern.
 
-\textbf{Message Queue}: Hat einen großen Overhead, dafür dass es nur für eine Methode verwendet werden soll.
+\textbf{Message Queue}: Hat nur für die Verwendung einer Methode einen zu großen Overhead.
 
 \textbf{Polling}: Ist nicht so effizient, da es entweder mehr Ressourcen braucht oder nicht real-time ist.

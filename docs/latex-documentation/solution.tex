@@ -10,15 +10,15 @@
 \end{figure}
 
 In Abbildung~\ref{fig:service-diagram} ist das Service Diagramm für die Applikation zu sehen.
-Es gibt ein Frontend, dass über ein zentrales API Gateway mit den Backend Services kommuniziert.
+Es gibt ein Frontend, dass über ein zentrales API Gateway mit den Backend-Services kommuniziert.
 Als API Gateway wird Gravitee verwendet.
-Der User Management Service ist für das verwalten von Usern auf der Webseite verantwortlich.
-Hierfür hat der Service seine eigene PostgreSQl Datenbank.
-Die Player API stellt eine Schnittstelle zur LoL Datenbank zur Verfügung.
+Der User-Management-Service ist für das Verwalten von Usern auf der Webseite verantwortlich.
+Hierfür hat der Service seine eigene PostgreSQl-Datenbank.
+Die Player-API stellt eine Schnittstelle zur LoL-Datenbank zur Verfügung.
 Hierüber werden alle Daten zur Verfügung gestellt, die Spielinformationen benötigen.
-Außerdem kommuniziert die Player API direkt mit dem Games Importer Service um das Importieren von Spielern zu triggern.
-Der Games Importer Service schreibt alle Daten in die geteilte LoL Datenbank, welches ebenfalls eine PostgreSQl Datenbank ist.
-Um an die Daten zu kommen, fragt der Games Importer Service die externe Riot API an.
+Außerdem kommuniziert die Player-API direkt mit dem Games-Importer-Service, um das Importieren von Spielern zu triggern.
+Der Games-Importer-Service schreibt alle Daten in die geteilte LoL-Datenbank, welches ebenfalls eine PostgreSQl-Datenbank ist.
+Um an die Daten zu kommen, fragt der Games-Importer-Service die externe Riot API an.
 
 \subsection{Technolgien}
 
@@ -36,7 +36,7 @@ Die Daten werden alle vom Games Importer Service aus der Riot API gelesen und in
 \subsubsection{Player API}
 
 Dieser Service stellt die importierten Daten des Service~\ref{subsubsec:games-importer} dar.
-Als Programmiersprache um eine schnelle Entwicklung zu erreichen und um im Backend nur eine Sprache zu verwenden.
+Als Programmiersprache wurde Python verwendet, um im Backend eine schnelle Entwicklung zu erreichen und nur eine Sprache zu verwenden.
 Als Webframework wurde sich für FastAPI entschieden, aufgrund der hohen Performance.
 Für den Datenbankzugriff wurde sich für SQLAlchemy entschieden, um ein ORM verwenden zu können.
 
@@ -52,11 +52,11 @@ Für das Mapping der Daten wurde SQLAlchemy genommen und die Speicherung findet 
 
 \textbf{NuxtJS} \\
 
-Für die Umsetzung des reaktiven Frontends wurde das "NuxtJs"-Framework (\href{https://nuxtjs.org/}{https://nuxtjs.org/}) entschieden. Dieses erlaubt es komplexe Vue-Anwendungen umzusetzen und unterstützt Entwickler:innen
-bei unterschiedlichen Problemstellungen der Frontend-Entwicklung. Aufgrund bereits existierender Erfahrung mit Vue und dem Framework viel die Wahl auf diese Technologie.
+Für die Umsetzung des reaktiven Frontends wurde das "NuxtJs"-Framework (\href{https://nuxtjs.org/}{https://nuxtjs.org/}) benutzt. Dieses erlaubt es, komplexe Vue-Anwendungen umzusetzen und unterstützt Entwickler:innen
+bei unterschiedlichen Problemstellungen der Frontend-Entwicklung. Aufgrund bereits existierender Erfahrung mit Vue und dem Framework fiel die Wahl auf diese Technologie.
 Dadurch ist eine rasche Entwicklung gewährleistet, indem die Einarbeitungszeit in neue Technologien wegfällt. Die Kommunikation mit verschiedenen Diensten passiert
 über das HTTP-Protokoll. Mit dem eingebauten Modul "Axios", welches als HTTP-Client dient, werden HTTP-Anfragen an das Backend gesendet, um die entsprechenden Daten 
-zu erhalten. Zur Authentifizierung der Benutzer:innen wird das Modul "NuxtJs Auth" (\href{https://auth.nuxtjs.org/}{https://auth.nuxtjs.org/}) verwendet. Dieses stellt eine API zur Verfügung, mit der Registierungs- und Anmeldeprozess durchgeführt werden kann.
+zu erhalten. Zur Authentifizierung der Benutzer:innen wird das Modul "NuxtJs Auth" (\href{https://auth.nuxtjs.org/}{https://auth.nuxtjs.org/}) verwendet. Dieses stellt eine API zur Verfügung, mit der Registierungs- und Anmeldeprozesse durchgeführt werden können.
 Ebenso übernimmt es die Speicherung und Verifizierung des vom User-Backend erhaltene JWT-Token. \\
 
 \textbf{Design} \\
