@@ -51,6 +51,24 @@ Mithilfe dieser Datei werden dann die nötigen Python Klassen generiert. In der 
 
 \subsection{Zentrales Logging}
 
+Um das Debuggen im Fehlerfall zu vereinfachen gibt es es zentrales Logging.
 Die Logs aller Services werden zentral von Loki eingesammelt und gespeichert.
-Über Grafana lassen sich die Logs durchsuchen.
-\todo{Zentrales Logging ausführlicher?}
+Die Logs werden über ein Docker Plugin direkt an Loki gesendet.
+Über Grafana lassen sich die Logs mit der Query Sprache Logql durchsuchen.
+So können zum Beispiel alle Logs eines Accounts im Games Importer Service angezeigt werden:
+
+\begin{lstlisting}
+  {compose_service="riot-api-connector"} |= `'accountId': 'P90cNvGn`
+\end{lstlisting}
+
+Das Ergebnis ist in Abbildung~\ref{fig:logging} zu sehen.
+Oben wird auf einer Zeitachse dargestellt, wann, wie viele Logs gefunden werden.
+Darunter sind alle gefundenen Logzeilen zu sehen.
+Logzeilen können ausgekplatt werden um weitere Metainformationen zu sehen.
+
+\begin{figure}
+    \centering
+    \includegraphics[width=\textwidth]{images/logging}
+    \caption{Ergebnis des Logging Queries}
+    \label{fig:logging}
+\end{figure}
