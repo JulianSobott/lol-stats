@@ -72,8 +72,18 @@ Um das Diagramm übersichtlich zu halten, wurden nur die Module ohne die enthalt
 \end{itemize}
 
 \subsection{User Management}
-\subsubsection{Klassendiagramm}
-\todo{User Management Klassendiagramm}
+\subsubsection{Komponentendiagramm}\label{subsubsec:user-management-component-diagram}
+
+\begin{figure}
+    \centering
+    \includegraphics[width=\textwidth]{cdc-06-user-management-static.drawio}
+    \caption{Komponenten Diagramm des User Management Services}
+    \label{fig:user-management-component-diagram}
+\end{figure}
+
+Das in Abbildung~\ref{fig:user-management-component-diagram} abgebildete Komponenten Diagramm stellt die
+Komponenten des User Management Services dar.
+
 \subsubsection{Verantwortlichkeiten}
 Zu den eigenen Daten des User Backends gehören unter anderem die Region oder die Referenz zu einem Lol-Account dazu, 
 aber auch alle notwendige Daten, die bei der Registrierung und beim Login entstehen. Für die Validierung dieser einkommenden Daten wurde die Libaries "Werkzeug" und "Marshmallow" verwendet.
