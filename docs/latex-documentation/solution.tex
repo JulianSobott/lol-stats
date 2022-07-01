@@ -10,7 +10,15 @@
 \end{figure}
 
 In Abbildung~\ref{fig:service-diagram} ist das Service Diagramm für die Applikation zu sehen.
-\todo{Diagramm erklären}
+Es gibt ein Frontend, dass über ein zentrales API Gateway mit den Backend Services kommuniziert.
+Als API Gateway wird Gravitee verwendet.
+Der User Management Service ist für das verwalten von Usern auf der Webseite verantwortlich.
+Hierfür hat der Service seine eigene PostgreSQl Datenbank.
+Die Player API stellt eine Schnittstelle zur LoL Datenbank zur Verfügung.
+Hierüber werden alle Daten zur Verfügung gestellt, die Spielinformationen benötigen.
+Außerdem kommuniziert die Player API direkt mit dem Games Importer Service um das Importieren von Spielern zu triggern.
+Der Games Importer Service schreibt alle Daten in die geteilte LoL Datenbank, welches ebenfalls eine PostgreSQl Datenbank ist.
+Um an die Daten zu kommen, fragt der Games Importer Service die externe Riot API an.
 
 \subsection{Technolgien}
 
