@@ -1,3 +1,44 @@
 \section{Architekturentscheidungen}
-\todo{Architekturentscheidungen}
 
+\subsection{Service orientierte Architektur}\label{subsec:soa}
+
+Das Backend soll in einzelne Services aufgeteilt werden.
+
+\subsubsection{Gründe für die Entscheidung}\label{subsubsec:grunde-fur-die-entscheidung}
+
+\textbf{Schnelle Entwicklung}: Dadurch, dass jeder Entwickler an einem Service arbeitet, gibt es kaum Abhängigkeiten
+und weniger Merge Konflikte.
+Da es keine Microservice Architektur ist, gibt es zwischen den Services kaum Kommunikation, welches das Entwickeln vereinfacht.
+
+\textbf{Freie Technologiewahl}: Für jeden Service kann die Technologie gewählt werden, die am besten geeignet ist.
+
+\textbf{Schnelles und unabhängiges Deployment}: Da die Services kaum Abhängigkeiten haben, können die Services
+schnell und einfach deployt werden.
+
+\subsubsection{Mögliche Alternativen}\label{subsubsec:mogliche-alternativen}
+
+\textbf{Monolith}: Es wurde sich gegen ein Monolith entschieden, um eine Unabhängige Entwicklung zu gewährleisten.
+
+\textbf{Microservices}: Es wurde sich gegen eine strenge Microservices Architektur entschieden, weil diese schwieriger
+zu designen ist und komplexer in der Kommunikation ist.
+
+
+\subsection{grpc für die Kommunikation zwischen Player API und Games Importer}\label{subsec:grpc-fur-die-kommunikation-zwischen-player-api-und-games-importer}
+
+Für die Kommunikation zwischen Player API und Games Importer soll grpc verwendet werden.
+
+\subsubsection{Gründe für die Entscheidung}\label{subsubsec:grunde-fur-die-entscheidung-01}
+
+\textbf{Streaming}: Durch grpc ist es sehr einfach Streaming zu verwenden.
+Streaming ist hier sinnvoll, da es eine Verbindung gibt, über die immer wieder updates übertragen werden sollen.
+
+\textbf{Einfache Implementierung}: Mithilfe der Client Bibliotheken, ist die Implemtierung sehr einfach, da es eine
+sehr high level Schnittstelle bietet.
+
+\subsubsection{Mögliche Alternativen}\label{subsubsec:mogliche-alternativen-01}
+
+\textbf{Sockets}: Ist sehr low level und man muss sich um mehr kümmern.
+
+\textbf{Message Queue}: Hat einen großen Overhead, dafür dass es nur für eine Methode verwendet werden soll.
+
+\textbf{Polling}: Ist nicht so effizient, da es entweder mehr Ressourcen braucht oder nicht real-time ist.
