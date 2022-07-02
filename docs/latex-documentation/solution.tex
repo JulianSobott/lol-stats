@@ -17,28 +17,29 @@ Hierfür hat der Service seine eigene PostgreSQl-Datenbank.
 Die Player-API stellt eine Schnittstelle zur LoL-Datenbank zur Verfügung.
 Hierüber werden alle Daten zur Verfügung gestellt, wie Rank, Spiele und Challenges.
 Außerdem kommuniziert die Player-API direkt mit dem Games-Importer-Service, um das Importieren von Spielern zu triggern.
+Um zu überprüfen, ob ein Spieler existiert, greift die Player-API auf die Riot API zu.
 Der Games-Importer-Service ist für das Importieren von Spielern zuständig und schreibt die Daten in die geteilte
 LoL-Datenbank, welches ebenfalls eine PostgreSQl-Datenbank ist.
-Um an die Daten zu kommen, fragt der Games-Importer-Service die externe Riot API an.
+Um an die Daten zu kommen, fragt der Games-Importer-Service die externe Riot API an. 
 
-\subsection{Technolgien}
+\subsection{Technologien}
 
 \subsubsection{Games Importer}\label{subsubsec:games-importer}
-Dieser Service ist die Verbindung zwischen der Riot API und unserer Anwendung. Er läuft in seinem eigenen Docker Container. Hier werden die Daten aus der Riot API abgefragt und dann in unserer Datenbank gespeichert.\\
+Dieser Service ist die Verbindung zwischen der Riot API und der Anwendung. Er läuft in seinem eigenen Docker Container. Hier werden die Daten aus der Riot API abgefragt und dann in der LoL-Database gespeichert.\\
 Der Service ist in Python geschrieben, da hierfür bereits Libraries zur Kommunikation mit der Riot API vorhanden sind (siehe \ref{riot-api-libraries}).\\
 Neben den Riot API Wrappern Cassiopeia und Riot Watcher wird noch das psycopg2 Package verwendet, welches Zugriff auf die PostgreSQL Datenbank bietet. Psycopg2 erlaubt es in Python SQL Statements zu bauen und auszuführen um somit die Daten von der Riot API in der Datenbank zu speichern.\\
 Der Games Importer Service läuft dauerhaft und aktualisiert in 5min Abständen alle in der Datenbank gespeicherten Spieler. \\
 Des weitere läuft in einem weiteren Thread eine GRPC Connection, welche es erlaubt den Import eines neuen Spieler anzufragen. Dieser wird dann erstmals von der Riot API in die Datenbank importiert und bei den zukünftigen Updates berücksichtigt.
 
-\subsubsection{LoL Database}
-Die PostgreSQL Datenbank läuft in einem eigenen Docker Container. In dieser Datenbank werden alle Spieler bezogenen Daten gespeichert, welche auf der Website angezeigt werden.\\
+\subsubsection{LoL-Database}
+Die PostgreSQL-Datenbank läuft in einem eigenen Docker Container. In dieser Datenbank werden alle Spieler bezogenen Daten gespeichert, welche auf der Website angezeigt werden.\\
 Die Daten werden alle vom Games Importer Service aus der Riot API gelesen und in dieser Datenbank gespeichert. Der Player API Service kann dann auf diese Daten zugreifen um sie an das Frontend weiterzugeben.
 
 \subsubsection{Player API}
 
 Dieser Service stellt die importierten Daten des Service~\ref{subsubsec:games-importer} dar.
 Als Programmiersprache wurde Python verwendet, um im Backend eine schnelle Entwicklung zu erreichen und nur eine Sprache zu verwenden.
-Als Webframework wurde sich für FastAPI entschieden, aufgrund der hohen Performance.
+Aufgrund der hohen Performance der Bibliothek wurde sich für FastAPI als Webframework entschieden.
 Für den Datenbankzugriff wurde sich für SQLAlchemy entschieden, um ein ORM verwenden zu können.
 
 \subsubsection{User Management}
@@ -69,7 +70,7 @@ umgesetzt werden. Ebenso bietet diese CCS-Framework bereits ein responsives Layo
 \subsection{Architektur}
 
 In den beiden Tabellen~\ref{tab:goals} und~\ref{tab:principles}, werden die Ziele der Architektur aufgelistet
-und die jeweiligen Architektur Prinzipien, die diese unterstützen.
+und die jeweiligen Architekturprinzipien, die diese unterstützen.
 
 \subsubsection{Architektur Ziele}
 \begin{center}

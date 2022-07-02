@@ -2,7 +2,7 @@
 
 In Abbildung~\ref{fig:deployment-diagram} ist eine Übersicht über das Deployment der Applikation und dazugehöriger
 Services zu sehen.
-\begin{figure}
+\begin{figure}[H]
     \centering
     \includegraphics[width=\textwidth]{cdc-08-deployment-diagram.drawio}
     \caption{Deployment Diagramm}
@@ -10,7 +10,7 @@ Services zu sehen.
 \end{figure}
 
 Die gesamte Applikation läuft innerhalb einer VM, wobei alles verdockert ist.
-Das initiale Routing und bereitstellen von https Zertifikaten übernimmt Traefik (Edge Router).
+Das initiale Routing und Bereitstellen von Https Zertifikaten übernimmt Traefik (Edge Router).
 So gibt es für jeden Teil eine eigene URL:
 \begin{itemize}
     \item Frontend: lol-stats.de

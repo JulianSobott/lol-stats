@@ -74,7 +74,7 @@ Um das Diagramm übersichtlich zu halten, wurden nur die Module ohne die enthalt
 \subsection{User Management}
 \subsubsection{Komponentendiagramm}\label{subsubsec:user-management-component-diagram}
 
-\begin{figure}
+\begin{figure}[H]
     \centering
     \includegraphics[width=\textwidth]{cdc-06-user-management-static.drawio}
     \caption{Komponenten Diagramm des User Management Services}
@@ -120,7 +120,7 @@ Im Package "Template Components" befinden sich Komponenten, die auf jeder Seite 
 
 \subsubsection{Verantwortlichkeiten}
 
-Die Benutzeroberfläche (Frontend) dient als Client und ist für die Kommunikation mit dem verschiedenen Microservices zuständig. Es stellt die Daten übersichtlich dar und sorgt für eine
+Die Benutzeroberfläche (Frontend) dient als Client und ist für die Kommunikation mit dem verschiedenen Services zuständig. Es stellt die Daten übersichtlich dar und sorgt für ein
 angenehmes Nutzererlebnis. \\
 
 \textbf{sign-up.vue}: Diese Seite ist für die Registrierung von neuen Benutzer:innen verantwortlich. Sobald die E-Mail-Adressen und Passwörter übergeben wurden, so werden diese zunächst
@@ -129,7 +129,7 @@ entsprechenden Daten an das User-Backend, wo das Benutzerkonto erstellt wird.
 \newline
 
 \textbf{login.vue}: Zum Anmelden eines Benutzers muss auf dieser Seite die korrekten Anmeldedaten in das Formular eingegeben werden. Die Methode \verb|login()| prüft, ob das User-Backend
-verifiziert hat, dass die Anmeldedaten korrekt sind. Ist dies der Fall, so wird der Token, das das User-Backend zusendet, gespeichert. 
+verifiziert hat, dass die Anmeldedaten korrekt sind. Ist dies der Fall, so wird der Token, den das User-Backend zusendet, gespeichert. 
 \newline
 
 \textbf{setting.vue}: Bei der ersten Anmeldung müssen die Nutzer:innen den gewünschten Spielernamen und die Region übergeben. Durch das Speichern dieser Einstellungen durch die Methode \verb|savePlayername|

@@ -22,38 +22,38 @@ In der Datenbank des User Managements werden alle User-spezifische Daten gespeic
 So werden hier die favorisierten Achievements und die ausgewählten Competitors auch mit abgespeichert. Außerdem werden hier die kreierten Token aller User abgespeichert.   
 
 \subsection{User Management API Spezifikation}
-\begin{figure}
-  \centering
+\begin{center}
   \includegraphics[width=1\textwidth, page=1]{images/pdfs/openapi-short.pdf}
   \caption{Kompakte Version der OpenApi vom User Management - Teil 1}
   \label{fig:compact_user_openapi_1}
-\end{figure}
-\begin{figure}
-  \centering
+\end{center}
+\begin{center}
   \includegraphics[width=1\textwidth, page=2]{images/pdfs/openapi-short.pdf}
   \caption{Kompakte Version der OpenApi vom User Management - Teil 2}
   \label{fig:compact_user_openapi_2}
-\end{figure}
+\end{center}
+
+Die ausführliche Variante der Dokumentation ist im Verzeichnis "open-api-specs/openapi.pdf" auffindbar.
 
 \subsection{Player API Spezifikation}
 
-\begin{figure}
-  \centering
+\begin{center}
   \includegraphics[width=1\textwidth, page=1]{images/pdfs/player-api-openapi-short.pdf}
-  \caption{Kompakte Version der OpenApi vod der Player API - Teil 1}
+  \caption{Kompakte Version der OpenApi von der Player API - Teil 1}
   \label{fig:compact_player_openapi_1}
-\end{figure}
-\begin{figure}
-  \centering
+\end{center}
+\begin{center}
   \includegraphics[width=1\textwidth, page=2]{images/pdfs/player-api-openapi-short.pdf}
-  \caption{Kompakte Version der OpenApi vod der Player API - Teil 2}
+  \caption{Kompakte Version der OpenApi von der Player API - Teil 2}
   \label{fig:compact_player_openapi_2}
-\end{figure}
+\end{center}
+
+Die ausführliche Variante der Dokumentation ist im Verzeichnis "/open-api-specs/player-api-openapi.pdf" auffindbar.
 
 \subsection{GRPC Interface}
 Damit der Import eines neuen Spieler angefragt werden kann, muss eine Kommunikation zwischen Frontend und dem Games Importer Service bestehen. Das Frontend kommuniziert nur mit der PlayerAPI, welche die Anfrage dann an den Games Importer Service weiterleiten muss.\\
-Da der Player API Service und der Games Importer Service beide in Pyton geschrieben wurden, kann diese Kommunikation über GRPC erfolgen, welches es der PlayerAPI erlaubt über einen Protocol Request die Import Funktion des Game Importers aufzurufen.\\ % TODO Tim: für grps müssen Applikationen nicht in gleicher Sprache geschrieben sein. Grund war eher, dass grpc Streaming erlaubt
-Die Schnittstelle wird in einer .proto Datei definiert:
+Mit einem GRPC Interface ist Streaming-Kommunikation möglich, welches es der PlayerAPI erlaubt, über einen Protocol Request die Import Funktion des Game Importers aufzurufen und Live-Updates über den Fortschritt zu erhalten.
+Die Schnittstelle wird in einer ".proto"-Datei definiert:
 
 \begin{lstlisting}
 syntax = "proto3";

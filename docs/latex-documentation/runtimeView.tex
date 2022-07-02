@@ -7,13 +7,13 @@
     \label{fig:load-data}
 \end{figure}
 
-In Abbildung~\ref{fig:load-data} ist der Ablauf gezeigt, welche http Requests gesendet werden, wenn sich ein Spieler
+In Abbildung~\ref{fig:load-data} ist der Ablauf gezeigt, welche Http Requests gesendet werden, wenn sich ein Spieler
 der schon einen Account hat und dessen Spiele schon importiert sind, einloggt.
 
 
 \subsection{Neuer Spieler importieren}
 
-Um einen neuen Spieler zu importieren, wird eine Anfrage von dem Front and die "Player-API" gesendet.
+Um einen neuen Spieler zu importieren, wird eine Anfrage von dem Frontend an die Player-API gesendet.
 Da diese Anfrage zustandslos ist, werden regelmäßig HTTP-Anfragen gesendet, um den aktuellen Import-Status
 zu erhalten.
 Diese Informationen werden im Frontend an den entsprechenden stellen dargestellt.
@@ -25,13 +25,13 @@ Games Importer Service startet und die Anzahl der importierten Spiele streamt.
 \subsection{Spieler vergleichen}
 
 Das Diagramm in Abbildung~\ref{fig:compare-diagram} stellt den Ablauf dar, wenn sich ein Spieler mit anderen Spielern vergleichen will.
-\begin{figure}
+
+\begin{figure}[H]
     \centering
     \includegraphics[width=\textwidth]{cdc-07-compare.drawio}
     \caption{Swimlane Diagramm zum Vergleich von Spielern}
     \label{fig:compare-diagram}
 \end{figure}
-
 
 \subsection{Error handling}
 \subsubsection{Game importing}
@@ -40,17 +40,17 @@ Auch die Datenbank kann Errors liefern, weshalb auch alle Datenbank Anfragen inn
 
 \subsubsection{Monitoring}
 
-Um die Applikation zu Monitoren werden verschiedene Tools verwendet.
+Um die Applikation zu monitoren, werden verschiedene Tools verwendet.
 
-\textbf{sentry} (\href{https://sentry.io/}{https://sentry.io/}) wird verwendet um Fehler zentral zu tracken und
+\textbf{sentry} (\href{https://sentry.io/}{https://sentry.io/}) wird verwendet, um Fehler zentral zu tracken und
 Alerts zu verschicken.
-Sentry wurde für alle Backend Services eingerichtet um einen Überblick über Serverseitiges Fehlverhalten zu bekommen.
+Sentry wurde für alle Backend Services eingerichtet um einen Überblick über serverseitiges Fehlverhalten zu bekommen.
 
 Um die Performance von Requests zu tracken, wird \textbf{SigNoz} (\href{https://signoz.io/}{https://signoz.io/}) verwendet.
 Damit werden Traces für Anfragen erstellt, womit festgestellt werden kann wie lange Anfragen brauchen und welche Methode wie lange braucht.
 Außerdem werden automatisch Datenbank Operationen gemessen, wodurch es möglich ist zwischen Applikationslogik
 und Datenbank Operationen zu unterscheiden, wie in Abbildung~\ref{fig:signoz-traces} zu sehen ist.
-\begin{figure}
+\begin{figure}[H]
     \centering
     \includegraphics[width=\textwidth]{signoz_traces}
     \caption{Trace Details in SigNoz zu einem /achievements Request}

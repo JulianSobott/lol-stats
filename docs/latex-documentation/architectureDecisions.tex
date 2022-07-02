@@ -1,6 +1,6 @@
 \section{Architekturentscheidungen}
 
-\subsection{Service orientierte Architektur}\label{subsec:soa}
+\subsection{Service-orientierte Architektur}\label{subsec:soa}
 
 Das Backend soll in einzelne Services aufgeteilt werden.
 
@@ -33,8 +33,8 @@ Für die Kommunikation zwischen Player API und Games Importer soll grpc verwende
 Streaming ist hier sinnvoll, da es eine Verbindung gibt, über die immer wieder Updates übertragen werden sollen.
 
 \textbf{Einfache Implementierung}: Mithilfe der Client-Bibliotheken ist die Implementierung sehr einfach.
-Man muss in einer .proto Datei nur das Schema festlegen und daraus wird automatisch der entsprechende Code generiert.
-Im eigenen Code muss man dann nur noch die generierte Methode aufrufen und die restliche Kommunikation von der Bibliothek übernommen.
+Man muss in einer ".proto"-Datei nur das Schema festlegen und daraus wird automatisch der entsprechende Code generiert.
+Im eigenen Code muss man dann nur noch die generierte Methode aufrufen und die restliche Kommunikation wird von der Bibliothek übernommen.
 
 \subsubsection{Mögliche Alternativen}\label{subsubsec:mogliche-alternativen-01}
 
