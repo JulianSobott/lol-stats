@@ -17,10 +17,12 @@
 5. install portainer: https://install.portainer.io/set-up-portainer
 6. install loki plugin: https://grafana.com/docs/loki/latest/clients/docker-driver/
 7. create networks: `docker network create traefik services tracing`
-8. Create all stacks in compose-stacks in portainer
+8. Create all stacks in [deployment/compose-stacks](deployment/compose-stacks) in portainer
 9. Clone repo: `git clone git@bitbucket.org:baehre/team-e.git`
-10. create .env file `cp .example.env .env` anf set values
-12. setup user backend
+10. create .env file `cp .example.env .env` and set values
+11. setup user backend
     1. `cp user-backend/user_backend/example.alembic.ini user-backend/user_backend/alembic.ini`
     2. set `sqlalchemy.url` in alembic.ini
-11. start container: `docker compose up -d`
+12. start container: `docker compose up -d`
+13. Setup user management database `docker exec -it user-management-api alembic upgrade head`
+14. create API endpoints, by executing [the create_apis.py](deployment/create_apis.py) script. 

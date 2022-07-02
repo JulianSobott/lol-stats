@@ -1,0 +1,111 @@
+{
+  "name" : "Authentication",
+  "crossId" : "493d1740-6cab-4f95-bd17-406cabcf955c",
+  "version" : "v1.0",
+  "description" : "Autentication backend",
+  "visibility" : "PRIVATE",
+  "gravitee" : "2.0.0",
+  "flow_mode" : "DEFAULT",
+  "resources" : [ ],
+  "properties" : [ ],
+  "members" : [ {
+    "source" : "memory",
+    "sourceId" : "admin",
+    "roles" : [ "024bbe1a-5938-469d-8bbe-1a5938369d14" ]
+  } ],
+  "pages" : [ {
+    "id" : "5d35d38a-cacf-4d42-b5d3-8acacffd4219",
+    "crossId" : "b4d77a9b-8bb7-4018-977a-9b8bb7f018f8",
+    "name" : "Aside",
+    "type" : "SYSTEM_FOLDER",
+    "order" : 0,
+    "published" : true,
+    "visibility" : "PUBLIC",
+    "lastModificationDate" : 1656773081820,
+    "contentType" : "application/json",
+    "homepage" : false,
+    "parentPath" : "",
+    "excludedAccessControls" : false,
+    "accessControls" : [ ],
+    "api" : "bf979f0c-cf4b-4999-979f-0ccf4bc999df",
+    "attached_media" : [ ]
+  } ],
+  "plans" : [ {
+    "id" : "d874ea84-8e5b-4f87-b4ea-848e5bef871e",
+    "crossId" : "c5007b21-4349-4799-807b-214349b7995e",
+    "name" : "public",
+    "description" : "public",
+    "validation" : "AUTO",
+    "security" : "KEY_LESS",
+    "type" : "API",
+    "status" : "PUBLISHED",
+    "api" : "bf979f0c-cf4b-4999-979f-0ccf4bc999df",
+    "order" : 0,
+    "characteristics" : [ ],
+    "created_at" : 1656363684205,
+    "updated_at" : 1656773081785,
+    "published_at" : 1656363684205,
+    "paths" : { },
+    "flows" : [ {
+      "name" : "",
+      "path-operator" : {
+        "path" : "/",
+        "operator" : "STARTS_WITH"
+      },
+      "condition" : "",
+      "consumers" : [ ],
+      "methods" : [ ],
+      "pre" : [ ],
+      "post" : [ ],
+      "enabled" : true
+    } ],
+    "comment_required" : false
+  } ],
+  "metadata" : [ {
+    "key" : "email-support",
+    "name" : "email-support",
+    "format" : "MAIL",
+    "value" : "${(api.primaryOwner.email)!''}",
+    "defaultValue" : "support@change.me",
+    "apiId" : "bf979f0c-cf4b-4999-979f-0ccf4bc999df"
+  } ],
+  "id" : "bf979f0c-cf4b-4999-979f-0ccf4bc999df",
+  "path_mappings" : [ ],
+  "proxy" : {
+    "virtual_hosts" : [ {
+      "path" : "/api/auth/"
+    } ],
+    "strip_context_path" : false,
+    "preserve_host" : false,
+    "groups" : [ {
+      "name" : "default-group",
+      "endpoints" : [ {
+        "backup" : false,
+        "inherit" : true,
+        "name" : "default",
+        "weight" : 1,
+        "type" : "http",
+        "target" : "http://user-management-api:5000/api/auth"
+      } ],
+      "load_balancing" : {
+        "type" : "ROUND_ROBIN"
+      },
+      "http" : {
+        "connectTimeout" : 5000,
+        "idleTimeout" : 60000,
+        "keepAlive" : true,
+        "readTimeout" : 10000,
+        "pipelining" : false,
+        "maxConcurrentConnections" : 100,
+        "useCompression" : true,
+        "followRedirects" : false
+      }
+    } ]
+  },
+  "response_templates" : { },
+  "primaryOwner" : {
+    "id" : "b912d5cc-aaff-43e5-92d5-ccaaff23e56c",
+    "displayName" : "admin",
+    "type" : "USER"
+  }
+}

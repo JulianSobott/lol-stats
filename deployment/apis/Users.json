@@ -1,0 +1,111 @@
+{
+  "name" : "Users",
+  "crossId" : "6f377995-6279-4f1a-b779-9562790f1ade",
+  "version" : "v1.0",
+  "description" : "Users data",
+  "visibility" : "PRIVATE",
+  "gravitee" : "2.0.0",
+  "flow_mode" : "DEFAULT",
+  "resources" : [ ],
+  "properties" : [ ],
+  "members" : [ {
+    "source" : "memory",
+    "sourceId" : "admin",
+    "roles" : [ "024bbe1a-5938-469d-8bbe-1a5938369d14" ]
+  } ],
+  "pages" : [ {
+    "id" : "664c99c7-4b0b-4ea3-8c99-c74b0bbea34b",
+    "crossId" : "e8507193-3c3b-4a0f-9071-933c3b7a0f34",
+    "name" : "Aside",
+    "type" : "SYSTEM_FOLDER",
+    "order" : 0,
+    "published" : true,
+    "visibility" : "PUBLIC",
+    "lastModificationDate" : 1656772512739,
+    "contentType" : "application/json",
+    "homepage" : false,
+    "parentPath" : "",
+    "excludedAccessControls" : false,
+    "accessControls" : [ ],
+    "api" : "12d11d6c-6b59-4918-911d-6c6b59d91802",
+    "attached_media" : [ ]
+  } ],
+  "plans" : [ {
+    "id" : "39346232-6308-40ac-b462-326308e0ac3e",
+    "crossId" : "202d711f-d266-42a4-ad71-1fd266a2a4fd",
+    "name" : "public",
+    "description" : "public",
+    "validation" : "AUTO",
+    "security" : "KEY_LESS",
+    "type" : "API",
+    "status" : "PUBLISHED",
+    "api" : "12d11d6c-6b59-4918-911d-6c6b59d91802",
+    "order" : 0,
+    "characteristics" : [ ],
+    "created_at" : 1656363431314,
+    "updated_at" : 1656772512698,
+    "published_at" : 1656363431317,
+    "paths" : { },
+    "flows" : [ {
+      "name" : "",
+      "path-operator" : {
+        "path" : "/",
+        "operator" : "STARTS_WITH"
+      },
+      "condition" : "",
+      "consumers" : [ ],
+      "methods" : [ ],
+      "pre" : [ ],
+      "post" : [ ],
+      "enabled" : true
+    } ],
+    "comment_required" : false
+  } ],
+  "metadata" : [ {
+    "key" : "email-support",
+    "name" : "email-support",
+    "format" : "MAIL",
+    "value" : "${(api.primaryOwner.email)!''}",
+    "defaultValue" : "support@change.me",
+    "apiId" : "12d11d6c-6b59-4918-911d-6c6b59d91802"
+  } ],
+  "id" : "12d11d6c-6b59-4918-911d-6c6b59d91802",
+  "path_mappings" : [ ],
+  "proxy" : {
+    "virtual_hosts" : [ {
+      "path" : "/api/users"
+    } ],
+    "strip_context_path" : false,
+    "preserve_host" : false,
+    "groups" : [ {
+      "name" : "default-group",
+      "endpoints" : [ {
+        "backup" : false,
+        "inherit" : true,
+        "name" : "default",
+        "weight" : 1,
+        "type" : "http",
+        "target" : "http://user-management-api:5000/api/users"
+      } ],
+      "load_balancing" : {
+        "type" : "ROUND_ROBIN"
+      },
+      "http" : {
+        "connectTimeout" : 5000,
+        "idleTimeout" : 60000,
+        "keepAlive" : true,
+        "readTimeout" : 10000,
+        "pipelining" : false,
+        "maxConcurrentConnections" : 100,
+        "useCompression" : true,
+        "followRedirects" : false
+      }
+    } ]
+  },
+  "response_templates" : { },
+  "primaryOwner" : {
+    "id" : "b912d5cc-aaff-43e5-92d5-ccaaff23e56c",
+    "displayName" : "admin",
+    "type" : "USER"
+  }
+}

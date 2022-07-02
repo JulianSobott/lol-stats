@@ -1,0 +1,111 @@
+{
+  "name" : "Achievments",
+  "crossId" : "09b3f21a-30e6-4d37-b3f2-1a30e62d3718",
+  "version" : "v1.0",
+  "description" : "Achievements comparison",
+  "visibility" : "PRIVATE",
+  "gravitee" : "2.0.0",
+  "flow_mode" : "DEFAULT",
+  "resources" : [ ],
+  "properties" : [ ],
+  "members" : [ {
+    "source" : "memory",
+    "sourceId" : "admin",
+    "roles" : [ "024bbe1a-5938-469d-8bbe-1a5938369d14" ]
+  } ],
+  "pages" : [ {
+    "id" : "742ed364-fe05-4758-aed3-64fe05d7581a",
+    "crossId" : "b1c1df4d-9ada-4fee-81df-4d9adadfee02",
+    "name" : "Aside",
+    "type" : "SYSTEM_FOLDER",
+    "order" : 0,
+    "published" : true,
+    "visibility" : "PUBLIC",
+    "lastModificationDate" : 1656772318916,
+    "contentType" : "application/json",
+    "homepage" : false,
+    "parentPath" : "",
+    "excludedAccessControls" : false,
+    "accessControls" : [ ],
+    "api" : "b495ce9a-f750-43c4-95ce-9af750d3c4a8",
+    "attached_media" : [ ]
+  } ],
+  "plans" : [ {
+    "id" : "6cc50ab0-8518-4326-850a-b085186326ca",
+    "crossId" : "d5eaa844-3c74-4471-aaa8-443c74d47136",
+    "name" : "public",
+    "description" : "public",
+    "validation" : "AUTO",
+    "security" : "KEY_LESS",
+    "type" : "API",
+    "status" : "PUBLISHED",
+    "api" : "b495ce9a-f750-43c4-95ce-9af750d3c4a8",
+    "order" : 0,
+    "characteristics" : [ ],
+    "created_at" : 1656363611546,
+    "updated_at" : 1656772318867,
+    "published_at" : 1656363611546,
+    "paths" : { },
+    "flows" : [ {
+      "name" : "",
+      "path-operator" : {
+        "path" : "/",
+        "operator" : "STARTS_WITH"
+      },
+      "condition" : "",
+      "consumers" : [ ],
+      "methods" : [ ],
+      "pre" : [ ],
+      "post" : [ ],
+      "enabled" : true
+    } ],
+    "comment_required" : false
+  } ],
+  "metadata" : [ {
+    "key" : "email-support",
+    "name" : "email-support",
+    "format" : "MAIL",
+    "value" : "${(api.primaryOwner.email)!''}",
+    "defaultValue" : "support@change.me",
+    "apiId" : "b495ce9a-f750-43c4-95ce-9af750d3c4a8"
+  } ],
+  "id" : "b495ce9a-f750-43c4-95ce-9af750d3c4a8",
+  "path_mappings" : [ ],
+  "proxy" : {
+    "virtual_hosts" : [ {
+      "path" : "/api/achievements"
+    } ],
+    "strip_context_path" : false,
+    "preserve_host" : false,
+    "groups" : [ {
+      "name" : "default-group",
+      "endpoints" : [ {
+        "backup" : false,
+        "inherit" : true,
+        "name" : "default",
+        "weight" : 1,
+        "type" : "http",
+        "target" : "http://player-api:80/achievements"
+      } ],
+      "load_balancing" : {
+        "type" : "ROUND_ROBIN"
+      },
+      "http" : {
+        "connectTimeout" : 5000,
+        "idleTimeout" : 60000,
+        "keepAlive" : true,
+        "readTimeout" : 10000,
+        "pipelining" : false,
+        "maxConcurrentConnections" : 100,
+        "useCompression" : true,
+        "followRedirects" : false
+      }
+    } ]
+  },
+  "response_templates" : { },
+  "primaryOwner" : {
+    "id" : "b912d5cc-aaff-43e5-92d5-ccaaff23e56c",
+    "displayName" : "admin",
+    "type" : "USER"
+  }
+}
