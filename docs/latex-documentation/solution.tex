@@ -15,9 +15,10 @@ Als API Gateway wird Gravitee verwendet.
 Der User-Management-Service ist für das Verwalten von Usern auf der Webseite verantwortlich.
 Hierfür hat der Service seine eigene PostgreSQl-Datenbank.
 Die Player-API stellt eine Schnittstelle zur LoL-Datenbank zur Verfügung.
-Hierüber werden alle Daten zur Verfügung gestellt, die Spielinformationen benötigen.
+Hierüber werden alle Daten zur Verfügung gestellt, wie Rank, Spiele und Challenges.
 Außerdem kommuniziert die Player-API direkt mit dem Games-Importer-Service, um das Importieren von Spielern zu triggern.
-Der Games-Importer-Service schreibt alle Daten in die geteilte LoL-Datenbank, welches ebenfalls eine PostgreSQl-Datenbank ist.
+Der Games-Importer-Service ist für das Importieren von Spielern zuständig und schreibt die Daten in die geteilte
+LoL-Datenbank, welches ebenfalls eine PostgreSQl-Datenbank ist.
 Um an die Daten zu kommen, fragt der Games-Importer-Service die externe Riot API an.
 
 \subsection{Technolgien}
@@ -27,7 +28,7 @@ Dieser Service ist die Verbindung zwischen der Riot API und unserer Anwendung. E
 Der Service ist in Python geschrieben, da hierfür bereits Libraries zur Kommunikation mit der Riot API vorhanden sind (siehe \ref{riot-api-libraries}).\\
 Neben den Riot API Wrappern Cassiopeia und Riot Watcher wird noch das psycopg2 Package verwendet, welches Zugriff auf die PostgreSQL Datenbank bietet. Psycopg2 erlaubt es in Python SQL Statements zu bauen und auszuführen um somit die Daten von der Riot API in der Datenbank zu speichern.\\
 Der Games Importer Service läuft dauerhaft und aktualisiert in 5min Abständen alle in der Datenbank gespeicherten Spieler. \\
-Des weitere läuft in deinem weiteren Thread eine GRPC Connection, welche es erlaubt den Import eines neuen Spieler anzufragen. Dieser wird dann erstmals von der Riot API in die Datenbank importiert und bei den zukünftigen Updates berücksichtigt.
+Des weitere läuft in einem weiteren Thread eine GRPC Connection, welche es erlaubt den Import eines neuen Spieler anzufragen. Dieser wird dann erstmals von der Riot API in die Datenbank importiert und bei den zukünftigen Updates berücksichtigt.
 
 \subsubsection{LoL Database}
 Die PostgreSQL Datenbank läuft in einem eigenen Docker Container. In dieser Datenbank werden alle Spieler bezogenen Daten gespeichert, welche auf der Website angezeigt werden.\\

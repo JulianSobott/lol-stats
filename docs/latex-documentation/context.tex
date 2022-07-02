@@ -25,7 +25,8 @@ Die Riot API ist eine Schnittstelle, mit mehreren Endpoints. Für dieses Projekt
 \item \textbf{Match-V5:} Hier können alle MatchIDs eines Spieler erhalten werden, mit welchen dann wiederum genaue Informationen zu den einzelnen Matches requested werden können
 \item \textbf{Summoner-V4:} Hier können Informationen zu einem Spieler abgefragt werden (wie z.B. SummonerID, Name, Level, ...)
 \end{itemize}
-Alle diese Anfragen können einfach per HTTP an die API geschickt werden. Die API jedoch Antwort dann verschiedene Fehler-Codes liefern:
+Alle diese Anfragen können einfach per HTTP Request an die API geschickt werden.
+Die API kann mit folgenden Fehlercodes antworten:
 \begin{itemize}
 \item \textbf{400 - Bad Request:} Syntax Error im Request
 \item \textbf{401 - Unauthorized:} Es wurde kein API Key im Request angegeben
@@ -40,7 +41,7 @@ Um das Ratelimiting und Error handling zu vereinfachen werden für dieses Projek
 Cassiopeia ist eine Python Library. Die Cassiopeia Library besitzt eingebautes Caching um die Anzahl an nötigen Requests zu reduzieren. Zudem kontrolliert die Library das Ratelimit und falls dieses erreicht wird, werden keine neuen Anfragen gesendet, bis wieder Platz dafür ist. Somit sollte nie ein 429 Error auftreten. Für den Fall, dass ein Error auftritt, welcher durch einen Retry gelöst werden kann (z.B. 500, 503) so wird der Request automatisch erneut gesendet.\\
 Cassiopeia besitzt Klassen für alle Daten, die von der API geliefert werden können. So kann z.B. mittels der Methode \textit{cassiopeia.get\_summoner(region, name)} ein Summoner Objekt erhalten werden, welche dann alle Informationen beinhaltet, die der Summoner-V4 Endpoint für diesen Spieler geliefert hat.\\
 
-Die Cassiopeia Library besitzt momentan einen Bug, welcher es verhindert mehr als 20 MatchIDs pro Spieler vom Match-V5 Endpoint zu erhalten (\href{https://github.com/meraki-analytics/cassiopeia/issues/403}).\\
+Die Cassiopeia Library besitzt momentan einen Bug, welcher es verhindert mehr als 20 MatchIDs pro Spieler vom Match-V5 Endpoint zu erhalten (\href{https://github.com/meraki-analytics/cassiopeia/issues/403}{github Issue}).\\
 Um dieses Problem zu umgehen, wird für den Request der MatchIDs die Riot Watcher Library verwendet.
 
 \subsubsection{Riot Watcher}
