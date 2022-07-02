@@ -1,0 +1,4 @@
+frontend Christian Greiner
+player-api Julian Sobott
+riot-api-connector Tim Staudenmaier
+user-backend Shadrach Arulrajah Patrick
